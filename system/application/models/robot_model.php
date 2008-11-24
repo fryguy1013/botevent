@@ -2,7 +2,7 @@
 
 class Robot_model extends Model
 {
-	function Robot()
+	function Robot_model()
 	{
 		parent::Model();
 		
@@ -12,7 +12,9 @@ class Robot_model extends Model
 	{
 		return $this->db->get('robot', 10)->result();
 	}
-	
-}
 
-?>
+	function get_robot($id)
+	{
+		return $this->db->get_where('robot', array('id'=>$id), 1)->row();
+	}	
+}

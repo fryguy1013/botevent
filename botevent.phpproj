@@ -302,11 +302,15 @@
     {
     "ProjRelPath" = "T"
     }
-    "system\\application\\views\\view_login.php"
+    "system\\application\\views\\view_event.php"
     {
     "ProjRelPath" = "T"
     }
-    "system\\application\\views\\view_openid.php"
+    "system\\application\\views\\view_event_all.php"
+    {
+    "ProjRelPath" = "T"
+    }
+    "system\\application\\views\\view_login.php"
     {
     "ProjRelPath" = "T"
     }

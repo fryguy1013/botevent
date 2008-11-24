@@ -1,1 +1,4 @@
 tmp
+*.puo
+*.suo
+logs

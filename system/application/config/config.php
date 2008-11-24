@@ -1,9 +1,7 @@
 <?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
+define('Auth_OpenID_RAND_SOURCE', null);
 
-$config['enable_query_strings'] = TRUE;
-$config['permitted_uri_chars'] = '';
-define('Auth_Yadis_CURL_OVERRIDE', true);
 
 /*
 |--------------------------------------------------------------------------
@@ -153,7 +151,7 @@ $config['permitted_uri_chars'] = 'a-z 0-9~%.:_\-';
 | use segment based URLs.
 |
 */
-$config['enable_query_strings'] = FALSE;
+$config['enable_query_strings'] = TRUE;
 $config['controller_trigger'] 	= 'c';
 $config['function_trigger'] 	= 'm';
 $config['directory_trigger'] 	= 'd'; // experimental not currently in use

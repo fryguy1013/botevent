@@ -8,7 +8,6 @@ class Login extends Controller {
 		
 		$this->lang->load('openid', 'english');
 		$this->load->library('openid');
-		$this->load->helper('url');
 		//$this->output->enable_profiler(TRUE);
 	}
 	
@@ -18,12 +17,6 @@ class Login extends Controller {
 		if ($this->input->post('action') == 'verify')
 		{
 			$user_id = $this->input->post('openid_identifier');
-			$pape_policy_uris = $this->input->post('policies');
-			
-			if (!$pape_policy_uris)
-			{
-				$pape_policy_uris = array();
-			}
 			
 			$this->config->load('openid');      
 			$req = $this->config->item('openid_required');
@@ -37,18 +30,13 @@ class Login extends Controller {
 			$this->openid->set_sreg(true, $req, $opt, $policy);
 			$this->openid->set_pape(false);
 			$this->openid->authenticate($user_id);
+			exit();
 		}
-		
-		$data['pape_policy_uris'] = array(
-				PAPE_AUTH_MULTI_FACTOR_PHYSICAL,
-				PAPE_AUTH_MULTI_FACTOR,
-				PAPE_AUTH_PHISHING_RESISTANT
-				);
-		
-		$this->load->view('view_login', $data);
-		
+
+		$data = array();
+		$this->load->view('view_login', $data);		
 	}
-	
+
 	// Policy
 	function policy()
 	{
@@ -63,7 +51,8 @@ class Login extends Controller {
 	
 	// Check
 	function check()
-	{    
+	{
+		$data = array();
 		$this->config->load('openid');
 		$request_to = site_url($this->config->item('openid_request_to'));
 		
@@ -116,7 +105,7 @@ class Login extends Controller {
 						$data['success'] .= $this->lang->line('openid_pape_not_affected');
 					}
 					
-					if ($pape_resp->auth_age)
+					if (isset($pape_resp->auth_age) && $pape_resp->auth_age)
 					{
 						$data['success'] .= $this->_set_message('openid_auth_age', $pape_resp->auth_age);
 					}
@@ -132,15 +121,8 @@ class Login extends Controller {
 				}
 				break;
 		}
-		
-		$data['pape_policy_uris'] = array(
-				PAPE_AUTH_MULTI_FACTOR_PHYSICAL,
-				PAPE_AUTH_MULTI_FACTOR,
-				PAPE_AUTH_PHISHING_RESISTANT
-				);
-		
-		$this->load->view('view_openid', $data);   
+				
+		$this->load->view('view_login', $data);   
 	}
-	
 }
-?>
+

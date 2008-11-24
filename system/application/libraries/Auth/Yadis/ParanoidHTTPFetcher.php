@@ -91,6 +91,11 @@ class Auth_Yadis_ParanoidHTTPFetcher extends Auth_Yadis_HTTPFetcher {
 
             $c = curl_init();
 
+			curl_setopt($c, CURLOPT_SSL_VERIFYPEER, 0);
+			//curl_setopt ($curlSession, CURLOPT_CAINFO, "c:\\windows\\system32\\ca-bundle.crt");
+			//curl_setopt ($curlSession, CURLOPT_CAPATH, "c:\\windows\\system32\\ca-bundle.crt");
+			//curl_setopt ($curlSession, CURL_CA_BUNDLE, "c:\\windows\\system32\\ca-bundle.crt"); 
+
             if ($c === false) {
                 Auth_OpenID::log(
                     "curl_init returned false; could not " .
@@ -180,6 +185,7 @@ class Auth_Yadis_ParanoidHTTPFetcher extends Auth_Yadis_HTTPFetcher {
         $this->reset();
 
         $c = curl_init();
+		curl_setopt($c, CURLOPT_SSL_VERIFYPEER, 0);
 
         if (defined('CURLOPT_NOSIGNAL')) {
             curl_setopt($c, CURLOPT_NOSIGNAL, true);

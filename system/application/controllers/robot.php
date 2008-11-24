@@ -7,17 +7,15 @@ class Robot extends Controller
 		parent::Controller();
 
 		$this->load->model('Robot_model');
-		
-		//$this->load->Scaffolding('robot');
 	}
 	
 	
 	function View($id)
 	{
 		$data = array();
-		$data['robots'] = $this->Robot_model->get_robots();
+		$data['robot'] = $this->Robot_model->get_robot($id);
 				
-		$this->load->view('robotview', $data);
+		$this->load->view('view_robot', $data);
 		
 	}
 }

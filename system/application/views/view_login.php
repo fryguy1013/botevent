@@ -1,5 +1,5 @@
 <html>
-  <head><title>PHP OpenID Authentication Example</title></head>
+  <head><title>Login</title></head>
   <style type="text/css">
       * {
         font-family: verdana,sans-serif;
@@ -35,7 +35,7 @@
       }
   </style>
   <body>
-    <h1>PHP OpenID Authentication Example</h1>
+    <h1>Login</h1>
 
     <?php if (isset($msg)) { echo "<div class=\"alert\">$msg</div>"; } ?>
     <?php if (isset($error)) { echo "<div class=\"error\">$error</div>"; } ?>
