@@ -52,6 +52,8 @@ class Login extends Controller {
 	// Check
 	function check()
 	{
+		$this->load->library('session');
+		
 		$data = array();
 		$this->config->load('openid');
 		$request_to = site_url($this->config->item('openid_request_to'));
@@ -69,56 +71,34 @@ class Login extends Controller {
 				break;
 			case Auth_OpenID_SUCCESS:
 				$openid = $response->getDisplayIdentifier();
-				$esc_identity = htmlspecialchars($openid, ENT_QUOTES);
+
+				$sreg_resp = Auth_OpenID_SRegResponse::fromSuccessResponse($response);
+				$sreg = $sreg_resp->contents();				
 				
+				/*
+				$esc_identity = htmlspecialchars($openid, ENT_QUOTES);
 				$data['success'] = $this->_set_message('openid_success', array($esc_identity, $esc_identity), array('%s','%t'));
 				
 				if ($response->endpoint->canonicalID) {
 					$data['success'] .= $this->_set_message('openid_canonical', $response->endpoint->canonicalID);
 				}
-				
-				$sreg_resp = Auth_OpenID_SRegResponse::fromSuccessResponse($response);
-				$sreg = $sreg_resp->contents();
-				
+				*/				
+			
+				/*
 				foreach ($sreg as $key => $value)
 				{
 					$data['success'] .= $this->_set_message('openid_content', array($key, $value), array('%s','%t'));
 				}
+				*/
 				
-				$pape_resp = Auth_OpenID_PAPE_Response::fromSuccessResponse($response);
+				$this->session->set_userdata('userurl', $openid);
 				
-				if ($pape_resp)
-				{
-					if ($pape_resp->auth_policies)
-					{
-						$data['success'] .= $this->lang->line('openid_pape_policies_affected');
-						
-						foreach ($pape_resp->auth_policies as $uri)
-						{
-							$data['success'] .= "<li><tt>$uri</tt></li>";
-						}
-						
-						$data['success'] .= "</ul>";
-					}
-					else
-					{
-						$data['success'] .= $this->lang->line('openid_pape_not_affected');
-					}
-					
-					if (isset($pape_resp->auth_age) && $pape_resp->auth_age)
-					{
-						$data['success'] .= $this->_set_message('openid_auth_age', $pape_resp->auth_age);
-					}
-					
-					if ($pape_resp->nist_auth_level)
-					{
-						$data['success'] .= $this->_set_message('openid_nist_level', $pape_resp->nist_auth_level);
-					}
-				}
-				else
-				{
-					$data['success'] .= $this->lang->line('openid_pape_noresponse');
-				}
+				if (isset($sreg['fullname']))
+					$this->session->set_userdata('openid_fullname', $sreg['fullname']);
+				if (isset($sreg['email']))
+					$this->session->set_userdata('openid_email', $sreg['email']);
+				
+				redirect($this->session->userdata('onloginurl'));
 				break;
 		}
 				

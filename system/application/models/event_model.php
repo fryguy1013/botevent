@@ -16,5 +16,14 @@ class Event_model extends Model
 	function get_event($id)
 	{
 		return $this->db->get_where('event', array('id'=>$id), 1)->row();
+	}
+	
+	function get_event_divisions($id)
+	{
+		return array(
+			'Antweight',
+			'Beetleweight',
+			'Featherweight'
+		);
 	}	
 }

@@ -45,7 +45,7 @@
       <form method="post" action="<?php echo /*site_url('login');*/"/login"; ?>">
         Identity&nbsp;URL:
         <input type="hidden" name="action" value="verify" />
-        <input type="text" id="openid_identifier" name="openid_identifier" value="" />
+        <input type="text" id="openid_identifier" name="openid_identifier" value="" size="40"/>
 
         <input type="submit" value="Verify" />
       </form>

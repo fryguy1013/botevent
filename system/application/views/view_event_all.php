@@ -8,7 +8,7 @@ body
 .event_all_list
 {
 	width: 85%;
-	border: 1px solid #000;
+	/*border: 1px solid #000;*/
 	clear: both;
 }
 
@@ -58,7 +58,7 @@ body
 
 <div class="event_all_event">
 	<div class="event_all_image_container">
-		<img class="event_all_image" src="<?=$event->smallimage?>" alt="<?=$event->name?> logo" />
+		<img class="event_all_image" width="100" src="<?=$event->smallimage?>" alt="<?=$event->name?> logo" />
 		<div class="event_all_robots_registered"><? /*=$event->registeredrobots */?> registered</div>
 	</div>
 	<div class="event_all_details_container">
