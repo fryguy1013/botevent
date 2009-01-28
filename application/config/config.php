@@ -14,7 +14,7 @@ define('Auth_OpenID_RAND_SOURCE', null);
 |	http://example.com/
 |
 */
-$config['base_url']	= "http://ponza.homeip.net/";
+$config['base_url']	= "http://fryguy.selfip.net/";
 
 /*
 |--------------------------------------------------------------------------

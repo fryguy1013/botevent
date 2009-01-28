@@ -31,17 +31,18 @@ class Event_model extends Model
 	
 	function get_event_divisions($id)
 	{
-		$this->db->select('divisions.id as id, divisions.name as name, event, division, description, ruleurl, maxentries');
-		$this->db->from('event_divisions');
-		$this->db->join('divisions', 'divisions.id = event_divisions.division');
-		$this->db->where('event', $id);
-		return $this->db->get()->result();
+		return $this->db
+			->select('divisions.id as id, divisions.name as name, event, division, description, ruleurl, maxentries')
+			->from('event_divisions')
+			->join('divisions', 'divisions.id = event_divisions.division')
+			->where('event', $id)
+			->get()->result();
 	}
 	
 	function get_event_divisions_with_counts($event)
 	{
 		return $this->db
-			->select('event_divisions.id as id, divisions.name as name, event, division, description, ruleurl, maxentries')
+			->select('event_divisions.id as id, divisions.name as name, event, division, description, ruleurl, maxentries, price')
 			->select('COALESCE(event_division_entries.ct, 0) as ct', FALSE)
 			->from('event_divisions')
 			->join('divisions', 'divisions.id = event_divisions.division')
@@ -64,14 +65,56 @@ class Event_model extends Model
 	
 	function get_event_entries($id, $division)
 	{
-		$this->db
+		return $this->db
 			->select('entry.id, entry.name, entry.description, entry.thumbnail, team.name as teamname, team.id as teamid, event_registrations.status')
 			->from('entry')
 			->join('event_entries', 'event_entries.entry = entry.id')
 			->join('event_registrations', 'event_entries.event_registration = event_registrations.id')
 			->join('team', 'team.id = entry.team')
-			->where('event_entries.event_division', $division);
-		return $this->db->get()->result();
+			->where('event_entries.event_division', $division)
+			->get()->result();
+	}
+	
+	function get_event_entries_grouped($id)
+	{
+		$entries = $this->db
+			->select('entry.id, entry.name, entry.description, entry.thumbnail, event_registration, divisions.name as divisionname')
+			->from('entry')
+			->join('event_entries', 'event_entries.entry = entry.id')
+			->join('event_registrations', 'event_entries.event_registration = event_registrations.id')
+			->join('event_divisions', 'event_divisions.id = event_entries.event_division')
+			->join('divisions', 'divisions.id = event_divisions.division')
+			->where('event_registrations.event', $id)
+			->get()->result();
+		
+		$ret = array();
+		foreach ($entries as $entry)
+		{
+			if (!isset($ret[$entry->event_registration]))
+				$ret[$entry->event_registration] = array();
+			$ret[$entry->event_registration][] = $entry;
+		}
+		return $ret;
+	}
+
+	function get_event_people_grouped($id)
+	{
+		$entries = $this->db
+			->select('person.id, person.fullname, person.picture_url, event_registration')
+			->from('person')
+			->join('event_people', 'event_people.person = person.id')
+			->join('event_registrations', 'event_people.event_registration = event_registrations.id')
+			->where('event_registrations.event', $id)
+			->get()->result();
+		
+		$ret = array();
+		foreach ($entries as $entry)
+		{
+			if (!isset($ret[$entry->event_registration]))
+				$ret[$entry->event_registration] = array();
+			$ret[$entry->event_registration][] = $entry;
+		}
+		return $ret;
 	}
 	
 	function get_event_divisions_as_id_desc($id)
@@ -93,6 +136,17 @@ class Event_model extends Model
 			->where('event_divisions.id', $id)
 			->get()->row();
 	}
+
+	function get_event_registrations($id)
+	{
+		return $this->db
+			->select('event_registrations.id, event_registrations.team, event_registrations.status, team.name as teamname, team.id as teamid')
+			->from('event_registrations')
+			->join('team', 'team.id = event_registrations.team')
+			->where('event', $id)
+			->get()->result();
+	}
+
 
 
 	function create_registration($event_id, $team_id, $registration_people, $registration_entries)
@@ -137,6 +191,17 @@ class Event_model extends Model
 		);
 		$this->db->insert('event_entries', $data);
 		return $this->db->insert_id();
+	}
+	
+	function update_reg_status($registration_id, $status)
+	{
+		$data = array(
+			'status' => $status
+		);
+		
+		$this->db
+			->where('id', $registration_id)
+			->update('event_registrations', $data);
 	}
 	
 }

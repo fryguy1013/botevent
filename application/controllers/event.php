@@ -224,6 +224,28 @@ class Event extends Controller
 		}		
 	}
 	
+	function Manage($id)
+	{
+		$data = array();
+		$data['event'] = $this->Event_model->get_event($id);
+		$data['event_registrations'] = $this->Event_model->get_event_registrations($id);
+		$data['event_entries'] = $this->Event_model->get_event_entries_grouped($id);
+		$data['event_people'] = $this->Event_model->get_event_people_grouped($id);
+
+		$this->load->view('view_header');		
+		$this->load->view('view_event_header', $data);
+		$this->load->view('view_event_manage', $data);
+		$this->load->view('view_footer');
+	}
+	
+	function Updatestatus($regid)
+	{
+		$status = $this->input->post('status');
+		$this->Event_model->update_reg_status($regid, $status);
+		
+		$this->output->set_output($status);
+	}
+	
 	
 	function valid_email_or_blank($str)
 	{

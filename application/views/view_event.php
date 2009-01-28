@@ -21,7 +21,7 @@
 	margin-right: auto;	
 	padding: .5em;
 	border: 1px solid black;
-	width: 30em;
+	width: 39em;
 	background: #eee;
 }
 
@@ -32,13 +32,21 @@
 	margin-bottom: .125em;
 }
 
-.event_division_name
+.event_division_name a
 {
 	width: 15em;
 	color: LimeGreen;
 	float: left;
-	clear: both;
 	font-weight: bold;
+	text-decoration: none;
+}
+
+.event_division_count
+{
+}
+
+.event_division_price
+{
 }
 
 .event_description
@@ -54,16 +62,16 @@
 		<a href="<?=site_url(array('event', 'register', $event->id))?>">Register</a>
 	</div>
 	
-	<div class="event_divisions">
+	<table class="event_divisions">
 	<? foreach ($event_divisions as $division): ?>
-		<div class="event_division">
-			<a href="<?=site_url(array('event', 'entries', $event->id, $division->id))?>">
-			<div class="event_division_name"><?=$division->name?></div>
-			<div class="event_division_count"><?=$division->ct?> entries<? if ($division->maxentries != 0) echo " ($division->maxentries max)"; ?></div>
-			</a>
-		</div>
+	
+		<tr class="event_division">			
+			<td class="event_division_name"><a href="<?=site_url(array('event', 'entries', $event->id, $division->id))?>"><?=$division->name?></a></td>
+			<td class="event_division_count"><?=$division->ct?> entries<? if ($division->maxentries != 0) echo " ($division->maxentries max)"; ?></td>
+			<td class="event_division_price">$<?=sprintf("%.2f",$division->price)?></td>
+		</tr>
 	<? endforeach; ?>
-	</div>
+	</table>
 
 	<div class="event_description">
 		<?=$event->description?>

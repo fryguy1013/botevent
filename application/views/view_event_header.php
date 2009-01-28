@@ -25,6 +25,7 @@ img
 .event_minor_details a
 {
 	color: #000;
+	text-decoration: none;
 }
 
 .event_title
@@ -46,9 +47,8 @@ img
 	<a href="<?=site_url(array('event', 'view', $event->id))?>">
 		<img class="event_image" src="<?=$event->image?>" alt="<?=$event->name?> logo" />
 	</a>
-	<div class="event_minor_details">
-		<a href="<?=site_url(array('event', 'view', $event->id))?>">
-		<div class="event_title"><?=$event->name?></div>
+	<div class="event_minor_details">		
+		<div class="event_title"><a href="<?=site_url(array('event', 'view', $event->id))?>"><?=$event->name?></a></div>
 		<div class="event_location"><span>Location: </span><?=$event->location?></div>
 		<div class="event_date"><span>Date: </span><?
 			if ($event->startdate != $event->enddate)
@@ -65,6 +65,5 @@ img
 			echo "Ends in ".timeuntil($duration)." (".date("M j, Y", strtotime($event->registrationends)).")";
 		?>
 		</div>
-		</a>
 	</div>
 </div>

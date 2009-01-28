@@ -210,8 +210,8 @@ function upload_picture_with_div(id)
 	</div>
 	
 	<script type="text/javascript">
-	$(document).ready(upload_picture_with_div(<?=$id?>));
-	</script>	
+	$(document).ready(upload_picture_with_div('<?=$id?>'));
+	</script>
 <? endforeach; ?>
 </div>
 
