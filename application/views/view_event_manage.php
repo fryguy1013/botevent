@@ -47,7 +47,6 @@
 
 .event_reg_status
 {
-	float: right;
 	margin: 1em;
 }
 
@@ -56,21 +55,25 @@
 	padding: 1em;
 }
 
+.event_reg_message
+{
+}
+
 </style>
 
 <script type="text/javascript">
 $(document).ready(function() {
-	$('div.event_reg_message').css('visibility', 'hidden');
+	$('div.event_reg_message').hide();
 	$('div.event_reg_status').find('input[type=submit]').attr('disabled', 'disabled');
 
 	$('select[name=change_status]').change(function() {	
 		$(this).siblings('input[type=submit]').attr('disabled', '');
-		$(this).parents('div.event_reg_status').find('div.event_reg_message').css('visibility', '');
+		$(this).parents('div.event_reg_status').find('div.event_reg_message').show();
 		//alert($(this).children('[selected]').text());
 	});
 	
 	$('form').submit(function() {
-		$(this).find('div.event_reg_message').css('visibility', 'hidden');
+		$(this).find('div.event_reg_message').hide();
 		var t = $(this).find('input[type=submit]');
 		$.post($(this).attr('action'), {
 			status: $(this).find('select[name=change_status]').children('[selected]').text()
@@ -100,6 +103,8 @@ $(document).ready(function() {
 	</div>
 
 	<div class="event_reg_fulldetails">
+		<div class="event_registration_team_name"><?=$reg->teamname?></div>
+
 
 		<div class="event_reg_status">
 			<?=form_open("event/updatestatus/".$reg->id)?>
@@ -113,15 +118,13 @@ $(document).ready(function() {
 				<div><?=form_textarea(array('name'=>'change_email', 'value'=>'', 'rows'=>4, 'cols'=>35))?></div>
 			</div>			
 			<?=form_close()?>
-		</div>
-		
-		<div class="event_registration_team_name"><?=$reg->teamname?></div>
+		</div>	
 	
 		<? foreach ($event_people[$reg->id] as $person): ?> 
 			<div class="event_person">
 				<a href="<?=site_url(array('person', $person->id))?>">
 				<div class="event_person_thumbnail">
-					<?=img(!empty($person->thumbnail)?$person->thumbnail:'/images/nopicture.png')?>
+					<?=img(!empty($person->thumbnail_url)?$person->thumbnail_url:'/images/nopicture.png')?>
 				</div>
 				<div class="event_person_name"><?=$person->fullname?></div>
 				</a>
@@ -132,7 +135,7 @@ $(document).ready(function() {
 			<div class="event_entry">
 				<a href="<?=site_url(array('entry', $entry->id))?>">
 				<div class="event_entry_thumbnail">
-					<?=img(!empty($entry->thumbnail)?$entry->thumbnail:'/images/nopicture-entry.png')?>
+					<?=img(!empty($entry->thumbnail_url)?$entry->thumbnail_url:'/images/nopicture-entry.png')?>
 				</div>
 				<div class="event_entry_name"><?=$entry->name?></div>
 				<div class="event_entry_division"><?=$entry->divisionname?></div>

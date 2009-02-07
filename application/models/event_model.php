@@ -49,24 +49,12 @@ class Event_model extends Model
 			->join('event_division_entries', 'event_division_entries.event_division = event_divisions.id', 'left')
 			->where('event_divisions.event', $event)
 			->get()->result();
-		
-	//COALESCE(
-		/*
-		$this->db->select('count(event_entries.id) as ct', FALSE);
-		$this->db->select('event_divisions.id as id, divisions.name as name, event_divisions.event, event_divisions.description, event_divisions.ruleurl, event_divisions.maxentries');
-		$this->db->from('event_entries');
-		$this->db->join('event_divisions', 'event_divisions.id = event_entries.event_division');
-		$this->db->join('divisions', 'divisions.id = event_divisions.division');
-		$this->db->where('event_divisions.event', $event);
-		$this->db->group_by('event_entries.event_division');
-		return $this->db->get()->result();
-		*/
 	}
 	
 	function get_event_entries($id, $division)
 	{
 		return $this->db
-			->select('entry.id, entry.name, entry.description, entry.thumbnail, team.name as teamname, team.id as teamid, event_registrations.status')
+			->select('entry.id, entry.name, entry.description, entry.thumbnail_url, team.name as teamname, team.id as teamid, event_registrations.status')
 			->from('entry')
 			->join('event_entries', 'event_entries.entry = entry.id')
 			->join('event_registrations', 'event_entries.event_registration = event_registrations.id')
@@ -78,7 +66,7 @@ class Event_model extends Model
 	function get_event_entries_grouped($id)
 	{
 		$entries = $this->db
-			->select('entry.id, entry.name, entry.description, entry.thumbnail, event_registration, divisions.name as divisionname')
+			->select('entry.id, entry.name, entry.description, entry.thumbnail_url, event_registration, divisions.name as divisionname')
 			->from('entry')
 			->join('event_entries', 'event_entries.entry = entry.id')
 			->join('event_registrations', 'event_entries.event_registration = event_registrations.id')
@@ -115,6 +103,48 @@ class Event_model extends Model
 			$ret[$entry->event_registration][] = $entry;
 		}
 		return $ret;
+	}
+	
+	function get_event_registration_by_team($teamid)
+	{
+		return $this->db
+			->select('event_registrations.id, event_registrations.team, event_registrations.status, team.name as teamname, team.id as teamid, event_registrations.event as event')
+			->from('event_registrations')
+			->join('team', 'team.id = event_registrations.team')
+			->where('event_registrations.team', $teamid)
+			->get()->row();
+	}
+	
+	function get_event_registration($id)
+	{
+		return $this->db
+			->select('event_registrations.id, event_registrations.team, event_registrations.status, team.name as teamname, team.id as teamid, event_registrations.event as event')
+			->from('event_registrations')
+			->join('team', 'team.id = event_registrations.team')
+			->where('event_registrations.id', $id)
+			->get()->row();
+	}	
+
+	function get_registration_entries($id)
+	{
+		return $this->db
+			->select('entry.id, entry.name, entry.description, entry.thumbnail_url, event_registration, divisions.name as divisionname')
+			->from('entry')
+			->join('event_entries', 'event_entries.entry = entry.id')
+			->join('event_registrations', 'event_entries.event_registration = event_registrations.id')
+			->join('event_divisions', 'event_divisions.id = event_entries.event_division')
+			->join('divisions', 'divisions.id = event_divisions.division')
+			->where('event_registrations.id', $id)
+			->get()->result();
+	}	
+	function get_registration_people($id)
+	{
+		return $this->db
+			->select('person.id, person.fullname, person.picture_url, event_registration, person.thumbnail_url')
+			->from('person')
+			->join('event_people', 'event_people.person = person.id')
+			->where('event_registration', $id)
+			->get()->result();	
 	}
 	
 	function get_event_divisions_as_id_desc($id)
@@ -158,6 +188,8 @@ class Event_model extends Model
 
 		foreach ($registration_entries as $entry)
 			$this->add_entry_to_registration($registration_id, $entry['id'], $entry['division']);
+			
+		return $registration_id;
 	}
 	
 	function add_new_registration($event_id, $team_id)

@@ -4,238 +4,200 @@
 ?>
 
 <style type="text/css">
-
-h5
-{
-	margin-top: 1.5em;
-	font-size: 11pt;
-	margin-bottom: 0px;
-}
-
-.event_register_block
-{
-	width: 400px; 
-	border: 1px solid #000;
-	background: #eee;
-	padding: 1em;
-	margin-right: 2em;
-	margin-bottom: 1em;
-	-moz-border-radius: 20px;
-	border-radius: 20px;
-	float: left;
-}
-
-.event_register_heading
-{
-	font-weight: bold;
-}
-
-.event_register_team_website
-{
-  margin-top: .5em;
-}
-
-.event_register_email
-{
-  margin-top: .5em;
-}
-
-.event_register_adult
-{
-	float: left;
+.error {
 	margin-top: .5em;
+	padding-left: .5em;
+	border: 1px solid #ff0000;
+	background: #ffaaaa;
 }
 
-.event_register_picture_frame
+.event_entry
 {
-	float: right;
-	margin-right: 10px;
+	width: 125px;
+	border: 1px solid #000;
+	background: #ccc;
+	float: left;
+	margin: .5em;
+	padding: .5em;
+	text-align: center;
+	overflow: hidden;
+}
+
+
+.event_entry_thumbnail img
+{
+	width: 125px;
+}
+
+.event_person
+{
+	width: 100px;
+	border: 1px solid #000;
+	background: #ccc;
+	float: left;
+	margin: .5em;
+	padding: .5em;
 	text-align: center;
 }
 
-.event_register_picture
+.event_person_thumbnail img
 {
-	width: <?=$thumbnail_width?>px;
-	height: <?=$thumbnail_height?>px;
-	margin: 0px;
+	width: 100px;
 }
 
-.event_register_image_frame
-{
-  overflow: hidden;
-  margin-left: 5px;
-  width: <?=$thumbnail_width?>px;
-  height: <?=$thumbnail_height?>px;
-}
-
-.event_register_picture_upload
+.event_register_add_person_frame, .event_register_add_entry_frame
 {
 	margin-top: 1em;
+	margin-left: .5em;
+	border: 1px solid #000;
+	padding-left: 1em;
+	padding-right: 1em;
+	width: 35em;
+	background: #eee;
+}
+
+.badge_photo_guidelines
+{
+	font-size: .8em;
+}
+
+#add_member, #add_entry
+{
 	display: none;
-}
-
-.event_register_entry_division
-{
-	margin-top: .5em;
-}
-
-#event_register_entries
-{
-  clear: both;
-}
-
-.event_register_entry_block
-{
-  width: 248px;
 }
 
 </style>
 
-<?=form_open_multipart("event/register/".$event->id)?>
-
-<?=validation_errors()?>
-
-<h5>Enter information about your team:</h5>
-<div class="event_register_block">
-	<div class="event_register_team_name">
-		<div class="event_register_heading">Team Name:</div>
-		<?=form_input("team[name]", $team['name'])?>		
-	</div>
-
-	<div class="event_register_team_website">
-		<div class="event_register_heading">Website:</div>
-		<?=form_input("team[website]", $team['website'], 'size="35"')?>
-	</div>
-
-</div>
+<script src="/js/jquery.ajax_upload.1.0.min.js" type="text/javascript"></script>
 
 <script type="text/javascript">
-function upload_picture_with_div(id)
-{
-	return function() {
 
-	$.ajax_upload('#upload_picture_' + id, {	  
-		action: '<?=site_url('/event/uploadpicture')?>',
-		name: 'photo',
-		data: { },
-		onSubmit: function(file, extension)
-		{
-		},
-		onComplete: function(file, response)
-		{
-		},
-		onSuccess: function(file, response)
-		{
-			response = response.substring(9);
-
-			$('#upload_picture_' + id + '_picture').attr('src', response); 
-			
-			jQuery.facebox(
-				'<div>' +
-				'	Please select the area of your face, only' +
-				'</div>' +
-				'<div style="text-align: center;">' +
-				'	<img src="' + response + '" id="photo_crop_' + id + '" style="max-width: 450px;"/>' +
-				'</div>');
-			
-			$('#photo_crop_' + id).Jcrop({
-				aspectRatio: .80,
-				boxWidth: 450,
-				onChange: function(c)
-				{
-					$('#person\\[' + id + '\\]\\[picturecropx\\]').val(c.x);
-					$('#person\\[' + id + '\\]\\[picturecropy\\]').val(c.y);
-					$('#person\\[' + id + '\\]\\[picturecropwidth\\]').val(c.w);
-					$('#person\\[' + id + '\\]\\[picturecropheight\\]').val(c.h);
-					
-					var rx = <?=$thumbnail_width?> / c.w;
-					var ry = <?=$thumbnail_height?> / c.h;					
-					$('#upload_picture_' + id + '_picture').css({
-						width: Math.round(rx * $('#photo_crop_' + id).attr('width')) + 'px',
-						height: Math.round(ry * $('#photo_crop_' + id).attr('height')) + 'px',
-						marginLeft: '-' + Math.round(rx * c.x) + 'px',
-						marginTop: '-' + Math.round(ry * c.y) + 'px'
-					});
-				}
-			});
-			
-			$('#person\\[' + id + '\\]\\[picturepath\\]').val(response);
-			
-		},
-		onError: function(file, response)
-		{
-			jQuery.facebox('Error occurred uploading picture: ' + response);
-		}
-	});
-
-	};
+function update_member_checked() {
+	$(this).parent().css('background', this.checked ? '#aaf' : '');
 }
+function toggle_add_member_frame() {
+	$('p#add_member').toggle();
+	$('div.event_register_add_person_frame').toggle();
+	return false;
+}
+function toggle_add_entry_frame() {
+	$('p#add_entry').toggle();
+	$('div.event_register_add_entry_frame').toggle();
+	return false;
+}
+
+$(document).ready(function() {
+	$('div.event_person > input[type=checkbox]')
+		.change(update_member_checked)
+		.each(update_member_checked);
+		
+	$('div.event_entry > input[type=checkbox]')
+		.change(update_member_checked)
+		.each(update_member_checked);		
+	
+	$('p#add_member > a').click(toggle_add_member_frame);
+	$('div.event_register_add_person_frame').find('input[type=reset]').click(toggle_add_member_frame);
+	
+	<? if (empty($show_add_member)): ?>
+	toggle_add_member_frame();
+	<? endif; ?>
+
+	$('p#add_entry > a').click(toggle_add_entry_frame);
+	$('div.event_register_add_entry_frame').find('input[type=reset]').click(toggle_add_entry_frame);
+	
+	<? if (empty($show_add_entry)): ?>
+	toggle_add_entry_frame();
+	<? endif; ?>
+
+});
 </script>
 
+<?=form_open_multipart("event/register/".$event->id)?>
+
+<h2>Select which people are going to attend</h2>
 <div id="event_register_competitors">
-<? foreach ($person as $id=>$p): ?>
-	<? if (!empty($p['heading'])): ?>
-		<h5 style="clear: both;"><?=$p['heading']?></h5>
-	<? endif; ?>
-	<input type="hidden" name="person[<?=$id?>][picturepath]" id="person[<?=$id?>][picturepath]" value="<?=$p['picturepath']?>" />
-	<input type="hidden" name="person[<?=$id?>][picturecropx]" id="person[<?=$id?>][picturecropx]" value="<?=$p['picturecropx']?>" />
-	<input type="hidden" name="person[<?=$id?>][picturecropy]" id="person[<?=$id?>][picturecropy]" value="<?=$p['picturecropy']?>" />
-	<input type="hidden" name="person[<?=$id?>][picturecropwidth]" id="person[<?=$id?>][picturecropwidth]" value="<?=$p['picturecropwidth']?>" />
-	<input type="hidden" name="person[<?=$id?>][picturecropheight]" id="person[<?=$id?>][picturecropheight]" value="<?=$p['picturecropheight']?>" />
-
-	<div class="event_register_block">	
-		<div class="event_register_picture_frame">
-			<div id="upload_picture_<?=$id?>">
-				<div class="event_register_image_frame">
-					<img id="upload_picture_<?=$id?>_picture" src="<?=$p['picture']?>" class="event_register_picture" />
-				</div>
-				<div>Upload</div>
-			</div>
+<? foreach ($team_members as $person): ?>
+	<div class="event_person">		
+		<?=form_checkbox('person[]', $person->id, $form_person)?>
+		<div class="event_person_thumbnail">
+			<?=img(!empty($person->thumbnail_url)?$person->thumbnail_url:'/images/nopicture.png')?>
 		</div>
-		<div class="event_register_name">
-			<div class="event_register_heading">Full Name:</div>
-			<?=form_input("person[${id}][fullname]", $p['fullname'])?>
-		</div>
-		<div class="event_register_email">
-			<div class="event_register_heading">Email:</div>
-			<?=form_input("person[${id}][email]", $p['email'], 'size="35"')?>
-		</div>	
-		<div class="event_register_adult">
-			<label>
-				<?=form_checkbox("person[${id}][adult]", 'is_adult', $p['adult'])?>
-				<span>Is at least 18 years of age</span>
-			</label>
-		</div>
-		<div style="clear: both;"></div>
+		<div class="event_person_name"><?=$person->fullname?></div>
+		<div><a href="#">Edit</a></div>
 	</div>
-	
-	<script type="text/javascript">
-	$(document).ready(upload_picture_with_div('<?=$id?>'));
-	</script>
 <? endforeach; ?>
+	<div style="clear: both;" />
+</div>
+<p id="add_member"><a href="#">Add a person to your team</a></p>
+
+<div class="event_register_add_person_frame">
+	<? if (!empty($add_member_errors)): ?><div class="error"><?=$add_member_errors?></div><? endif; ?>
+
+	<h3>Add Person to Team</h3>
+	<p>
+		<div>Full Name:</div>
+		<input name="fullname" type="text" value="<?=set_value('fullname', '')?>" size="25" />
+	</p>
+	
+	<p>
+		<div>Email Address:</div>
+		<?=form_input("email_addr", set_value('email_addr', ''), 'size="40"')?>
+	</p>
+	
+	<p>
+		<div>Badge Photo Picture:</div>
+		<?=form_upload('badge_photo')?>
+		<div class="badge_photo_guidelines">Note: Follow the
+		<a href="http://robogames.net/badges.php" target="_blank">badge photo guidelines</a>
+		to ensure your registration will be accepted.</div>
+	</p>
+	
+	<p>
+		<?=form_submit('submit', 'Add Member')?>
+		<?=form_reset('submit', 'Cancel')?>
+	</p>
 </div>
 
-
+<h2>Select the entries that will be present</h2>
 <div id="event_register_entries">
-	<h5>Please enter information about the entries.</h5>
-	<? foreach ($entries as $i=>$entry): ?>
-	<div class="event_register_block event_register_entry_block">
-		<div class="event_register_entry_name">
-			<div class="event_register_heading">Entry Name:</div>
-			<?=form_input("entry[${i}][name]", $entry['name'])?>
-		</div>
-		<div class="event_register_entry_division">
-			<div class="event_register_heading">Division:</div>
-			<?=form_dropdown("entry[${i}][division]", $event_divisions, $entry['division'])?>
-		</div>
+<? foreach ($team_entries as $entry): ?> 
+	<div class="event_entry">
+		<?=form_checkbox('entry[]', $entry->id, $form_entry)?>
+		<div><?=form_dropdown("entry_division[$entry->id]", $event_divisions)?></div>
 		
-		<div style="clear: both;"></div>
+		<div class="event_entry_thumbnail">
+			<?=img(!empty($entry->thumbnail_url)?$entry->thumbnail_url:'/images/nopicture-entry.png')?>
+		</div>
+		<div class="event_entry_name"><?=$entry->name?></div>
 	</div>
-	<? endforeach; ?>
+<? endforeach; ?>
+<? if (count($team_entries) == 0): ?>
+	<div class="error">There are no entries. Add one first</div>
+<? endif; ?>
+	<div style="clear: both;"></div>
 </div>
 
-<div style="clear: both;"></div>
+<p id="add_entry"><a href="#">Add an entry to your team</a></p>
+<div class="event_register_add_entry_frame">
+	<? if (!empty($add_member_errors)): ?><div class="error"><?=$add_member_errors?></div><? endif; ?>
 
-<?=form_submit('submit', 'Register')?>
+	<h3>Add Entry to Team</h3>
+	<p>
+		<div>Name:</div>
+		<input name="entry_name" type="text" value="<?=set_value('entry_name', '')?>" size="25" />
+	</p>
+	
+	<p>
+		<div>Picture: (optional)</div>
+		<?=form_upload('entry_photo')?>
+	</p>
+	
+	<p>
+		<?=form_submit('submit', 'Add Entry')?>
+		<?=form_reset('submit', 'Cancel')?>
+	</p>
+</div>
+
+<p id="register_button_frame"><?=form_submit('submit', 'Register')?></p>
 
 <?=form_close()?>

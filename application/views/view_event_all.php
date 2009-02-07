@@ -1,19 +1,8 @@
 <style type="text/css">
 
-body
-{
-	font: normal 9pt arial, helvetica, sans-serif;
-	color: #000;
-}
-
-a
-{
-	color: #000;
-}
-
 .event_all_list
 {
-	width: 85%;
+	/*width: 85%;*/
 	/*border: 1px solid #000;*/
 	clear: both;
 }

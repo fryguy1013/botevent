@@ -6,14 +6,19 @@ class Login extends Controller {
 	{
 		parent::Controller();
 		
+		$this->load->library(array('openid', 'session', 'form_validation'));
 		$this->lang->load('openid', 'english');
-		$this->load->library('openid');
+		$this->load->model('Person_model');
+		$this->config->load('openid');
+		
 		//$this->output->enable_profiler(TRUE);
 	}
 	
 	// Index
 	function index()
 	{
+		$data = array();
+	
 		if ($this->input->post('action') == 'verify')
 		{
 			$user_id = $this->input->post('openid_identifier');
@@ -32,10 +37,143 @@ class Login extends Controller {
 			$this->openid->authenticate($user_id);
 			exit();
 		}
+		
+		if ($this->input->post('action') == 'email_password')
+		{
+			$data['show_email_only'] = TRUE;
+		
+			$this->form_validation->set_rules('email_addr', 'Email Address', 'trim|required|valid_email');
+			$this->form_validation->set_rules('login_type', 'Login Type', 'trim|required');
+				
+			if ($this->form_validation->run() != FALSE)
+			{
+				$person = $this->Person_model->get_person_by_email($this->input->post('email_addr'));
+				if ($this->input->post('login_type') == 'new_member')
+				{
+					if (count($person) == 0)
+					{
+						$this->session->set_userdata('openid_email', $this->input->post('email_addr'));
+						redirect('login/register');
+						return;
+					}
+					else
+					{
+						$data['error'] = "That email address is already in use. Did you mean to login instead?";
+					}
+				}
+				else
+				{
+					if (count($person) == 0)
+					{
+						$data['error'] = "That email address does not exist. Did you mean to create a new account?";
+					}
+					else
+					{
+						// TODO: password checking here
+						print_r($person);
+						exit();
+					}
+				}
+				
+			}
+			else
+			{
+				$data['error'] = validation_errors();
+			}
+		}
 
-		$data = array();
 		$this->load->view('view_header', $data);				
 		$this->load->view('view_login', $data);   
+		$this->load->view('view_footer', $data);		
+	}
+	
+	function logout()
+	{
+		$this->session->sess_destroy();
+		redirect('login');
+	}
+	
+	function register()
+	{
+		$data = array();
+		$this->load->model('Team_model');
+		
+		$data['email_addr'] = $this->session->userdata('openid_email');
+		$data['userurl'] = $this->session->userdata('userurl');
+		$data['openid_fullname'] = $this->session->userdata('openid_fullname');
+		$data['openid_email'] = $this->session->userdata('openid_email');
+		
+		if (empty($data['email_addr']) && empty($data['userurl']))
+		{
+			redirect('login');
+			exit();
+		}
+		
+		if ($this->input->post('action') == 'register')
+		{
+			$this->form_validation->set_rules('team_name', 'Team Name', 'trim|required');
+			$this->form_validation->set_rules('team_website', 'Web Site', 'trim');
+			$this->form_validation->set_rules('is_adult', 'Is Adult', 'trim');
+			$personid = 0;
+		
+			if (empty($data['userurl']))
+			{
+				$this->form_validation->set_rules('fullname', 'Full Name', 'trim|required');
+				$this->form_validation->set_rules('password1', 'Password', 'trim|required|matches[password2]');
+				$this->form_validation->set_rules('password2', 'Password Confirmation', 'trim|required');
+					
+				if ($this->form_validation->run() != FALSE)
+				{		
+					$personid = $this->Person_model->add_person(
+						$this->input->post('fullname'),
+						$this->session->userdata('openid_email'),
+						'',
+						"mailto:".$this->session->userdata('openid_email'),
+						$this->input->post('password1'));
+				}
+				else
+				{
+					$data['error'] = validation_errors();
+				}
+			}
+			else
+			{
+				$this->form_validation->set_rules('fullname', 'Full Name', 'trim|required');
+				$this->form_validation->set_rules('email_addr', 'Email Address', 'trim|required|valid_email');
+					
+				if ($this->form_validation->run() != FALSE)
+				{		
+					$personid = $this->Person_model->add_person(
+						$this->input->post('fullname'),
+						$this->input->post('email_addr'),
+						'',
+						$this->session->userdata('userurl'),
+						'');
+				}
+				else
+				{
+					$data['error'] = validation_errors();
+				}
+			}
+			
+			if ($personid != 0)
+			{
+				$teamid = $this->Team_model->add_team(
+					$this->input->post('team_name'),
+					$this->input->post('team_website'));
+					
+				$this->Team_model->add_team_member($teamid, $personid);
+				
+				$this->session->set_userdata('userid', $personid);
+				$this->session->set_userdata('fullname', $this->input->post('fullname'));				
+				$this->session->set_flashdata('teamid', $teamid);
+				redirect($this->session->userdata('onloginurl'));
+			}
+		}
+			
+		
+		$this->load->view('view_header', $data);				
+		$this->load->view('view_register', $data);   
 		$this->load->view('view_footer', $data);		
 	}
 
@@ -54,15 +192,12 @@ class Login extends Controller {
 	// Check
 	function check()
 	{
-		$this->load->library('session');
-		
 		$data = array();
-		$this->config->load('openid');
 		$request_to = site_url($this->config->item('openid_request_to'));
 		
 		$this->openid->set_request_to($request_to);
 		$response = $this->openid->getResponse();
-		
+				
 		switch ($response->status)
 		{
 			case Auth_OpenID_CANCEL:
@@ -93,14 +228,31 @@ class Login extends Controller {
 				}
 				*/
 				
-				$this->session->set_userdata('userurl', $openid);
+				$person = $this->Person_model->get_person_by_url($openid);
 				
-				if (isset($sreg['fullname']))
-					$this->session->set_userdata('openid_fullname', $sreg['fullname']);
-				if (isset($sreg['email']))
-					$this->session->set_userdata('openid_email', $sreg['email']);
+				if (count($person) > 0)
+				{
+					// they have logged into an account, so set the session var 
+					$this->session->set_userdata('userid', $person->id);
+					$this->session->set_userdata('fullname', $person->fullname);
+					
+					redirect($this->session->userdata('onloginurl'));
+					return;
+				}
+				else
+				{
+					// there isn't an account, so make them register first
+					$this->session->set_userdata('userurl', $openid);
 				
-				redirect($this->session->userdata('onloginurl'));
+					if (isset($sreg['fullname']))
+						$this->session->set_userdata('openid_fullname', $sreg['fullname']);
+					if (isset($sreg['email']))
+						$this->session->set_userdata('openid_email', $sreg['email']);
+					
+					$this->output->set_output("invalid user: $openid");
+					redirect('login/register');
+					return;
+				}
 				break;
 		}
 

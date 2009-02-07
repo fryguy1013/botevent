@@ -18,6 +18,37 @@ class Team_model extends Model
 		return $this->db->get_where('team', array('id'=>$id), 1)->row();
 	}
 	
+	function get_teams_for_person($personid)
+	{
+		return $this->db
+			->select('team.id, name, url')
+			->from('team')
+			->join('team_members', 'team.id = team_members.team')
+			->where('team_members.person', $personid)
+			->get()->result();
+	}
+	
+	function get_team_members($id)
+	{
+		return $this->db
+			->select('person.id, fullname, picture_url, thumbnail_url')
+			->from('person')
+			->join('team_members', 'person.id = team_members.person')
+			->where('team_members.team', $id)
+			->get()->result();			
+	}
+	
+	function get_team_entries($id)
+	{
+		return $this->db
+			->select('id, name, description, thumbnail_url, team')
+			->from('entry')
+			->where('team', $id)
+			->get()->result();			
+	}
+	
+	
+	
 	function add_team($name, $website)
 	{
 		$data = array(
@@ -30,11 +61,12 @@ class Team_model extends Model
 		return $this->db->insert_id();
 	}
 	
-	function set_team_captain($team, $captain)
+	function add_team_member($teamid, $personid)
 	{
 		$data = array(
-			'captain' => $captain,
+			'team' => $teamid,
+			'person' => $personid,
 		);
-    	$this->db->update('team', $data, array('id' => $team));
+		$this->db->insert('team_members', $data);
 	}
 }
