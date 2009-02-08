@@ -22,7 +22,7 @@ class Person_model extends Model
 		return $this->db->get_where('person', array('email'=>$email), 1)->row();
 	}
 	
-	function add_person($fullname, $email, $picture_url, $idurl, $password = '')
+	function add_person($fullname, $dob, $email, $picture_url, $idurl, $password = '')
 	{
 		$this->load->helper('string');
 		
@@ -35,6 +35,7 @@ class Person_model extends Model
 			'email' => $email,
 			'picture_url' => $picture_url,
 			'idurl' => $idurl,
+			'dob' => $dob
 		);			
 		
 		if (!empty($password))

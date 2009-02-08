@@ -1,6 +1,25 @@
 <?php
-  $thumbnail_width = 80;
-  $thumbnail_height = 100;
+	$thumbnail_width = 80;
+	$thumbnail_height = 100;
+
+	$months = array(
+		1 => "January",
+		2 => "February",
+		3 => "March",
+		4 => "April",
+		5 => "May",
+		6 => "June",
+		7 => "July",
+		8 => "August",
+		9 => "September",
+		10 => "October",
+		11 => "November",
+		12 => "December"
+	);
+	$days = array();
+	for ($i=1; $i<=31; $i++) $days[$i] = $i;
+	$years = array();
+	for ($i=2009; $i>=1920; $i--) $years[$i] = $i;
 ?>
 
 <style type="text/css">
@@ -123,7 +142,6 @@ $(document).ready(function() {
 			<?=img(!empty($person->thumbnail_url)?$person->thumbnail_url:'/images/nopicture.png')?>
 		</div>
 		<div class="event_person_name"><?=$person->fullname?></div>
-		<div><a href="#">Edit</a></div>
 	</div>
 <? endforeach; ?>
 	<div style="clear: both;" />
@@ -151,6 +169,13 @@ $(document).ready(function() {
 		<a href="http://robogames.net/badges.php" target="_blank">badge photo guidelines</a>
 		to ensure your registration will be accepted.</div>
 	</p>
+	
+	<p>
+		<div>Date of Birth</div>
+		<?=form_dropdown('dob_month', $months, set_value('dob_month'))?>
+		<?=form_dropdown('dob_day', $days, set_value('dob_day'))?>
+		<?=form_dropdown('dob_year', $years, set_value('dob_year', 1984))?>
+	</p>	
 	
 	<p>
 		<?=form_submit('submit', 'Add Member')?>

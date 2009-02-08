@@ -42,7 +42,12 @@
 .event_registration_status
 {
 	font-size: 20pt;
-	margin-left: 1em;
+	margin-left: .5em;
+}
+
+.event_registration_status_description
+{
+	margin-left: 2em;
 }
 
 </style>
@@ -56,6 +61,13 @@ $(document).ready(function() {
 <div class="event_registration_team">
 	<div class="event_registration_status">
 		Status: <?=$registration->status?>
+	</div>
+	<div class="event_registration_status_description">
+		<? if ($registration->status == "new"): ?>
+		Your registration is pending. The event organizer will review it, and
+		accept or reject it. You will get an email when this happens, and at
+		that point, you will be able to pay for your entry. 
+		<? endif; ?>
 	</div>
 
 	<? foreach ($people as $person): ?> 

@@ -49,11 +49,17 @@ class Team_model extends Model
 	
 	
 	
-	function add_team($name, $website)
+	function add_team($name, $website, $addr1, $addr2, $city, $state, $zip, $country)
 	{
 		$data = array(
 				'name' => $name,
 				'url' => $website,
+				'addr1' => $addr1,
+				'addr2' => $addr2,
+				'city' => $city,
+				'state' => $state,
+				'zip' => $zip,
+				'country' => $country				
 				);
 
 		$this->db->set('created', 'now()', FALSE);

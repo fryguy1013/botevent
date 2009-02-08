@@ -52,10 +52,18 @@ h2
 </style>
 
 <link rel="stylesheet" href="css/openid.css" />
-<script type="text/javascript" src="/js/openid-jquery.js"></script>
+<script type="text/javascript" src="js/jquery.openid.min.js"></script>
 <script type="text/javascript">
-$(document).ready(function() {
-    openid.init('openid_identifier');
+$(function() {
+  $('#openid').openid({
+    img_path: '{{ MEDIA_URL }}img/openid/',
+    txt: {
+      label: 'Enter your {username} for <b>{provider}</b>',
+      username: 'Username',
+      title: 'Please select your account provider',
+      sign: 'Sign-In'
+    }
+  });
 });
 </script>
 
@@ -68,18 +76,7 @@ $(document).ready(function() {
 
 <? if (empty($show_email_only)): ?>
 
-	<form method="post" action="<?=site_url('login');?>" id="openid_form">
-	<input type="hidden" name="action" value="verify" />
-	<div id="openid_choice">
-		<p>Please click your account provider:</p>
-		<div id="openid_btns"></div>
-	</div>
-
-	<div id="openid_input_area">
-		<input id="openid_identifier" name="openid_identifier" type="text" value="http://" />
-		<input id="openid_submit" type="submit" value="Sign-In"/>
-	</div>
-	</form>
+	<form method="POST" action="<?=site_url('login');?>" id="openid"></form>
 	
 	<h4>What is this?</h4>
 	<p>Instead of creating yet another username and password combination, you

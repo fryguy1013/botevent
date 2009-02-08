@@ -47,7 +47,7 @@
 					<?=img('/images/entry-pending.png')?>
 				<? endif; ?>
 				</div>
-				<?=img(!empty($entry->thumbnail)?$entry->thumbnail:'/images/nopicture-entry.png')?>
+				<?=img(!empty($entry->thumbnail_url)?$entry->thumbnail_url:'/images/nopicture-entry.png')?>
 			</div>
 			<div class="event_entry_name"><?=$entry->name?></div>
 			</a>

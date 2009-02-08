@@ -179,9 +179,9 @@ class Event_model extends Model
 
 
 
-	function create_registration($event_id, $team_id, $registration_people, $registration_entries)
+	function create_registration($event_id, $team_id, $captain, $registration_people, $registration_entries)
 	{
-		$registration_id = $this->add_new_registration($event_id, $team_id);
+		$registration_id = $this->add_new_registration($event_id, $team_id, $captain);
 		
 		foreach ($registration_people as $person)
 			$this->add_person_to_registration($registration_id, $person['id']);
@@ -192,12 +192,13 @@ class Event_model extends Model
 		return $registration_id;
 	}
 	
-	function add_new_registration($event_id, $team_id)
+	function add_new_registration($event_id, $team_id, $captain)
 	{
 		$data = array(
 			'team' => $team_id,
 			'event' => $event_id,
 			'status' => 'new',
+			'captain' => $captain
 		);
 		
 		$this->db->insert('event_registrations', $data);

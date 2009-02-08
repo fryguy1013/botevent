@@ -58,7 +58,7 @@ class Event extends Controller
 	function Register($id)
 	{
 		$this->load->library(array('session', 'form_validation'));
-		$this->load->model(array('Person_model', 'Team_model', 'Entry_model'));		
+		$this->load->model(array('Person_model', 'Team_model', 'Entry_model'));
 	
 		$personid = $this->session->userdata('userid');
 		if ($personid === false)
@@ -94,11 +94,17 @@ class Event extends Controller
 		{
 			$this->form_validation->set_rules("fullname", "Full Name", 'trim|required');
 			$this->form_validation->set_rules("email_addr", "Email Address", 'trim|required|valid_email');
+			$this->form_validation->set_rules('dob_month', 'DOB Month', 'trim|required');
+			$this->form_validation->set_rules('dob_day', 'DOB Day', 'trim|required');
+			$this->form_validation->set_rules('dob_year', 'DOB Year', 'trim|required');			
+			
+			$dob = sprintf("%s/%s/%s", $this->input->post('dob_month'), $this->input->post('dob_day'), $this->input->post('dob_year'));
 			$file_upload = $this->_do_upload('badge_photo');
 			if ($this->form_validation->run() != FALSE && $file_upload !== FALSE)
 			{
 				$p = $this->Person_model->add_person(
 						$this->input->post('fullname'),
+						$dob,
 						$this->input->post('email_addr'),
 						$file_upload,
 						'');
@@ -111,7 +117,7 @@ class Event extends Controller
 			else
 			{
 				$data['show_add_member'] = TRUE;
-				$data['add_member_errors'] = validation_errors();
+				$data['add_member_errors'] =  $this->upload_errors.validation_errors();
 			}			
 		}
 		else if ($this->input->post('submit') == 'Add Entry')
@@ -155,7 +161,7 @@ class Event extends Controller
 					);
 				}
 				
-				$registration_id = $this->Event_model->create_registration($id, $teamid, $registration_people, $registration_entries);
+				$registration_id = $this->Event_model->create_registration($id, $teamid, $personid, $registration_people, $registration_entries);
 				
 				$this->session->set_flashdata('registration_success', TRUE);
 				redirect(array('event', 'viewregistration', $registration_id));
@@ -250,27 +256,29 @@ class Event extends Controller
 		return valid_email($str);
 	}
 	
-	function _do_upload($field)
-	{
-		$config = array();
-		$config['upload_path'] = './images/uploads/';
-		$config['allowed_types'] = 'gif|jpg|png';
-		$config['max_size']	= '2000';
-		$config['encrypt_name'] = TRUE;
-		//$config['max_width']  = '1024';
+	
+	function _do_upload($field) 
+	{ 
+		$config = array(); 
+		$config['upload_path'] = './images/uploads/'; 
+		$config['allowed_types'] = 'gif|jpg|png'; 
+		$config['max_size']	= '2000'; 
+		$config['encrypt_name'] = TRUE; 
+		//$config['max_width']  = '1024'; 
 		//$config['max_height']  = '768';
-		
-		$this->load->library('upload', $config);
-		
-		if (!$this->upload->do_upload($field))
-		{
-			$error = array('error' => $this->upload->display_errors());
-			return FALSE;			
-		}	
-		else
-		{
-			$data = $this->upload->data();
-			return "/images/uploads/".$data['file_name'];
-		}	
+		 
+		$this->load->library('upload', $config); 
+		 
+		if (!$this->upload->do_upload($field)) 
+		{ 
+			$this->upload_errors = $this->upload->display_errors(); 
+			return FALSE;			 
+		}	 
+		else 
+		{ 
+			$data = $this->upload->data(); 
+			return "/images/uploads/".$data['file_name']; 
+		}	 
 	}
+	
 }
