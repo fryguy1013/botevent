@@ -1,9 +1,7 @@
 tmp
 *.puo
 *.suo
-logs
-upload
-uploads
-upload
+system/logs/*
+images/uploads/*
 application/config/config.php
 application/config/database.php
