@@ -13,7 +13,7 @@
 <body>
 
 <div id="mainheading">
-	<strong><a href="<?=site_url('')?>">Bot Event</a></strong>
+	<strong><a href="<?=site_url('')?>">RoboGames - Event Registration</a></strong>
 	<div>
 	<? if ($this->session->userdata('userid') === false): ?>
 		<a href="<?=site_url('login/logout')?>">Login</a>

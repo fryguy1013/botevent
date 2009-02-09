@@ -1,5 +1,7 @@
 <div class="event_all_list">
 
+<h2>Upcoming Events</h2>
+
 <? foreach ($events as $event): ?>
 
 <div class="event_all_event">	
