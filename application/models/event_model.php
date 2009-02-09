@@ -10,6 +10,15 @@ class Event_model extends Model
 	
 	function reset()
 	{
+		echo "<pre>";
+		print_r($this->db->query("show databases")->result());
+		/*$this->db->empty_table('entry');
+		$this->db->empty_table('person');
+		$this->db->empty_table('team');
+		$this->db->empty_table('event_entries');
+		$this->db->empty_table('event_people');
+		$this->db->empty_table('event_registrations');
+		*/
 	}
 	
 	function get_events()

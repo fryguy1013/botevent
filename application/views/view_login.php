@@ -1,16 +1,23 @@
-<script type="text/javascript" src="js/jquery.openid.min.js"></script>
+<script type="text/javascript" src="<?=site_url('js/jquery.openid.min.js')?>"></script>
 <script type="text/javascript">
 $(function() {
-  $('#openid').openid({
-    img_path: '{{ MEDIA_URL }}img/openid/',
-    txt: {
-      label: 'Enter your {username} for <b>{provider}</b>',
-      username: 'Username',
-      title: 'Please select your account provider',
-      sign: 'Sign-In'
-    }
-  });
+	$('#openid').openid({
+	img_path: '<?=site_url("images")?>',
+	txt: {
+		label: 'Enter your {username} for <b>{provider}</b>',
+		username: 'Username',
+		title: 'Please select your account provider',
+		sign: 'Sign-In'
+	}
+	});
+	// and, because css is a bastard:
+	$('.openid_large_btn, .openid_small_btn').css('background-image', 'url(<?=site_url("/images/openid-icons.png")?>)');
+	$('#openid_inputarea').css('background-image', 'url(<?=site_url("/images/balloon.png")?>)');
+	$('#openid').css('background-image', 'url(<?=site_url("indicator.gif")?>)');
+	
+  
 });
+
 </script>
 
 <div class="login_frame">

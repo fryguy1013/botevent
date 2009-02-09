@@ -2,14 +2,13 @@
 
 <? foreach ($events as $event): ?>
 
-<div class="event_all_event">
-	<a href="<?=site_url(array('event', 'view', $event->id))?>">
+<div class="event_all_event">	
 	<div class="event_all_image_container">
-		<img class="event_all_image" width="100" src="<?=$event->smallimage?>" alt="<?=$event->name?> logo" />
-		<div class="event_all_robots_registered"><? /*=$event->registeredrobots */?> registered</div>
+		<img class="event_all_image" width="100" src="<?=site_url($event->smallimage)?>" alt="<?=$event->name?> logo" />
+		<!--<div class="event_all_robots_registered"><? /*=$event->registeredrobots */?> registered</div>-->
 	</div>
 	<div class="event_all_details_container">
-		<div class="event_all_title"><?=$event->name?></div>
+		<div class="event_all_title"><a href="<?=site_url(array('event', 'view', $event->id))?>"><?=$event->name?></a></div>
 		<div class="event_all_location"><?=$event->location?></div>
 		<div class="event_all_date"><?
 			if ($event->startdate != $event->enddate)

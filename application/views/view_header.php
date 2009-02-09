@@ -4,8 +4,8 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <title>RoboGames - Robot Event Registration<? if (isset($title)) { echo $title; } ?></title>
 
-<link href="/css/site.css" media="screen" rel="stylesheet" type="text/css"/>
-<link href="/css/openid.css" media="screen" rel="stylesheet" type="text/css"/> 
+<link href="<?=site_url('/css/site.css')?>" media="screen" rel="stylesheet" type="text/css"/>
+<link href="<?=site_url('/css/openid.css')?>" media="screen" rel="stylesheet" type="text/css"/> 
  
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.3.1/jquery.min.js"></script>
 

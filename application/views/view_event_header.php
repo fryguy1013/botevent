@@ -1,51 +1,6 @@
-<style type="text/css">
-
-img
-{
-	border: 0;
-}
-
-.event_major_details
-{
-	text-align: center;
-	font-size: 11pt;
-}
-
-.event_minor_details
-{
-	margin: 1em; 
-	border: 1px solid #000;
-	width: 30em;
-	margin-left: auto;
-	margin-right: auto;
-	padding: .5em;
-	background: #eee;	
-}
-
-.event_minor_details a
-{
-	color: #000;
-	text-decoration: none;
-}
-
-.event_title
-{
-	font-size: 18pt;
-	margin: .25em;
-	margin-top: 0;
-	font-weight: bold;
-}
-
-.event_major_details span
-{
-	color: LimeGreen;
-	font-weight: bold;
-}
-</style>
-
 <div class="event_major_details">
 	<a href="<?=site_url(array('event', 'view', $event->id))?>">
-		<img class="event_image" src="<?=$event->image?>" alt="<?=$event->name?> logo" />
+		<img class="event_image" src="<?=site_url($event->image)?>" alt="<?=$event->name?> logo" />
 	</a>
 	<div class="event_minor_details">		
 		<div class="event_title"><a href="<?=site_url(array('event', 'view', $event->id))?>"><?=$event->name?></a></div>

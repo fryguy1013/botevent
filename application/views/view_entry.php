@@ -1,5 +1,5 @@
 
 <div class="entry">
-	<img src="<?=$entry->thumbnail_url?>" />
+	<img src="<?=site_url($entry->thumbnail_url)?>" />
 	<div><?=$entry->name?></div>
 </div>
