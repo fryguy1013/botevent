@@ -10,8 +10,126 @@ class Event_model extends Model
 	
 	function reset()
 	{
-		echo "<pre>";
-		print_r($this->db->query("show databases")->result());
+	/*
+		$prefix = $this->db->dbprefix;
+		$this->db->query("
+			CREATE TABLE `${prefix}divisions` (
+			`id` int(10) unsigned NOT NULL auto_increment,
+			`name` varchar(128) NOT NULL,
+			PRIMARY KEY  (`id`)
+			) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=latin1;
+		");
+		$this->db->query("
+			CREATE TABLE `${prefix}entry` (
+			  `id` int(11) NOT NULL auto_increment,
+			  `name` varchar(128) NOT NULL,
+			  `description` text NOT NULL,
+			  `thumbnail_url` varchar(200) NOT NULL,
+			  `team` int(11) NOT NULL,
+			  `picture_url` varchar(200) NOT NULL,
+			  PRIMARY KEY  (`id`)
+			) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=latin1;
+		");
+		$this->db->query("
+			CREATE TABLE `${prefix}event` (
+			  `id` int(10) unsigned NOT NULL auto_increment,
+			  `name` varchar(128) NOT NULL,
+			  `image` varchar(128) NOT NULL,
+			  `description` text NOT NULL,
+			  `startdate` datetime NOT NULL,
+			  `enddate` datetime NOT NULL,
+			  `registrationends` datetime NOT NULL,
+			  `websiteurl` varchar(128) NOT NULL,
+			  `smallimage` varchar(128) NOT NULL,
+			  `location` varchar(128) NOT NULL,
+			  PRIMARY KEY  (`id`)
+			) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=latin1;		
+		");
+		$this->db->query("
+			CREATE TABLE `${prefix}event_divisions` (
+			  `id` int(10) unsigned NOT NULL auto_increment,
+			  `event` int(10) unsigned NOT NULL,
+			  `division` int(10) unsigned NOT NULL,
+			  `description` text NOT NULL,
+			  `ruleurl` varchar(128) NOT NULL,
+			  `maxentries` int(10) unsigned NOT NULL,
+			  `price` decimal(10,0) NOT NULL,
+			  PRIMARY KEY  (`id`),
+			  KEY `FK_eventclasses_1` USING BTREE (`event`)
+			) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=latin1;		
+		");
+		$this->db->query("
+			CREATE TABLE `${prefix}event_entries` (
+			  `id` int(10) unsigned NOT NULL auto_increment,
+			  `event_division` int(10) unsigned NOT NULL,
+			  `entry` int(10) unsigned NOT NULL,
+			  `event_registration` int(10) unsigned NOT NULL,
+			  PRIMARY KEY  (`id`)
+			) ENGINE=InnoDB AUTO_INCREMENT=29 DEFAULT CHARSET=latin1;
+		");
+		$this->db->query("
+			CREATE TABLE `${prefix}event_people` (
+			  `id` int(10) unsigned NOT NULL auto_increment,
+			  `person` int(10) unsigned NOT NULL,
+			  `event_registration` int(10) unsigned NOT NULL,
+			  PRIMARY KEY  (`id`)
+			) ENGINE=InnoDB AUTO_INCREMENT=23 DEFAULT CHARSET=latin1;		
+		");
+		$this->db->query("
+			CREATE TABLE `${prefix}event_registrations` (
+			  `id` int(10) unsigned NOT NULL auto_increment,
+			  `team` int(10) unsigned NOT NULL,
+			  `event` int(10) unsigned NOT NULL,
+			  `status` varchar(45) NOT NULL,
+			  `captain` int(10) unsigned NOT NULL,
+			  PRIMARY KEY  (`id`)
+			) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=latin1;		
+		");
+		$this->db->query("
+			CREATE TABLE `${prefix}person` (
+			  `id` int(10) unsigned NOT NULL auto_increment,
+			  `fullname` varchar(200) NOT NULL,
+			  `email` varchar(200) NOT NULL,
+			  `dob` varchar(200) NOT NULL,
+			  `idurl` varchar(200) default NULL,
+			  `picture_url` varchar(200) NOT NULL,
+			  `password` varchar(200) NOT NULL,
+			  `passwordsalt` varchar(200) NOT NULL,
+			  `thumbnail_url` varchar(200) NOT NULL,
+			  PRIMARY KEY  (`id`),
+			  KEY `Index_2` (`idurl`),
+			  KEY `Index_3` (`email`)
+			) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=latin1;
+		");
+		$this->db->query("
+			CREATE TABLE `${prefix}team` (
+			  `id` int(10) unsigned NOT NULL auto_increment,
+			  `name` varchar(128) NOT NULL,
+			  `url` varchar(128) NOT NULL,
+			  `description` text NOT NULL,
+			  `created` datetime NOT NULL,
+			  `addr1` varchar(255) NOT NULL,
+			  `addr2` varchar(255) NOT NULL,
+			  `city` varchar(255) NOT NULL,
+			  `state` varchar(255) NOT NULL,
+			  `zip` varchar(255) NOT NULL,
+			  `country` varchar(255) NOT NULL,
+			  PRIMARY KEY  (`id`)
+			) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=latin1;
+		");
+		$this->db->query("
+			CREATE TABLE `${prefix}team_members` (
+			  `id` int(10) unsigned NOT NULL auto_increment,
+			  `person` int(10) unsigned NOT NULL,
+			  `team` int(10) unsigned NOT NULL,
+			  PRIMARY KEY  (`id`)
+			) ENGINE=InnoDB AUTO_INCREMENT=36 DEFAULT CHARSET=latin1;
+		");
+		$this->db->query("
+			CREATE VIEW `${prefix}event_division_entries` AS select `event_entries`.`event_division` AS `event_division`,count(0) AS `ct` from `event_entries` group by `event_entries`.`event_division`
+		");
+
+
 		/*$this->db->empty_table('entry');
 		$this->db->empty_table('person');
 		$this->db->empty_table('team');
