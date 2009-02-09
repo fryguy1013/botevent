@@ -4,52 +4,9 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <title>RoboGames - Robot Event Registration<? if (isset($title)) { echo $title; } ?></title>
 
-<style type="text/css">
-body
-{
-	background: #aaaaaa;
-	padding: 0;
-	margin: 0;
-	text-align: center;
-	font: normal 10pt arial, helvetica, sans-serif;
-}
-
-#mainheading
-{
-	text-align: left;
-	background: #d6d6d6;
-	width: 720px;
-	margin-left: auto;
-	margin-right: auto;
-	margin-top: 0;
-	padding: 10px;
-}
-
-#maincontainer
-{
-	text-align: left;
-	background: #d6d6d6;
-	width: 720px;
-	margin-left: auto;
-	margin-right: auto;
-	margin-top: 2px;
-	padding: 10px;
-}
-
-#mainheading > div
-{
-	float: right;
-}
-
-a
-{
-	color: #000;
-}
-
-</style>
-<link href="/css/facebox.css" media="screen" rel="stylesheet" type="text/css"/>
-<link href="/css/jquery.Jcrop.css" media="screen" rel="stylesheet" type="text/css"/>
-
+<link href="/css/site.css" media="screen" rel="stylesheet" type="text/css"/>
+<link href="/css/openid.css" media="screen" rel="stylesheet" type="text/css"/> 
+ 
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.3.1/jquery.min.js"></script>
 
 </head>
@@ -61,7 +18,7 @@ a
 	<? if ($this->session->userdata('userid') === false): ?>
 		<a href="<?=site_url('login/logout')?>">Login</a>
 	<? else: ?>
-		Logged in as <a href="<?=site_url('person/'.$this->session->userdata('userid'))?>"><?=$this->session->userdata('fullname')?></a> | <a href="<?=site_url('login/logout')?>">Logout</a>
+		Logged in as <a href="<?=site_url('person/view/'.$this->session->userdata('userid'))?>"><?=$this->session->userdata('fullname')?></a> | <a href="<?=site_url('login/logout')?>">Logout</a>
 	<? endif; ?>
 	</div>
 </div>

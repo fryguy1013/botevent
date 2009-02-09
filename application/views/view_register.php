@@ -19,57 +19,6 @@
 	for ($i=2009; $i>=1920; $i--) $years[$i] = $i;
 ?>
 
-<style type="text/css">
-.error {
-	padding: 1em;
-	border: 1px solid #ff0000;
-	background: #ffaaaa;
-}
-
-.login_frame
-{
-	border: 1px solid #000;
-	background: #eee;
-	width: 36em;
-	padding: 1em;
-	margin-right: auto;
-	margin-left: auto;
-	margin-bottom: 1em;
-}
-
-h2
-{
-	margin-top: .25em;
-}
-
-#email_form_container
-{
-	border: 1px solid #000;
-	background: #ddd;
-	margin: 1em;
-	padding: 1em;
-	margin-right: auto;
-	margin-left: auto;
-}
-
-#email_form_container h3
-{
-	margin-top: .25em;
-	margin-bottom: .25em;
-}
-
-#email_form_container div
-{
-	margin-bottom: .75em;
-}
-
-.badge_photo_guidelines
-{
-	font-size: .8em;
-}
-
-</style>
-
 <?=form_open_multipart("login/register")?>
 <input type="hidden" name="action" value="register" />
 <div class="login_frame">

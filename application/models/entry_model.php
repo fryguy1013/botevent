@@ -8,6 +8,11 @@ class Entry_model extends Model
 		
 	}
 	
+	function get_entry($id)
+	{
+		return $this->db->get_where('entry', array('id'=>$id), 1)->row();
+	}
+	
 	function add_entry($name, $team, $picture_url)
 	{
 		$data = array(

@@ -1,66 +1,3 @@
-<style type="text/css">
-
-.event_entry
-{
-	width: 125px;
-	border: 1px solid #000;
-	background: #eee;
-	float: left;
-	margin: .5em;
-	padding: .5em;
-	text-align: center;
-}
-
-.event_entry_thumbnail img
-{
-	width: 125px;
-}
-
-.event_person
-{
-	width: 100px;
-	border: 1px solid #000;
-	background: #eee;
-	float: left;
-	margin: .5em;
-	padding: .5em;
-	text-align: center;
-}
-
-.event_person_thumbnail img
-{
-	width: 100px;
-}
-
-.event_registration_team
-{
-	margin: 1em;
-	border: 1px solid #000;
-	background: #ddd;
-}
-
-.event_registration_team_name
-{
-	font-size: 20pt;
-	margin-left: 1em;
-}
-
-.event_reg_status
-{
-	margin: 1em;
-}
-
-.event_reg_minordetails
-{
-	padding: 1em;
-}
-
-.event_reg_message
-{
-}
-
-</style>
-
 <script type="text/javascript">
 $(document).ready(function() {
 	$('div.event_reg_message').hide();
@@ -122,7 +59,7 @@ $(document).ready(function() {
 	
 		<? foreach ($event_people[$reg->id] as $person): ?> 
 			<div class="event_person">
-				<a href="<?=site_url(array('person', $person->id))?>">
+				<a href="<?=site_url(array('person', 'view', $person->id))?>">
 				<div class="event_person_thumbnail">
 					<?=img(!empty($person->thumbnail_url)?$person->thumbnail_url:'/images/nopicture.png')?>
 				</div>
@@ -133,7 +70,7 @@ $(document).ready(function() {
 		
 		<? foreach ($event_entries[$reg->id] as $entry): ?> 
 			<div class="event_entry">
-				<a href="<?=site_url(array('entry', $entry->id))?>">
+				<a href="<?=site_url(array('entry', 'view', $entry->id))?>">
 				<div class="event_entry_thumbnail">
 					<?=img(!empty($entry->thumbnail_url)?$entry->thumbnail_url:'/images/nopicture-entry.png')?>
 				</div>

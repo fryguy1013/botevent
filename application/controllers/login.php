@@ -22,19 +22,7 @@ class Login extends Controller {
 		$user_id = $this->input->post('url');
 		if (!empty($user_id))
 		{
-			$this->config->load('openid');      
-			$req = $this->config->item('openid_required');
-			$opt = $this->config->item('openid_optional');
-			$policy = site_url($this->config->item('openid_policy'));
-			$request_to = site_url($this->config->item('openid_request_to'));
-			
-			$this->openid->set_request_to($request_to);
-			$this->openid->set_trust_root(base_url());
-			$this->openid->set_args(null);
-			$this->openid->set_sreg(true, $req, $opt, $policy);
-			$this->openid->set_pape(false);
-			$this->openid->authenticate($user_id);
-			exit();
+			$this->_check_openid($user_id);
 		}
 		
 		if ($this->input->post('action') == 'email_password')
@@ -43,6 +31,7 @@ class Login extends Controller {
 		
 			$this->form_validation->set_rules('email_addr', 'Email Address', 'trim|required|valid_email');
 			$this->form_validation->set_rules('login_type', 'Login Type', 'trim|required');
+			$this->form_validation->set_rules('email_password', 'Password', 'trim');
 				
 			if ($this->form_validation->run() != FALSE)
 			{
@@ -62,15 +51,31 @@ class Login extends Controller {
 				}
 				else
 				{
+					$email_addr = $this->input->post('email_addr');
+					$password = $this->input->post('email_password');
 					if (count($person) == 0)
 					{
 						$data['error'] = "That email address does not exist. Did you mean to create a new account?";
 					}
+					else if (empty($person->password) && !empty($person->idurl))
+					{
+						$this->_check_openid($person->idurl);
+					}
+					else if (empty($person->password))
+					{
+						$data['error'] = "Your email address is associated with a member of a team. In the future, you will be able to log in to this account.";
+						$data['show_email_only'] = FALSE; 
+					}
+					else if ($person->password != $this->Person_model->generate_password($password, $email_addr, $person->passwordsalt))
+					{
+						$data['error'] = "The password you have typed does not exist. Try again.";						
+					}
 					else
 					{
-						// TODO: password checking here
-						print_r($person);
-						exit();
+						$this->session->set_userdata('userid', $person->id);
+						$this->session->set_userdata('fullname', $person->fullname);				
+						redirect($this->session->userdata('onloginurl'));
+						die();
 					}
 				}
 				
@@ -303,6 +308,23 @@ class Login extends Controller {
 			$data = $this->upload->data(); 
 			return "/images/uploads/".$data['file_name']; 
 		}	 
+	}
+	
+	function _check_openid($user_id)
+	{
+		$this->config->load('openid');      
+		$req = $this->config->item('openid_required');
+		$opt = $this->config->item('openid_optional');
+		$policy = site_url($this->config->item('openid_policy'));
+		$request_to = site_url($this->config->item('openid_request_to'));
+		
+		$this->openid->set_request_to($request_to);
+		$this->openid->set_trust_root(base_url());
+		$this->openid->set_args(null);
+		$this->openid->set_sreg(true, $req, $opt, $policy);
+		$this->openid->set_pape(false);
+		$this->openid->authenticate($user_id);
+		exit();	
 	}
 }
 

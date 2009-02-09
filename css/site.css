@@ -1,0 +1,356 @@
+/* header */
+body
+{
+	background: #aaaaaa;
+	padding: 0;
+	margin: 0;
+	text-align: center;
+	font: normal 10pt arial, helvetica, sans-serif;
+}
+
+#mainheading
+{
+	text-align: left;
+	background: #d6d6d6;
+	width: 720px;
+	margin-left: auto;
+	margin-right: auto;
+	margin-top: 0;
+	padding: 10px;
+}
+
+#maincontainer
+{
+	text-align: left;
+	background: #d6d6d6;
+	width: 720px;
+	margin-left: auto;
+	margin-right: auto;
+	margin-top: 2px;
+	padding: 10px;
+}
+
+#mainheading > div
+{
+	float: right;
+}
+
+a
+{
+	color: #000;
+}
+
+h2
+{
+	margin-top: .25em;
+}
+
+.error {
+	margin-top: .5em;
+	padding-left: .5em;
+	border: 1px solid #ff0000;
+	background: #ffaaaa;
+}
+
+
+/* view event */
+
+.event_registerbutton
+{
+	margin: 10px;
+	text-align: center;
+}
+
+.event_registerbutton a
+{
+	border: 1px solid LimeGreen;
+	background-color: GreenYellow;
+	color: #000;
+	padding: 3px;
+	margin: 10px;
+}
+
+.event_divisions
+{
+	margin-left: auto;
+	margin-right: auto;	
+	padding: .5em;
+	border: 1px solid black;
+	width: 39em;
+	background: #eee;
+}
+
+.event_division
+{
+	font-size: 12pt;
+	margin-top: .125em;
+	margin-bottom: .125em;
+}
+
+.event_division_name a
+{
+	width: 15em;
+	color: LimeGreen;
+	float: left;
+	font-weight: bold;
+	text-decoration: none;
+}
+
+.event_description
+{
+	margin-top: 1em;
+}
+
+
+/* view event all */
+
+.event_all_list
+{
+	clear: both;
+}
+
+.event_all_event
+{
+	border: 1px solid #888;
+	background: #ccc;
+	width: 25em;
+	height: 6em;
+	float: left;
+	margin: .5em;	
+}
+
+.event_all_image_container
+{
+	float: left;
+	width: 110px;
+	text-align: center;
+}
+
+.event_all_details_container
+{
+	margin-left: 115px;
+}
+
+.event_all_image
+{
+	margin: 5px;
+}
+
+.event_all_robots_registered
+{
+	font-size: 8pt;
+}
+
+.event_all_title
+{
+	font-size: 14pt;
+	font-weight: bold;
+}
+
+/* view event entries */
+
+.event_entry
+{
+	width: 150px;
+	border: 1px solid #000;
+	background: #eee;
+	float: left;
+	margin: .5em;
+	padding: .5em;
+	text-align: center;
+}
+
+.event_entry_thumbnail img
+{
+	width: 150px;
+}
+
+.event_entry_status
+{
+	position: absolute;	
+}
+.event_entry_status img
+{
+	width: 150px;	
+}
+
+.event_details > h2
+{
+	text-align: center;
+	
+}
+
+/* view event manage */
+.event_registration_team
+{
+	margin: 1em;
+	border: 1px solid #000;
+	background: #ddd;
+}
+
+.event_registration_team_name
+{
+	font-size: 20pt;
+	margin-left: 1em;
+}
+
+.event_reg_status
+{
+	margin: 1em;
+}
+
+.event_reg_minordetails
+{
+	padding: 1em;
+}
+
+/* view event register */
+.event_person
+{
+	width: 100px;
+	border: 1px solid #000;
+	background: #ccc;
+	float: left;
+	margin: .5em;
+	padding: .5em;
+	text-align: center;
+}
+
+.event_person_thumbnail img
+{
+	width: 100px;
+}
+
+.event_register_add_person_frame, .event_register_add_entry_frame
+{
+	margin-top: 1em;
+	margin-left: .5em;
+	border: 1px solid #000;
+	padding-left: 1em;
+	padding-right: 1em;
+	width: 35em;
+	background: #eee;
+}
+
+.badge_photo_guidelines
+{
+	font-size: .8em;
+}
+
+#add_member, #add_entry
+{
+	display: none;
+}
+
+
+/* view event registration */
+.event_person
+{
+	width: 125px;
+	border: 1px solid #000;
+	background: #eee;
+	float: left;
+	margin: .5em;
+	padding: .5em;
+	text-align: center;
+}
+
+.event_person_thumbnail img
+{
+	width: 125px;
+}
+
+.event_registration_team
+{
+	margin: 1em;
+	border: 1px solid #000;
+	background: #ddd;
+}
+
+.event_registration_status
+{
+	font-size: 20pt;
+	margin-left: .5em;
+}
+
+.event_registration_status_description
+{
+	margin-left: 2em;
+}
+
+/* view login */
+
+.login_frame
+{
+	border: 1px solid #000;
+	background: #eee;
+	width: 36em;
+	padding: 1em;
+	margin-right: auto;
+	margin-left: auto;
+}
+
+h2
+{
+	margin-top: .25em;
+}
+
+#email_form_container
+{
+	border: 1px solid #000;
+	background: #ddd;
+	margin: 1em;
+	padding: 1em;
+	margin-right: auto;
+	margin-left: auto;
+}
+
+#email_form_container h3
+{
+	margin-top: .25em;
+	margin-bottom: .25em;
+}
+
+#email_form_container div
+{
+	margin-bottom: .75em;
+}
+
+/* view register */
+
+.login_frame
+{
+	border: 1px solid #000;
+	background: #eee;
+	width: 36em;
+	padding: 1em;
+	margin-right: auto;
+	margin-left: auto;
+	margin-bottom: 1em;
+}
+
+#email_form_container
+{
+	border: 1px solid #000;
+	background: #ddd;
+	margin: 1em;
+	padding: 1em;
+	margin-right: auto;
+	margin-left: auto;
+}
+
+#email_form_container h3
+{
+	margin-top: .25em;
+	margin-bottom: .25em;
+}
+
+#email_form_container div
+{
+	margin-bottom: .75em;
+}
+
+.badge_photo_guidelines
+{
+	font-size: .8em;
+}
