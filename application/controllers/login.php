@@ -101,7 +101,6 @@ class Login extends Controller {
 	{
 		$data = array();
 		$this->load->model('Team_model');
-		$this->output->enable_profiler(TRUE);
 		
 		$data['email_addr'] = $this->session->userdata('openid_email');
 		$data['userurl'] = $this->session->userdata('userurl');

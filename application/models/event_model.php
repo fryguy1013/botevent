@@ -257,7 +257,7 @@ class Event_model extends Model
 	function get_event_divisions($id)
 	{
 		return $this->db
-			->select('divisions.id as id, divisions.name as name, event, division, description, ruleurl, maxentries, price')
+			->select('event_divisions.id as event_division, divisions.id as id, divisions.name as name, event, division, description, ruleurl, maxentries, price')
 			->from('event_divisions')
 			->join('divisions', 'divisions.id = event_divisions.division')
 			->where('event', $id)
@@ -285,7 +285,7 @@ class Event_model extends Model
 	}
 
 	
-	function get_event_entries($id, $division)
+	function get_event_entries($division)
 	{
 		return $this->db
 			->select('entry.id, entry.name, entry.description, entry.thumbnail_url, team.name as teamname, team.id as teamid, event_registrations.status')
@@ -386,7 +386,7 @@ class Event_model extends Model
 		$ret = array();
 		foreach ($this->get_event_divisions($id) as $row)
 		{
-			$ret[$row->id] = $row->name;
+			$ret[$row->event_division] = $row->name;
 		}
 		return $ret;
 	}
