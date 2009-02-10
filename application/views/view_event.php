@@ -9,7 +9,7 @@
 	
 		<tr class="event_division">			
 			<td class="event_division_name"><a href="<?=site_url(array('event', 'entries', $event->id, $division->id))?>"><?=$division->name?></a></td>
-			<td class="event_division_count"><?=$division->ct?> entries<? if ($division->maxentries != 0) echo " ($division->maxentries max)"; ?></td>
+			<td class="event_division_count"><?=isset($event_division_counts[$division->id]) ? $event_division_counts[$division->id] : 0?> entries<? if ($division->maxentries != 0) echo " ($division->maxentries max)"; ?></td>
 			<td class="event_division_price"><?=$division->price == 0 ? "Free" : sprintf("\$%d",$division->price)?></td>
 		</tr>
 	<? endforeach; ?>

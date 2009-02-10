@@ -144,10 +144,10 @@ class Event_model extends Model
 			  PRIMARY KEY  (`id`)
 			) ENGINE=InnoDB AUTO_INCREMENT=36 DEFAULT CHARSET=latin1;
 		");
-		$this->db->query("DROP VIEW IF EXISTS `${prefix}event_division_entries`");
-		$this->db->query("
-			CREATE VIEW `${prefix}event_division_entries` AS select `${prefix}event_entries`.`event_division` AS `event_division`,count(0) AS `ct` from `${prefix}event_entries` group by `${prefix}event_entries`.`event_division`
-		");
+		//$this->db->query("DROP VIEW IF EXISTS `${prefix}event_division_entries`");
+		//$this->db->query("
+		//	CREATE VIEW `${prefix}event_division_entries` AS select `${prefix}event_entries`.`event_division` AS `event_division`,count(0) AS `ct` from `${prefix}event_entries` group by `${prefix}event_entries`.`event_division`
+		//");
 
 		$divisions = array();
         $divisions[] = $this->div_helper('Humanoid - Kung-Fu (LightWt-R/C)', 35, 0);
@@ -257,24 +257,33 @@ class Event_model extends Model
 	function get_event_divisions($id)
 	{
 		return $this->db
-			->select('divisions.id as id, divisions.name as name, event, division, description, ruleurl, maxentries')
+			->select('divisions.id as id, divisions.name as name, event, division, description, ruleurl, maxentries, price')
 			->from('event_divisions')
 			->join('divisions', 'divisions.id = event_divisions.division')
 			->where('event', $id)
 			->get()->result();
 	}
 	
-	function get_event_divisions_with_counts($event)
+	function get_event_divisions_counts($event)
 	{
-		return $this->db
-			->select('event_divisions.id as id, divisions.name as name, event, division, description, ruleurl, maxentries, price')
-			->select('(COALESCE(ct, 0)) as ct', FALSE)
-			->from('event_divisions')
-			->join('divisions', 'divisions.id = event_divisions.division')
-			->join('event_division_entries', 'event_division_entries.event_division = event_divisions.id', 'left')
+		//select `${prefix}event_entries`.`event_division` AS `event_division`, count(0) AS `ct`
+		//from `${prefix}event_entries`
+		//group by `${prefix}event_entries`.`event_division`
+		$cts = $this->db
+			->select('event_entries.event_division, COUNT(*) as ct', FALSE)
+			->from('event_entries')
+			->join('event_divisions', 'event_divisions.id = event_division')
 			->where('event_divisions.event', $event)
+			->group_by('event_division')
 			->get()->result();
+		$ret = array();
+		foreach ($cts as $ct)
+		{
+			$ret[$ct->event_division] = $ct->ct;
+		}
+		return $ret;
 	}
+
 	
 	function get_event_entries($id, $division)
 	{

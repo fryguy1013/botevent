@@ -34,7 +34,8 @@ class Event extends Controller
 	{
 		$data = array();
 		$data['event'] = $this->Event_model->get_event($id);
-		$data['event_divisions'] = $this->Event_model->get_event_divisions_with_counts($id);
+		$data['event_divisions'] = $this->Event_model->get_event_divisions($id);
+		$data['event_division_counts'] = $this->Event_model->get_event_divisions_counts($id);
 
 		$this->load->view('view_header');		
 		$this->load->view('view_event_header', $data);
