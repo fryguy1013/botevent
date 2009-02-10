@@ -8,10 +8,20 @@ class Event_model extends Model
 		
 	}
 	
+	function div_helper($name, $price, $max)
+	{
+		return array(
+			'division' => $this->create_division($name),
+			'price' => $price,
+			'maxentries' => $max,
+			'description' => '',
+			'ruleurl' => ''
+		);
+	}	
 	function reset()
 	{
-	/*
 		$prefix = $this->db->dbprefix;
+		$this->db->query("DROP TABLE IF EXISTS `${prefix}divisions`");
 		$this->db->query("
 			CREATE TABLE `${prefix}divisions` (
 			`id` int(10) unsigned NOT NULL auto_increment,
@@ -19,6 +29,7 @@ class Event_model extends Model
 			PRIMARY KEY  (`id`)
 			) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=latin1;
 		");
+		$this->db->query("DROP TABLE IF EXISTS `${prefix}entry`");
 		$this->db->query("
 			CREATE TABLE `${prefix}entry` (
 			  `id` int(11) NOT NULL auto_increment,
@@ -30,6 +41,7 @@ class Event_model extends Model
 			  PRIMARY KEY  (`id`)
 			) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=latin1;
 		");
+		$this->db->query("DROP TABLE IF EXISTS `${prefix}event`");
 		$this->db->query("
 			CREATE TABLE `${prefix}event` (
 			  `id` int(10) unsigned NOT NULL auto_increment,
@@ -45,6 +57,7 @@ class Event_model extends Model
 			  PRIMARY KEY  (`id`)
 			) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=latin1;		
 		");
+		$this->db->query("DROP TABLE IF EXISTS `${prefix}event_divisions`");
 		$this->db->query("
 			CREATE TABLE `${prefix}event_divisions` (
 			  `id` int(10) unsigned NOT NULL auto_increment,
@@ -58,6 +71,7 @@ class Event_model extends Model
 			  KEY `FK_eventclasses_1` USING BTREE (`event`)
 			) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=latin1;		
 		");
+		$this->db->query("DROP TABLE IF EXISTS `${prefix}event_entries`");
 		$this->db->query("
 			CREATE TABLE `${prefix}event_entries` (
 			  `id` int(10) unsigned NOT NULL auto_increment,
@@ -67,6 +81,7 @@ class Event_model extends Model
 			  PRIMARY KEY  (`id`)
 			) ENGINE=InnoDB AUTO_INCREMENT=29 DEFAULT CHARSET=latin1;
 		");
+		$this->db->query("DROP TABLE IF EXISTS `${prefix}event_people`");
 		$this->db->query("
 			CREATE TABLE `${prefix}event_people` (
 			  `id` int(10) unsigned NOT NULL auto_increment,
@@ -75,6 +90,7 @@ class Event_model extends Model
 			  PRIMARY KEY  (`id`)
 			) ENGINE=InnoDB AUTO_INCREMENT=23 DEFAULT CHARSET=latin1;		
 		");
+		$this->db->query("DROP TABLE IF EXISTS `${prefix}event_registrations`");
 		$this->db->query("
 			CREATE TABLE `${prefix}event_registrations` (
 			  `id` int(10) unsigned NOT NULL auto_increment,
@@ -85,6 +101,7 @@ class Event_model extends Model
 			  PRIMARY KEY  (`id`)
 			) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=latin1;		
 		");
+		$this->db->query("DROP TABLE IF EXISTS `${prefix}person`");
 		$this->db->query("
 			CREATE TABLE `${prefix}person` (
 			  `id` int(10) unsigned NOT NULL auto_increment,
@@ -101,6 +118,7 @@ class Event_model extends Model
 			  KEY `Index_3` (`email`)
 			) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=latin1;
 		");
+		$this->db->query("DROP TABLE IF EXISTS `${prefix}team`");
 		$this->db->query("
 			CREATE TABLE `${prefix}team` (
 			  `id` int(10) unsigned NOT NULL auto_increment,
@@ -117,6 +135,7 @@ class Event_model extends Model
 			  PRIMARY KEY  (`id`)
 			) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=latin1;
 		");
+		$this->db->query("DROP TABLE IF EXISTS `${prefix}team_members`");
 		$this->db->query("
 			CREATE TABLE `${prefix}team_members` (
 			  `id` int(10) unsigned NOT NULL auto_increment,
@@ -125,10 +144,96 @@ class Event_model extends Model
 			  PRIMARY KEY  (`id`)
 			) ENGINE=InnoDB AUTO_INCREMENT=36 DEFAULT CHARSET=latin1;
 		");
+		$this->db->query("DROP VIEW IF EXISTS `${prefix}event_division_entries`");
 		$this->db->query("
-			CREATE VIEW `${prefix}event_division_entries` AS select `event_entries`.`event_division` AS `event_division`,count(0) AS `ct` from `event_entries` group by `event_entries`.`event_division`
+			CREATE VIEW `${prefix}event_division_entries` AS select `${prefix}event_entries`.`event_division` AS `event_division`,count(0) AS `ct` from `${prefix}event_entries` group by `${prefix}event_entries`.`event_division`
 		");
 
+		$divisions = array();
+        $divisions[] = $this->div_helper('Humanoid - Kung-Fu (LightWt-R/C)', 35, 0);
+        $divisions[] = $this->div_helper('Humanoid - Kung-Fu (MiddleWt-R/C)', 35, 0);
+        $divisions[] = $this->div_helper('Humanoid - Freestyle/Acrobatics (R/C)', 35, 0);
+        $divisions[] = $this->div_helper('Humanoid - Stair Climbing (R/C)', 35, 0);
+        $divisions[] = $this->div_helper('Humanoid - Biped Race (R/C)', 35, 0);
+        $divisions[] = $this->div_helper('Humanoid - Golf (R/C)', 35, 0);
+        $divisions[] = $this->div_helper('Humanoid - Obstacle Course (R/C)', 35, 0);
+        $divisions[] = $this->div_helper('Humanoid - Sumo (R/C)', 35, 0);
+        $divisions[] = $this->div_helper('Humanoid - MechWars', 35, 0);
+        $divisions[] = $this->div_helper('Humanoid - BasketBall (Auto)', 35, 0);
+        $divisions[] = $this->div_helper('Humanoid - Weight Lifting (Auto)', 35, 0);
+        $divisions[] = $this->div_helper('Humanoid - Lift and Carry (Auto)', 35, 0);
+        $divisions[] = $this->div_helper('Humanoid - Marathon (Auto)', 35, 0);
+        $divisions[] = $this->div_helper('Humanoid - Obstacle Run (Auto)', 35, 0);
+        $divisions[] = $this->div_helper('Humanoid - Penalty Kick (Auto)', 35, 0);
+        $divisions[] = $this->div_helper('Humanoid - Dash (Auto)', 35, 0);
+        $divisions[] = $this->div_helper('Soccer - Biped Soccer 3:3 (R/C)', 100, 0);
+        $divisions[] = $this->div_helper('Soccer - MiroSot 5:5 (auton)', 300, 0);
+        $divisions[] = $this->div_helper('Soccer - MiroSot 11:11 (auton)', 300, 0);
+        $divisions[] = $this->div_helper('Sumo - 3kg (R/C)', 35, 0);
+        $divisions[] = $this->div_helper('Sumo - 3kg (auton)', 35, 0);
+        $divisions[] = $this->div_helper('Sumo - 1kg - Lego (auton)', 35, 0);
+        $divisions[] = $this->div_helper('Sumo - 500g (auton)', 35, 0);
+        $divisions[] = $this->div_helper('Sumo - 100g (auton)', 35, 0);
+        $divisions[] = $this->div_helper('Sumo - 25g (auton)', 35, 0);
+        $divisions[] = $this->div_helper('Combat - 340 lbs / 154.5 kg', 340, 0);
+        $divisions[] = $this->div_helper('Combat - 220 lbs / 100 kg', 220, 0);
+        $divisions[] = $this->div_helper('Combat - 120 lbs / 54.5 kg', 120, 0);
+        $divisions[] = $this->div_helper('Combat - 60 lbs / 27.3 kg', 60, 0);
+        $divisions[] = $this->div_helper('Combat - 30 lbs / 13.6 kg', 35, 0);
+        $divisions[] = $this->div_helper('Combat - 3 lbs / 1.4 kg', 35, 0);
+        $divisions[] = $this->div_helper('Combat - 3 lbs (auton)', 0, 0);
+        $divisions[] = $this->div_helper('Combat - 1 lb / 454g', 35, 0);
+        $divisions[] = $this->div_helper('Combat - 1 lb (auton)', 0, 0);
+        $divisions[] = $this->div_helper('Combat - 5.3 oz / 150g', 35, 0);
+        $divisions[] = $this->div_helper('Hockey - 12 lbs', 35, 0);
+        $divisions[] = $this->div_helper('Open - Best of Show', 35, 0);
+        $divisions[] = $this->div_helper('Open - Line Follower (auton)', 35, 0);
+        $divisions[] = $this->div_helper('Open - Maze/MicroMouse (auton)', 35, 0);
+        $divisions[] = $this->div_helper('Open - Lego Open (auton)', 35, 0);
+        $divisions[] = $this->div_helper('Open - Lego Challenge (auton)', 35, 0);
+        $divisions[] = $this->div_helper('Open - Tetrix Challenge', 35, 0);
+        $divisions[] = $this->div_helper('Open - Fire-Fighting (auton)', 35, 0);
+        $divisions[] = $this->div_helper('Open - Ribbon Climber (auton)', 35, 0);
+        $divisions[] = $this->div_helper('Open - Walker Challenge', 35, 0);
+        $divisions[] = $this->div_helper('Open - Aibo Performer (auton)', 35, 0);
+        $divisions[] = $this->div_helper('Open - Balancer Race (R/C)', 35, 0);
+        $divisions[] = $this->div_helper('Open - Balancer Race (auton)', 35, 0);
+        $divisions[] = $this->div_helper('Open - Table Top Nav (auton)', 35, 0);
+        $divisions[] = $this->div_helper('Open - Vex Challenge', 35, 0);
+        $divisions[] = $this->div_helper('Jr League - Woots & Snarks', 0, 0);
+        $divisions[] = $this->div_helper('Jr League - Lego Challenge', 0, 0);
+        $divisions[] = $this->div_helper('Jr League - Lego Magellan', 0, 0);
+        $divisions[] = $this->div_helper('Jr League - Lego Open', 0, 0);
+        $divisions[] = $this->div_helper('Jr League - Best of Show', 0, 0);
+        $divisions[] = $this->div_helper('Jr League - 500 g Sumo', 0, 0);
+        $divisions[] = $this->div_helper('Jr League - 120 lb combat', 0, 0);
+        $divisions[] = $this->div_helper('Jr League - 1 lb Combat', 0, 0);
+        $divisions[] = $this->div_helper('Jr League - BotsketBall', 0, 0);
+        $divisions[] = $this->div_helper('Jr League - Tetrix Challenge', 35, 0);
+        $divisions[] = $this->div_helper('Auto - Robomagellan', 35, 0);
+        $divisions[] = $this->div_helper('Auto - NatCar (auton)', 35, 0);
+        $divisions[] = $this->div_helper('Tetsujin - Weightlifting', 100, 0);
+        $divisions[] = $this->div_helper('Tetsujin - Walking Race', 100, 0);
+        $divisions[] = $this->div_helper('Art Bots - Static', 35, 0);
+        $divisions[] = $this->div_helper('Art Bots - Kinetic', 35, 0);
+        $divisions[] = $this->div_helper('Art Bots - Bartending', 35, 0);
+        $divisions[] = $this->div_helper('Art Bots - Musical', 35, 0);
+        $divisions[] = $this->div_helper('Art Bots - Painting', 35, 0);
+        $divisions[] = $this->div_helper('BEAM - Speeder', 35, 0);
+        $divisions[] = $this->div_helper('BEAM - Photovore', 35, 0);
+        $divisions[] = $this->div_helper('BEAM - Robosapien', 35, 0);
+
+		$this->create_event(array(
+			'name' => 'Robogames 2009',
+			'image' => '/images/events/robogames.gif',
+			'smallimage' => '/images/events/robogames.gif',
+			'description' => 'RoboGames, the world\'s largest robot competition, returns this summer, with teams from around the world competing in over 60 different events.  Register today.',
+			'startdate' => '2009-06-12 00:00:00',
+			'enddate' => '2009-06-14 00:00:00',
+			'registrationends' => '2009-05-20 00:00:00',
+			'websiteurl' => 'http://www.robogames.net/',
+			'location' => 'San Francisco, CA'
+		), $divisions);
 
 		/*$this->db->empty_table('entry');
 		$this->db->empty_table('person');
@@ -163,7 +268,7 @@ class Event_model extends Model
 	{
 		return $this->db
 			->select('event_divisions.id as id, divisions.name as name, event, division, description, ruleurl, maxentries, price')
-			->select('COALESCE(event_division_entries.ct, 0) as ct', FALSE)
+			->select('(COALESCE(ct, 0)) as ct', FALSE)
 			->from('event_divisions')
 			->join('divisions', 'divisions.id = event_divisions.division')
 			->join('event_division_entries', 'event_division_entries.event_division = event_divisions.id', 'left')
@@ -355,6 +460,31 @@ class Event_model extends Model
 		$this->db
 			->where('id', $registration_id)
 			->update('event_registrations', $data);
+	}
+
+	function create_event($data, $divisions)
+	{	
+		$this->db->insert('event', $data);
+		$eventid = $this->db->insert_id();
+		
+		foreach ($divisions as $div)
+		{
+			$data = array(
+				'event' => $eventid,
+				'division' => $div['division'],
+				'description' => $div['description'],
+				'ruleurl' => $div['ruleurl'],
+				'maxentries' => $div['maxentries'],
+				'price' => $div['price']
+			);
+			$this->db->insert('event_divisions', $data);
+		}
+	}
+	
+	function create_division($name)
+	{		
+		$this->db->insert('divisions', array('name' => $name));
+		return $this->db->insert_id();
 	}
 	
 }
