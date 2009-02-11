@@ -322,7 +322,7 @@ class Event_model extends Model
 	function get_event_people_grouped($id)
 	{
 		$entries = $this->db
-			->select('person.id, person.fullname, person.picture_url, event_registration')
+			->select('person.id, person.fullname, person.picture_url, person.thumbnail_url, event_registration')
 			->from('person')
 			->join('event_people', 'event_people.person = person.id')
 			->join('event_registrations', 'event_people.event_registration = event_registrations.id')
