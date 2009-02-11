@@ -66,11 +66,13 @@ $(document).ready(function() {
 
 <?=form_open_multipart("event/register/".$event->id)?>
 
+<? if (!empty($registration_errors)): ?><div class="error"><?=$registration_errors?></div><? endif; ?>
+
 <h2>Select which people are going to attend</h2>
 <div id="event_register_competitors">
 <? foreach ($team_members as $person): ?>
 	<div class="event_person">		
-		<?=form_checkbox('person[]', $person->id, $form_person)?>
+		<?=form_checkbox('person[]', $person->id, isset($form_person[$person->id]))?>
 		<div class="event_person_thumbnail">
 			<?=img(!empty($person->thumbnail_url)?$person->thumbnail_url:'/images/nopicture.png')?>
 		</div>
@@ -120,8 +122,8 @@ $(document).ready(function() {
 <div id="event_register_entries">
 <? foreach ($team_entries as $entry): ?> 
 	<div class="event_entry">
-		<?=form_checkbox('entry[]', $entry->id, $form_entry)?>
-		<div><?=form_dropdown("entry_division[$entry->id]", $event_divisions)?></div>
+		<?=form_checkbox('entry[]', $entry->id, isset($form_entry[$entry->id]))?>
+		<div><?=form_dropdown("entry_division[$entry->id]", $event_divisions, isset($form_entry_division[$entry->id])?$form_entry_division[$entry->id]:'')?></div>
 		
 		<div class="event_entry_thumbnail">
 			<?=img(!empty($entry->thumbnail_url)?$entry->thumbnail_url:'/images/nopicture-entry.png')?>
@@ -137,7 +139,7 @@ $(document).ready(function() {
 
 <p id="add_entry"><a href="#">Add an entry to your team</a></p>
 <div class="event_register_add_entry_frame">
-	<? if (!empty($add_member_errors)): ?><div class="error"><?=$add_member_errors?></div><? endif; ?>
+	<? if (!empty($add_entry_errors)): ?><div class="error"><?=$add_entry_errors?></div><? endif; ?>
 
 	<h3>Add Entry to Team</h3>
 	<p>

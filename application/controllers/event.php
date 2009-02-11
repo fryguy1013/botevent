@@ -8,6 +8,7 @@ class Event extends Controller
 		parent::Controller();
 		
 		$this->load->model('Event_model');
+		$this->upload_errors = "";
 	}
 	
 	function index()
@@ -125,7 +126,7 @@ class Event extends Controller
 		{
 			$this->form_validation->set_rules("entry_name", "Entry Name", 'trim|required');
 			$file_upload = $this->_do_upload('entry_photo');
-			if ($this->form_validation->run() != FALSE)
+			if ($this->form_validation->run() != FALSE && ($file_upload === TRUE || empty($_FILES['entry_photo']['name'])))
 			{
 				$e = $this->Entry_model->add_entry(
 						$this->input->post('entry_name'),						
@@ -135,13 +136,13 @@ class Event extends Controller
 			else
 			{
 				$data['show_add_entry'] = TRUE;
-				$data['add_entry_errors'] = validation_errors();
+				$data['add_entry_errors'] = $this->upload_errors.validation_errors();
 			}			
 		}
 		else if ($this->input->post('submit') == 'Register')
 		{
-			$this->form_validation->set_rules('person[]', 'Person List', 'required');
-			$this->form_validation->set_rules('entry[]', 'Entry List', 'required');
+			$this->form_validation->set_rules('person[]', 'List of people attending', 'required');
+			$this->form_validation->set_rules('entry[]', 'List of entries attending', 'required');
 
 			if ($this->form_validation->run() != FALSE)
 			{
@@ -179,6 +180,7 @@ class Event extends Controller
 		$data['team_entries'] = $this->Team_model->get_team_entries($teamid);
 		$data['form_person'] = $this->input->post('person');
 		$data['form_entry'] = $this->input->post('entry');
+		$data['form_entry_division'] = $this->input->post('entry_division');
 		
 		$this->load->view('view_header');	
 		$this->load->view('view_event_header', $data);
