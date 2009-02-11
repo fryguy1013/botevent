@@ -94,8 +94,9 @@ class Event extends Controller
 		
 		if ($this->input->post('submit') == 'Add Member')
 		{
+			$this->form_validation->set_message('unique_email', 'That email address is already in use. Choose another.');
 			$this->form_validation->set_rules("fullname", "Full Name", 'trim|required');
-			$this->form_validation->set_rules("email_addr", "Email Address", 'trim|required|valid_email');
+			$this->form_validation->set_rules("email_addr", "Email Address", 'trim|required|valid_email|callback_unique_email');
 			$this->form_validation->set_rules('dob_month', 'DOB Month', 'trim|required');
 			$this->form_validation->set_rules('dob_day', 'DOB Day', 'trim|required');
 			$this->form_validation->set_rules('dob_year', 'DOB Year', 'trim|required');			
@@ -252,11 +253,11 @@ class Event extends Controller
 		$this->output->set_output($status);
 	}
 	
-	function valid_email_or_blank($str)
+	function unique_email($str)
 	{
-		if (empty($str))
-			return TRUE;		
-		return valid_email($str);
+		$this->load->model('Person_model');
+		$person = $this->Person_model->get_person_by_email($str);		
+		return count($person) == 0;
 	}
 	
 	
