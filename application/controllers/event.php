@@ -127,7 +127,7 @@ class Event extends Controller
 		{
 			$this->form_validation->set_rules("entry_name", "Entry Name", 'trim|required');
 			$file_upload = $this->_do_upload('entry_photo');
-			if ($this->form_validation->run() != FALSE && ($file_upload === TRUE || empty($_FILES['entry_photo']['name'])))
+			if ($this->form_validation->run() != FALSE && ($file_upload !== FALSE || empty($_FILES['entry_photo']['name'])))
 			{
 				$e = $this->Entry_model->add_entry(
 						$this->input->post('entry_name'),						
