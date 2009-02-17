@@ -39,6 +39,7 @@
 			<?=img(!empty($person->thumbnail_url)?$person->thumbnail_url:'/images/nopicture.png')?>
 		</div>
 		<div class="event_person_name"><?=$person->fullname?></div>
+		<div class="event_person_edit"><a href="<?=site_url(array('person', 'edit', $person->id))?>" id="edit_member_<?=$person->id?>">Edit</a></div>
 	</div>
 <? endforeach; ?>
 	<div style="clear: both;" />
@@ -48,10 +49,11 @@
 <div class="event_register_add_person_frame">
 	<? if (!empty($add_member_errors)): ?><div class="error"><?=$add_member_errors?></div><? endif; ?>
 
-	<h3>Add Person to Team</h3>
+	<?=form_hidden('person_id', set_value('person_id', ''))?>
+	<h3 id="add_member_heading">Add Person to Team</h3>
 	<p>
 		<div>Full Name:</div>
-		<input name="fullname" type="text" value="<?=set_value('fullname', '')?>" size="25" />
+		<?=form_input("fullname", set_value('fullname', ''), 'size="25"')?>
 	</p>
 	
 	<p>
@@ -69,13 +71,13 @@
 	
 	<p>
 		<div>Date of Birth</div>
-		<?=form_dropdown('dob_month', $months, set_value('dob_month'))?>
-		<?=form_dropdown('dob_day', $days, set_value('dob_day'))?>
-		<?=form_dropdown('dob_year', $years, set_value('dob_year', 1984))?>
+		<?=form_dropdown('dob_month', $months, set_value('dob_month'), 'id="dob_month"')?>
+		<?=form_dropdown('dob_day', $days, set_value('dob_day'), 'id="dob_day"')?>
+		<?=form_dropdown('dob_year', $years, set_value('dob_year', 1984), 'id="dob_year"')?>
 	</p>	
 	
 	<p>
-		<?=form_submit('submit', 'Add Member')?>
+		<?=form_submit('submit', !empty($show_edit_member) ? 'Edit Member' : 'Add Member', 'id="add_member_button"')?>
 		<?=form_reset('submit', 'Cancel')?>
 	</p>
 </div>
@@ -91,6 +93,7 @@
 			<?=img(!empty($entry->thumbnail_url)?$entry->thumbnail_url:'/images/nopicture-entry.png')?>
 		</div>
 		<div class="event_entry_name"><?=$entry->name?></div>
+		<div class="event_entry_edit"><a href="<?=site_url(array('entry', 'edit', $entry->id))?>" id="edit_entry_<?=$entry->id?>">Edit</a></div>
 	</div>
 <? endforeach; ?>
 <? if (count($team_entries) == 0): ?>
@@ -103,7 +106,8 @@
 <div class="event_register_add_entry_frame">
 	<? if (!empty($add_entry_errors)): ?><div class="error"><?=$add_entry_errors?></div><? endif; ?>
 
-	<h3>Add Entry to Team</h3>
+	<?=form_hidden('entry_id', set_value('entry_id', ''))?>
+	<h3 id="add_entry_heading">Add Entry to Team</h3>
 	<p>
 		<div>Name:</div>
 		<input name="entry_name" type="text" value="<?=set_value('entry_name', '')?>" size="25" />
@@ -115,7 +119,7 @@
 	</p>
 	
 	<p>
-		<?=form_submit('submit', 'Add Entry')?>
+		<?=form_submit('submit', !empty($show_edit_entry) ? 'Edit Entry' : 'Add Entry', 'id="add_entry_button"')?>
 		<?=form_reset('submit', 'Cancel')?>
 	</p>
 </div>
@@ -131,39 +135,81 @@
 function update_member_checked() {
 	$(this).parent().css('background', this.checked ? '#aaf' : '');
 }
-function toggle_add_member_frame() {
-	$('p#add_member').toggle();
-	$('div.event_register_add_person_frame').toggle();
-	return false;
+
+var which_visible = 'none';
+function update_frames_visibility()
+{
+	$('p#add_member').toggle(which_visible != 'add_member');
+	$('div.event_register_add_person_frame').toggle(which_visible == 'add_member');
+
+	$('p#add_entry').toggle(which_visible != 'add_entry');
+	$('div.event_register_add_entry_frame').toggle(which_visible == 'add_entry');
+	$("form:not(.filter) :input[type=text]:visible:first").focus();
+
 }
-function toggle_add_entry_frame() {
-	$('p#add_entry').toggle();
-	$('div.event_register_add_entry_frame').toggle();
-	return false;
+function make_update_frames_closure(x)
+{
+	return function()
+	{
+		which_visible = x;
+		update_frames_visibility();
+		return false;
+	}
+}
+function make_edit_member_closure(id, name, email, dob_month, dob_day, dob_year)
+{
+	return function()
+	{
+		$('input[name=person_id]').val(id);
+		$('input[name=fullname]').val(name);
+		$('input[name=email_addr]').val(email);
+		if (dob_month)
+			$('select[name=dob_month]').find("option[value='" + dob_month + "']").attr('selected', 'selected');
+		if (dob_day)			
+			$('select[name=dob_day]').find("option[value='" + dob_day + "']").attr('selected', 'selected');
+		if (dob_year)
+			$('select[name=dob_year]').find("option[value='" + dob_year + "']").attr('selected', 'selected');
+		$('#add_member_heading').text(!id ? 'Add Person To Team' : 'Edit Person');		
+		$('#add_member_button').val(!id ? 'Add Member' : 'Edit Member');
+		return make_update_frames_closure('add_member')();
+	}
+}
+
+function make_edit_entry_closure(id, name)
+{
+	return function()
+	{
+		$('input[name=entry_id]').val(id);
+		$('input[name=entry_name]').val(name);
+
+		$('#add_entry_heading').text(!id ? 'Add Entry to Team' : 'Edit Entry');		
+		$('#add_entry_button').val(!id ? 'Add Entry' : 'Edit Entry');
+		return make_update_frames_closure('add_entry')();
+	}
 }
 
 $(document).ready(function() {
 	$('div.event_person > input[type=checkbox]')
-		.change(update_member_checked)
+		.change(update_member_checked)		
+		.click(update_member_checked)
 		.each(update_member_checked);
 		
 	$('div.event_entry > input[type=checkbox]')
 		.change(update_member_checked)
-		.each(update_member_checked);		
+		.click(update_member_checked)
+		.each(update_member_checked);
 	
-	$('p#add_member > a').click(toggle_add_member_frame);
-	$('div.event_register_add_person_frame').find('input[type=reset]').click(toggle_add_member_frame);
+	$('p#add_member > a').click(make_edit_member_closure('', '', '', '1', '1', '1984'));
+	$('div.event_register_add_person_frame').find('input[type=reset]').click(make_update_frames_closure('none'));	
+	$('p#add_entry > a').click(make_edit_entry_closure('', ''));
+	$('div.event_register_add_entry_frame').find('input[type=reset]').click(make_update_frames_closure('none'));
 	
-	<? if (empty($show_add_member)): ?>
-	toggle_add_member_frame();
+	<? if (!empty($show_add_member)): ?>
+	which_visible = 'add_member';
+	<? elseif (!empty($show_add_entry)): ?>
+	which_visible = 'add_entry';
 	<? endif; ?>
-
-	$('p#add_entry > a').click(toggle_add_entry_frame);
-	$('div.event_register_add_entry_frame').find('input[type=reset]').click(toggle_add_entry_frame);
-	
-	<? if (empty($show_add_entry)): ?>
-	toggle_add_entry_frame();
-	<? endif; ?>
+	update_frames_visibility();
 
 
 	<? if (!empty($hide_form)): ?>
@@ -175,5 +221,28 @@ $(document).ready(function() {
 		return false;
 	});
 	<? endif; ?>
+	
+	
+	
+	<? foreach ($team_members as $person): ?>
+	<? $dob_parts = explode('/', $person->dob); ?>			
+		$('a#edit_member_<?=$person->id?>').click(make_edit_member_closure(
+			'<?=$person->id?>',
+			'<?=$person->fullname?>',
+			'<?=$person->email?>',
+			'<?=$dob_parts[0]?>',
+			'<?=$dob_parts[1]?>',
+			'<?=$dob_parts[2]?>'
+		));
+	<? endforeach; ?>
+
+	<? foreach ($team_entries as $entry): ?>
+		$('a#edit_entry_<?=$entry->id?>').click(make_edit_entry_closure(
+			'<?=$entry->id?>',
+			'<?=$entry->name?>'
+		));
+	<? endforeach; ?>
+	
+	
 });
 </script>

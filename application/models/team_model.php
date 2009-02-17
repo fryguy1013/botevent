@@ -31,7 +31,7 @@ class Team_model extends Model
 	function get_team_members($id)
 	{
 		return $this->db
-			->select('person.id, fullname, picture_url, thumbnail_url')
+			->select('person.id, fullname, picture_url, thumbnail_url, email, dob')
 			->from('person')
 			->join('team_members', 'person.id = team_members.person')
 			->where('team_members.team', $id)

@@ -92,7 +92,7 @@ class Event extends Controller
 		$data['event'] = $this->Event_model->get_event($id);
 		$data['event_divisions'] = $this->Event_model->get_event_divisions_as_id_desc($id);
 		
-		if ($this->input->post('submit') == 'Add Member')
+		if ($this->input->post('submit') == 'Add Member' || $this->input->post('submit') == 'Edit Member')
 		{			
 			$this->form_validation->set_rules("fullname", "Full Name", 'trim|required');
 			$this->form_validation->set_rules("email_addr", "Email Address", 'trim|callback_valid_email_or_blank|callback_unique_email');
@@ -104,34 +104,58 @@ class Event extends Controller
 			$file_upload = $this->_do_upload('badge_photo');
 			if ($this->form_validation->run() != FALSE && $file_upload !== FALSE)
 			{
-				$p = $this->Person_model->add_person(
-						$this->input->post('fullname'),
-						$dob,
-						$this->input->post('email_addr'),
-						$file_upload,
-						'');
+				if ($this->input->post('submit') == 'Add Member')
+				{
+					$p = $this->Person_model->add_person(
+							$this->input->post('fullname'),
+							$dob,
+							$this->input->post('email_addr'),
+							$file_upload,
+							'');
+				print_r($p);
 				
-				if ($p !== FALSE)
-					$this->Team_model->add_team_member($teamid, $p);
+					if ($p !== FALSE)
+						$this->Team_model->add_team_member($teamid, $p);
+					else
+						$data['show_add_member'] = TRUE;
+				}
 				else
-					$data['show_add_member'] = TRUE;
+				{									
+					$this->Person_model->edit_person(
+							$this->input->post('person_id'),
+							$this->input->post('fullname'),
+							$dob,
+							$this->input->post('email_addr'),
+							$file_upload);					
+				}
 			}
 			else
 			{
 				$data['show_add_member'] = TRUE;
+				$data['show_edit_member'] = $this->input->post('submit') == 'Edit Member';
 				$data['add_member_errors'] =  $this->upload_errors.validation_errors();
 			}			
 		}
-		else if ($this->input->post('submit') == 'Add Entry')
+		else if ($this->input->post('submit') == 'Add Entry' || $this->input->post('submit') == 'Edit Entry')
 		{
 			$this->form_validation->set_rules("entry_name", "Entry Name", 'trim|required');
 			$file_upload = $this->_do_upload('entry_photo');
 			if ($this->form_validation->run() != FALSE && ($file_upload !== FALSE || empty($_FILES['entry_photo']['name'])))
 			{
-				$e = $this->Entry_model->add_entry(
-						$this->input->post('entry_name'),						
-						$teamid,
-						$file_upload);
+				if ($this->input->post('submit') == 'Add Entry')
+				{
+					$e = $this->Entry_model->add_entry(
+							$this->input->post('entry_name'),						
+							$teamid,
+							$file_upload);
+				}
+				else
+				{
+					$this->Entry_model->edit_entry(
+							$this->input->post('entry_id'),
+							$this->input->post('entry_name'),						
+							$file_upload);
+				}
 			}
 			else
 			{
@@ -245,7 +269,7 @@ class Event extends Controller
 		$this->load->model('Person_model');
 		$person = $this->Person_model->get_person_by_email($str);
 		$this->form_validation->set_message('unique_email', 'That email address is already in use. Choose another.');		
-		return count($person) == 0;
+		return TRUE; //count($person) == 0;
 	}	
 	
 	function _do_upload($field) 
