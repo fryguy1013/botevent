@@ -22,49 +22,11 @@
 	for ($i=2009; $i>=1920; $i--) $years[$i] = $i;
 ?>
 
-<script type="text/javascript">
 
-function update_member_checked() {
-	$(this).parent().css('background', this.checked ? '#aaf' : '');
-}
-function toggle_add_member_frame() {
-	$('p#add_member').toggle();
-	$('div.event_register_add_person_frame').toggle();
-	return false;
-}
-function toggle_add_entry_frame() {
-	$('p#add_entry').toggle();
-	$('div.event_register_add_entry_frame').toggle();
-	return false;
-}
 
-$(document).ready(function() {
-	$('div.event_person > input[type=checkbox]')
-		.change(update_member_checked)
-		.each(update_member_checked);
-		
-	$('div.event_entry > input[type=checkbox]')
-		.change(update_member_checked)
-		.each(update_member_checked);		
-	
-	$('p#add_member > a').click(toggle_add_member_frame);
-	$('div.event_register_add_person_frame').find('input[type=reset]').click(toggle_add_member_frame);
-	
-	<? if (empty($show_add_member)): ?>
-	toggle_add_member_frame();
-	<? endif; ?>
-
-	$('p#add_entry > a').click(toggle_add_entry_frame);
-	$('div.event_register_add_entry_frame').find('input[type=reset]').click(toggle_add_entry_frame);
-	
-	<? if (empty($show_add_entry)): ?>
-	toggle_add_entry_frame();
-	<? endif; ?>
-
-});
-</script>
-
+<div id="event_register_form">
 <?=form_open_multipart("event/register/".$event->id)?>
+<?=form_hidden('hide_registration', 'TRUE')?>
 
 <? if (!empty($registration_errors)): ?><div class="error"><?=$registration_errors?></div><? endif; ?>
 
@@ -72,7 +34,7 @@ $(document).ready(function() {
 <div id="event_register_competitors">
 <? foreach ($team_members as $person): ?>
 	<div class="event_person">		
-		<?=form_checkbox('person[]', $person->id, isset($form_person[$person->id]))?>
+		<?=form_checkbox('person[]', $person->id, is_array($form_person) && in_array($person->id, $form_person))?>
 		<div class="event_person_thumbnail">
 			<?=img(!empty($person->thumbnail_url)?$person->thumbnail_url:'/images/nopicture.png')?>
 		</div>
@@ -122,7 +84,7 @@ $(document).ready(function() {
 <div id="event_register_entries">
 <? foreach ($team_entries as $entry): ?> 
 	<div class="event_entry">
-		<?=form_checkbox('entry[]', $entry->id, isset($form_entry[$entry->id]))?>
+		<?=form_checkbox('entry[]', $entry->id, is_array($form_entry) && in_array($entry->id, $form_entry))?>
 		<div><?=form_dropdown("entry_division[$entry->id]", $event_divisions, isset($form_entry_division[$entry->id])?$form_entry_division[$entry->id]:'')?></div>
 		
 		<div class="event_entry_thumbnail">
@@ -161,3 +123,57 @@ $(document).ready(function() {
 <p id="register_button_frame"><?=form_submit('submit', 'Register')?></p>
 
 <?=form_close()?>
+</div>
+
+
+<script type="text/javascript">
+
+function update_member_checked() {
+	$(this).parent().css('background', this.checked ? '#aaf' : '');
+}
+function toggle_add_member_frame() {
+	$('p#add_member').toggle();
+	$('div.event_register_add_person_frame').toggle();
+	return false;
+}
+function toggle_add_entry_frame() {
+	$('p#add_entry').toggle();
+	$('div.event_register_add_entry_frame').toggle();
+	return false;
+}
+
+$(document).ready(function() {
+	$('div.event_person > input[type=checkbox]')
+		.change(update_member_checked)
+		.each(update_member_checked);
+		
+	$('div.event_entry > input[type=checkbox]')
+		.change(update_member_checked)
+		.each(update_member_checked);		
+	
+	$('p#add_member > a').click(toggle_add_member_frame);
+	$('div.event_register_add_person_frame').find('input[type=reset]').click(toggle_add_member_frame);
+	
+	<? if (empty($show_add_member)): ?>
+	toggle_add_member_frame();
+	<? endif; ?>
+
+	$('p#add_entry > a').click(toggle_add_entry_frame);
+	$('div.event_register_add_entry_frame').find('input[type=reset]').click(toggle_add_entry_frame);
+	
+	<? if (empty($show_add_entry)): ?>
+	toggle_add_entry_frame();
+	<? endif; ?>
+
+
+	<? if (!empty($hide_form)): ?>
+	$('div#event_register_form').hide();
+	
+	$('div.event_registerbutton > a').click(function() {
+		$('div.event_registration').hide();
+		$('div#event_register_form').show();
+		return false;
+	});
+	<? endif; ?>
+});
+</script>

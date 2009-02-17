@@ -57,7 +57,7 @@ class Event extends Controller
 		$this->load->view('view_footer');
 	}
 	
-	function Register($id)
+	function Register($id, $extra = '')
 	{
 		$this->load->library(array('session', 'form_validation'));
 		$this->load->model(array('Person_model', 'Team_model', 'Entry_model', 'Event_registration_model'));
@@ -81,11 +81,11 @@ class Event extends Controller
 		
 		// first check if they are already registered, and if they are, redirect them
 		$team_registration = $this->Event_registration_model->get_event_registration_by_team($id, $teamid);
-		if (count($team_registration) != 0)
-		{
-			redirect(array('event_registration', 'view', $team_registration->id));
-			return;		
-		}
+		//if (count($team_registration) != 0)
+		//{
+		//	redirect(array('event_registration', 'view', $team_registration->id));
+		//	return;		
+		//}
 		
 
 		$data = array();
@@ -164,7 +164,12 @@ class Event extends Controller
 					);
 				}
 				
-				$registration_id = $this->Event_registration_model->create_registration($id, $teamid, $personid, $registration_people, $registration_entries);
+				$registration_id = $this->Event_registration_model->create_registration(
+					$id,
+					$teamid,
+					$personid,
+					$registration_people,
+					$registration_entries);
 				
 				$this->session->set_flashdata('registration_success', TRUE);
 				redirect(array('event_registration', 'view', $registration_id));
@@ -185,6 +190,16 @@ class Event extends Controller
 		
 		$this->load->view('view_header');	
 		$this->load->view('view_event_header', $data);
+		if (count($team_registration) != 0 && !$this->input->post('hide_registration') && $extra != 'update')
+		{
+			$data2 = array();
+			$data2['event'] = $data['event'];
+			$data2['registration'] = $team_registration;
+			$data2['entries'] = $this->Event_registration_model->get_registration_entries($team_registration->id);
+			$data2['people'] = $this->Event_registration_model->get_registration_people($team_registration->id);
+			$this->load->view('view_event_registration', $data2);
+			$data['hide_form'] = TRUE;
+		}
 		$this->load->view('view_event_register', $data);
 		$this->load->view('view_footer');		
 	}
@@ -194,9 +209,11 @@ class Event extends Controller
 	
 	function Manage($id)
 	{
+		$this->load->model('Event_registration_model');
+	
 		$data = array();
 		$data['event'] = $this->Event_model->get_event($id);
-		$data['event_registrations'] = $this->Event_model->get_event_registrations($id);
+		$data['event_registrations'] = $this->Event_registration_model->get_event_registrations($id);
 		$data['event_entries'] = $this->Event_model->get_event_entries_grouped($id);
 		$data['event_people'] = $this->Event_model->get_event_people_grouped($id);
 

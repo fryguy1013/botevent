@@ -23,4 +23,3 @@ class Person extends Controller
 		$this->load->view('view_footer');		
 	}
 }
-?>

@@ -37,7 +37,9 @@ class Event_model extends Model
 			->select('event_entries.event_division, COUNT(*) as ct', FALSE)
 			->from('event_entries')
 			->join('event_divisions', 'event_divisions.id = event_division')
+			->join('event_registrations', 'event_entries.event_registration = event_registrations.id')
 			->where('event_divisions.event', $event)
+			->where('event_registrations.status !=', 'withdrawn')
 			->group_by('event_division')
 			->get()->result();
 		$ret = array();

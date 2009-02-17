@@ -9,13 +9,15 @@ class Event_registration_model extends Model
 	}
 	
 
-	function get_event_registrations($id)
+	function get_event_registrations($event_id)
 	{
 		return $this->db
 			->select('event_registrations.id, event_registrations.team, event_registrations.status, team.name as teamname, team.id as teamid')
 			->from('event_registrations')
 			->join('team', 'team.id = event_registrations.team')
-			->where('event', $id)
+			->where('event', $event_id)
+			->where('event_registrations.status !=', 'withdrawn')
+			->order_by('team.name')
 			->get()->result();
 	}
 	
@@ -27,20 +29,21 @@ class Event_registration_model extends Model
 			->join('team', 'team.id = event_registrations.team')
 			->where('event_registrations.team', $teamid)
 			->where('event_registrations.event', $eventid)
+			->where('event_registrations.status !=', 'withdrawn')
 			->get()->row();
 	}
 	
-	function get_event_registration($id)
+	function get_event_registration($registration_id)
 	{
 		return $this->db
 			->select('event_registrations.id, event_registrations.team, event_registrations.status, team.name as teamname, team.id as teamid, event_registrations.event as event')
 			->from('event_registrations')
 			->join('team', 'team.id = event_registrations.team')
-			->where('event_registrations.id', $id)
+			->where('event_registrations.id', $registration_id)
 			->get()->row();
 	}	
 
-	function get_registration_entries($id)
+	function get_registration_entries($registration_id)
 	{
 		return $this->db
 			->select('entry.id, entry.name, entry.description, entry.thumbnail_url, event_registration, divisions.name as divisionname')
@@ -49,16 +52,16 @@ class Event_registration_model extends Model
 			->join('event_registrations', 'event_entries.event_registration = event_registrations.id')
 			->join('event_divisions', 'event_divisions.id = event_entries.event_division')
 			->join('divisions', 'divisions.id = event_divisions.division')
-			->where('event_registrations.id', $id)
+			->where('event_registrations.id', $registration_id)
 			->get()->result();
 	}	
-	function get_registration_people($id)
+	function get_registration_people($registration_id)
 	{
 		return $this->db
 			->select('person.id, person.fullname, person.picture_url, event_registration, person.thumbnail_url')
 			->from('person')
 			->join('event_people', 'event_people.person = person.id')
-			->where('event_registration', $id)
+			->where('event_registration', $registration_id)
 			->get()->result();	
 	}
 	
@@ -80,12 +83,18 @@ class Event_registration_model extends Model
 	
 	function add_new_registration($event_id, $team_id, $captain)
 	{
+		// we must remove the other registrations, first
+		$this->db
+			->where('team', $team_id)
+			->update('event_registrations', array('status' => 'withdrawn'));
+	
+		// now add the new one
 		$data = array(
 			'team' => $team_id,
 			'event' => $event_id,
 			'status' => 'new',
 			'captain' => $captain
-		);
+		);		
 		
 		$this->db->insert('event_registrations', $data);
 		return $this->db->insert_id();

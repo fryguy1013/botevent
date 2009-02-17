@@ -1,4 +1,4 @@
-<div class="event_registration_team">
+<div class="event_registration">
 	<div class="event_registration_status">
 		Status: <?=$registration->status?>
 	</div>
@@ -9,6 +9,14 @@
 		that point, you will be able to pay for your entry. 
 		<? endif; ?>
 	</div>
+
+	<div class="event_registerbutton">
+		<a href="<?=site_url(array('event', 'register', $event->id, 'update'))?>">Change Registration</a>
+	</div>
+	<div class="event_withdrawbutton">
+		<a href="<?=site_url(array('event_registration', 'withdraw', $registration->id))?>">Withdraw</a>
+	</div>
+
 
 	<? foreach ($people as $person): ?> 
 		<div class="event_person">
