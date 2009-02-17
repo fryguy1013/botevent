@@ -206,30 +206,6 @@ class Event extends Controller
 		$this->load->view('view_footer');
 	}
 	
-	function Uploadpicture()
-	{
-		$config = array();
-		$config['upload_path'] = './images/uploads/';
-		$config['allowed_types'] = 'gif|jpg|png';
-		$config['max_size']	= '2000';
-		$config['encrypt_name'] = TRUE;
-		//$config['max_width']  = '1024';
-		//$config['max_height']  = '768';
-		
-		$this->load->library('upload', $config);
-		
-		if (!$this->upload->do_upload('photo'))
-		{
-			$error = array('error' => $this->upload->display_errors());			
-			$this->output->set_output("error: ". var_export($error));
-		}	
-		else
-		{
-			$data = $this->upload->data();
-			$this->output->set_output("success: /images/uploads/".$data['file_name']);
-		}		
-	}
-	
 	function Updatestatus($regid)
 	{
 		$status = $this->input->post('status');
@@ -238,13 +214,13 @@ class Event extends Controller
 		$this->output->set_output($status);
 	}
 	
+	
 	function unique_email($str)
 	{
 		$this->load->model('Person_model');
 		$person = $this->Person_model->get_person_by_email($str);		
 		return count($person) == 0;
-	}
-	
+	}	
 	
 	function _do_upload($field) 
 	{ 

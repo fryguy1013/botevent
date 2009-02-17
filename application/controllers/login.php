@@ -132,6 +132,7 @@ class Login extends Controller {
 			$file_upload = $this->_do_upload('badge_photo');
 			if (empty($data['userurl']))
 			{
+				// NO OPENID
 				$this->form_validation->set_rules('fullname', 'Full Name', 'trim|required');
 				$this->form_validation->set_rules('password1', 'Password', 'trim|required|matches[password2]');
 				$this->form_validation->set_rules('password2', 'Password Confirmation', 'trim|required');
@@ -142,7 +143,7 @@ class Login extends Controller {
 						$this->input->post('fullname'),
 						$dob,
 						$this->session->userdata('openid_email'),
-						'',
+						$file_upload,
 						"mailto:".$this->session->userdata('openid_email'),
 						$this->input->post('password1'));
 				}
@@ -153,6 +154,7 @@ class Login extends Controller {
 			}
 			else
 			{
+				// HAS OPENID
 				$this->form_validation->set_rules('fullname', 'Full Name', 'trim|required');
 				$this->form_validation->set_rules('email_addr', 'Email Address', 'trim|required|valid_email');
 					
