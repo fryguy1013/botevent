@@ -58,9 +58,10 @@ class Event_model extends Model
 			->select('entry.id, entry.name, entry.description, entry.thumbnail_url, team.name as teamname, team.id as teamid, event_registrations.status')
 			->from('entry')
 			->join('event_entries', 'event_entries.entry = entry.id')
-			->join('event_registrations', 'event_entries.event_registration = event_registrations.id')
+			->join('event_registrations', 'event_entries.event_registration = event_registrations.id')			
 			->join('team', 'team.id = entry.team')
 			->where('event_entries.event_division', $division)
+			->where('event_registrations.status !=', 'withdrawn')
 			->get()->result();
 	}
 	
