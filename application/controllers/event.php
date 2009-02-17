@@ -93,10 +93,9 @@ class Event extends Controller
 		$data['event_divisions'] = $this->Event_model->get_event_divisions_as_id_desc($id);
 		
 		if ($this->input->post('submit') == 'Add Member')
-		{
-			$this->form_validation->set_message('unique_email', 'That email address is already in use. Choose another.');
+		{			
 			$this->form_validation->set_rules("fullname", "Full Name", 'trim|required');
-			$this->form_validation->set_rules("email_addr", "Email Address", 'trim|required|valid_email|callback_unique_email');
+			$this->form_validation->set_rules("email_addr", "Email Address", 'trim|callback_valid_email_or_blank|callback_unique_email');
 			$this->form_validation->set_rules('dob_month', 'DOB Month', 'trim|required');
 			$this->form_validation->set_rules('dob_day', 'DOB Day', 'trim|required');
 			$this->form_validation->set_rules('dob_year', 'DOB Year', 'trim|required');			
@@ -232,10 +231,20 @@ class Event extends Controller
 	}
 	
 	
+	function valid_email_or_blank($email)
+	{
+		if (empty($email))
+			return TRUE;
+		$this->form_validation->set_message('valid_email_or_blank', 'The email address must be valid, or blank');
+		return $this->form_validation->valid_email($email);
+	}	
 	function unique_email($str)
 	{
+		if (empty($str))
+			return TRUE;
 		$this->load->model('Person_model');
-		$person = $this->Person_model->get_person_by_email($str);		
+		$person = $this->Person_model->get_person_by_email($str);
+		$this->form_validation->set_message('unique_email', 'That email address is already in use. Choose another.');		
 		return count($person) == 0;
 	}	
 	
