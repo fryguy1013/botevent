@@ -10,8 +10,9 @@ class Install_model extends Model
 	
 	function div_helper($name, $price, $max)
 	{
+		$this->load->model('Event_model');
 		return array(
-			'division' => $this->create_division($name),
+			'division' => $this->Event_model->create_division($name),
 			'price' => $price,
 			'maxentries' => $max,
 			'description' => '',
@@ -20,6 +21,7 @@ class Install_model extends Model
 	}		
 	function reset()
 	{
+		/*
 		$prefix = $this->db->dbprefix;
 		$this->db->query("DROP TABLE IF EXISTS `${prefix}divisions`");
 		$this->db->query("
@@ -223,7 +225,7 @@ class Install_model extends Model
         $divisions[] = $this->div_helper('BEAM - Photovore', 35, 0);
         $divisions[] = $this->div_helper('BEAM - Robosapien', 35, 0);
 
-		$this->create_event(array(
+		$this->Event_model->create_event(array(
 			'name' => 'Robogames 2009',
 			'image' => '/images/events/robogames.gif',
 			'smallimage' => '/images/events/robogames.gif',
@@ -234,13 +236,20 @@ class Install_model extends Model
 			'websiteurl' => 'http://www.robogames.net/',
 			'location' => 'San Francisco, CA'
 		), $divisions);
-
+		*/
 		/*$this->db->empty_table('entry');
 		$this->db->empty_table('person');
 		$this->db->empty_table('team');
 		$this->db->empty_table('event_entries');
 		$this->db->empty_table('event_people');
 		$this->db->empty_table('event_registrations');
+		*/
+		
+		/*
+		$this->db->where('name', 'Humanoid - MechWars')->update('divisions', array('name' => 'Humanoid - MechWars (LW)'));		
+		
+		$this->Event_model->add_division_to_event(4, $this->div_helper('Humanoid - MechWars (MW)', 35, 0));
+		$this->Event_model->add_division_to_event(4, $this->div_helper('Open - Shooting Gallery', 35, 0));
 		*/
 	}	
 }

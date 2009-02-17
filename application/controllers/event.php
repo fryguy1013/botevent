@@ -18,7 +18,8 @@ class Event extends Controller
 	
 	function Reset()
 	{
-		$this->Event_model->reset();
+		$this->load->model('Install_model');
+		$this->Install_model->reset();
 	}
 
 	function All()

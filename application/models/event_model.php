@@ -25,6 +25,7 @@ class Event_model extends Model
 			->from('event_divisions')
 			->join('divisions', 'divisions.id = event_divisions.division')
 			->where('event', $id)
+			->order_by('divisions.name')
 			->get()->result();
 	}
 	
@@ -141,16 +142,20 @@ class Event_model extends Model
 		
 		foreach ($divisions as $div)
 		{
-			$data = array(
-				'event' => $eventid,
-				'division' => $div['division'],
-				'description' => $div['description'],
-				'ruleurl' => $div['ruleurl'],
-				'maxentries' => $div['maxentries'],
-				'price' => $div['price']
-			);
-			$this->db->insert('event_divisions', $data);
+			add_division_to_event($eventid, $div);
 		}
+	}
+	function add_division_to_event($eventid, $div)
+	{
+		$data = array(
+			'event' => $eventid,
+			'division' => $div['division'],
+			'description' => $div['description'],
+			'ruleurl' => $div['ruleurl'],
+			'maxentries' => $div['maxentries'],
+			'price' => $div['price']
+		);
+		$this->db->insert('event_divisions', $data);
 	}
 	
 	function create_division($name)
