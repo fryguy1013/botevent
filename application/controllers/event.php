@@ -60,7 +60,7 @@ class Event extends Controller
 	function Register($id)
 	{
 		$this->load->library(array('session', 'form_validation'));
-		$this->load->model(array('Person_model', 'Team_model', 'Entry_model'));
+		$this->load->model(array('Person_model', 'Team_model', 'Entry_model', 'Event_registration_model'));
 	
 		$personid = $this->session->userdata('userid');
 		if ($personid === false)
@@ -80,10 +80,10 @@ class Event extends Controller
 		}
 		
 		// first check if they are already registered, and if they are, redirect them
-		$team_registration = $this->Event_model->get_event_registration_by_team($teamid);
+		$team_registration = $this->Event_registration_model->get_event_registration_by_team($id, $teamid);
 		if (count($team_registration) != 0)
 		{
-			redirect(array('event', 'viewregistration', $team_registration->id));
+			redirect(array('event_registration', 'view', $team_registration->id));
 			return;		
 		}
 		
@@ -164,10 +164,10 @@ class Event extends Controller
 					);
 				}
 				
-				$registration_id = $this->Event_model->create_registration($id, $teamid, $personid, $registration_people, $registration_entries);
+				$registration_id = $this->Event_registration_model->create_registration($id, $teamid, $personid, $registration_people, $registration_entries);
 				
 				$this->session->set_flashdata('registration_success', TRUE);
-				redirect(array('event', 'viewregistration', $registration_id));
+				redirect(array('event_registration', 'view', $registration_id));
 				return;
 			}
 			else
@@ -189,22 +189,7 @@ class Event extends Controller
 		$this->load->view('view_footer');		
 	}
 	
-	function Viewregistration($id)
-	{
-		$data = array();
-		
-		$registration = $this->Event_model->get_event_registration($id);
 
-		$data['event'] = $this->Event_model->get_event($registration->event);
-		$data['registration'] = $registration;
-		$data['entries'] = $this->Event_model->get_registration_entries($id);
-		$data['people'] = $this->Event_model->get_registration_people($id);
-
-		$this->load->view('view_header');	
-		$this->load->view('view_event_header', $data);
-		$this->load->view('view_event_registration', $data);
-		$this->load->view('view_footer');				
-	}
 
 	
 	function Manage($id)
