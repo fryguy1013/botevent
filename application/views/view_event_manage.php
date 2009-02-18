@@ -13,7 +13,7 @@ $(document).ready(function() {
 		$(this).find('div.event_reg_message').hide();
 		var t = $(this).find('input[type=submit]');
 		$.post($(this).attr('action'), {
-			status: $(this).find('select[name=change_status]').children('[selected]').text()
+			status: $(this).find('select[name=change_status]').val()
 		}, function (data) {
 			t.attr('disabled', 'disabled');
 		});
@@ -47,13 +47,17 @@ $(document).ready(function() {
 			<?=form_open("event/updatestatus/".$reg->id)?>
 			<div>
 				Update status:
-				<?=form_dropdown('change_status', array('new', 'pending_payment', 'accepted', 'rejected'), $reg->status)?>
+				<?=form_dropdown('change_status', array(
+					'new' => 'New',
+					'pending_payment' => 'Pending Payment',
+					'accepted' => 'Accepted',
+					'rejected' => 'Rejected'), $reg->status)?>
 				<?=form_submit('submit', 'Change')?>
 			</div>
-			<div class="event_reg_message">
+			<!--<div class="event_reg_message">
 				<div>Enter Message:</div>
 				<div><?=form_textarea(array('name'=>'change_email', 'value'=>'', 'rows'=>4, 'cols'=>35))?></div>
-			</div>			
+			</div>-->			
 			<?=form_close()?>
 		</div>	
 	

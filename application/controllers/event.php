@@ -250,8 +250,9 @@ class Event extends Controller
 	
 	function Updatestatus($regid)
 	{
+		$this->load->model('Event_registration_model');
 		$status = $this->input->post('status');
-		$this->Event_model->update_reg_status($regid, $status);
+		$this->Event_registration_model->update_reg_status($regid, $status);
 		
 		$this->output->set_output($status);
 	}
