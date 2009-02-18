@@ -87,7 +87,9 @@
 <? foreach ($team_entries as $entry): ?> 
 	<div class="event_entry">
 		<?=form_checkbox('entry[]', $entry->id, is_array($form_entry) && in_array($entry->id, $form_entry))?>
-		<div><?=form_dropdown("entry_division[$entry->id]", $event_divisions, isset($form_entry_division[$entry->id])?$form_entry_division[$entry->id]:'')?></div>
+		<div><?=form_dropdown("entry_division[$entry->id]", $event_divisions,
+			isset($form_entry_division[$entry->id]) ? $form_entry_division[$entry->id] :
+			(isset($form_entry_division_base[$entry->id]) ? $form_entry_division_base[$entry->id] : ''))?></div>
 		
 		<div class="event_entry_thumbnail">
 			<?=img(!empty($entry->thumbnail_url)?$entry->thumbnail_url:'/images/nopicture-entry.png')?>

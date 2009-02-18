@@ -211,6 +211,7 @@ class Event extends Controller
 		$data['form_person'] = $this->input->post('person');
 		$data['form_entry'] = $this->input->post('entry');
 		$data['form_entry_division'] = $this->input->post('entry_division');
+		$data['form_entry_division_base'] = $this->Team_model->get_team_entry_event_divisions($teamid, $id);
 		
 		$this->load->view('view_header');	
 		$this->load->view('view_event_header', $data);
