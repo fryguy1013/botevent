@@ -218,7 +218,10 @@ img
 	margin: .5em;
 	padding: .5em;
 	text-align: center;
-	overflow: hidden;
+}
+.event_entry select
+{
+	width: 150px;
 }
 
 .event_entry_thumbnail img
