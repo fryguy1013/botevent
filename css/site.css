@@ -30,6 +30,11 @@ body
 	padding: 10px;
 }
 
+img
+{
+	max-width: 100%;
+}
+
 #mainheading > div
 {
 	float: right;
@@ -37,12 +42,17 @@ body
 
 a
 {
-	color: #000;
+	color: #203356;
 }
 
 h2
 {
 	margin-top: .25em;
+}
+
+h4
+{
+	margin-bottom: 0em;
 }
 
 .error {
@@ -425,4 +435,25 @@ h2
 .badge_photo_guidelines
 {
 	font-size: .8em;
+}
+
+
+/* view_entry */
+.entryview_team,
+.entryview_entry
+{
+	margin-bottom: .5em;
+}
+
+.entryview_team span,
+.entryview_entry span
+{
+	font-size: 12pt;
+	font-weight: bold;
+}
+
+.entryview_picture img
+{
+	margin-bottom: .5em;
+	border: 1px solid #000;
 }

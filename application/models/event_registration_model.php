@@ -64,7 +64,20 @@ class Event_registration_model extends Model
 			->where('event_registration', $registration_id)
 			->get()->result();	
 	}
-	
+	function get_events_for_entry($entry_id)
+	{
+		return $this->db
+			->select('event.id, event.name, event.startdate as date, divisions.name as division, event_entries.event_division, event_registrations.status')
+			->from('event_entries')
+			->join('event_divisions', 'event_divisions.id = event_entries.event_division')
+			->join('divisions', 'event_divisions.division = divisions.id')
+			->join('event', 'event_divisions.event = event.id')
+			->join('event_registrations', 'event_registrations.id = event_entries.event_registration')
+			->where('event_entries.entry', $entry_id)
+			->where('event_registrations.status !=', 'withdrawn')
+			->orderby('event.startdate desc')
+			->get()->result();	
+	}
 		
 
 
