@@ -13,14 +13,15 @@
 <body>
 
 <div id="mainheading">
-	<strong><a href="<?=site_url('')?>">RoboGames - Event Registration</a></strong>
-	<div>
+	<div id="mainheadingleft"><strong><a href="<?=site_url('')?>">RoboGames - Event Registration</a></strong></div>
+	<div id="mainheadingright">
 	<? if ($this->session->userdata('userid') === false): ?>
 		<a href="<?=site_url('login/logout')?>">Login</a>
 	<? else: ?>
 		Logged in as <a href="<?=site_url('person/view/'.$this->session->userdata('userid'))?>"><?=$this->session->userdata('fullname')?></a> | <a href="<?=site_url('login/logout')?>">Logout</a>
 	<? endif; ?>
 	</div>
+	<div style="clear: both;"></div>
 </div>
 
 <div id="maincontainer">

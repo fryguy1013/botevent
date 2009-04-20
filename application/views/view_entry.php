@@ -1,12 +1,12 @@
 
+<div class="entryview_entry">
+	<!--<span>Robot:</span>-->
+	<a href="<?=site_url(array('entry', 'view', $entry->id))?>"><?=$entry->name?></a>
+</div>
+
 <div class="entryview_team">
 	<span>Team:</span>
 	<a href="<?=site_url(array('team', 'view', $team->id))?>"><?=$team->name?></a>
-</div>
-
-<div class="entryview_entry">
-	<span>Robot:</span>
-	<a href="<?=site_url(array('entry', 'view', $entry->id))?>"><?=$entry->name?></a>
 </div>
 
 <div class="entryview_picture">
@@ -14,7 +14,7 @@
 </div>
 
 
-<div class="entryview_entry">
+<div class="entryview_competed">
 	<span>Competing in the following events:</span>
 	<? if (count($events) == 0): ?>
 	None
@@ -28,10 +28,3 @@
 	</div>
 	<? endforeach; ?>
 </div>
-
-
-<!--
-<br/><br/><pre><? print_r($entry); ?></pre>
-<br/><br/><pre><? print_r($team); ?></pre>
-<br/><br/><pre><? print_r($events); ?></pre>
--->

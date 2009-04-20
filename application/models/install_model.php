@@ -251,5 +251,26 @@ class Install_model extends Model
 		$this->Event_model->add_division_to_event(4, $this->div_helper('Humanoid - MechWars (MW)', 35, 0));
 		$this->Event_model->add_division_to_event(4, $this->div_helper('Open - Shooting Gallery', 35, 0));
 		*/
+		
+		/*
+		$salt = "6yQ4m4499HoplgP5CBqe";
+		$userid = "mwinders@me.com";
+		$this->db
+			->where('id', 177)
+			//->update('person', array('idurl' => 'https://www.google.com/accounts/o8/id?id=AItOawn2FYK0rhRlMus7ncSxkQxggFeXp5F2bw0'));
+			//->update('person', array('idurl' => 'http://www.burntpopcorn.net/'));
+			->update('person', array(
+				'password' => "65c09f8b2f686ce379e1d5ba216179633c12dc14",//sha1("test:$userid:$salt"),
+				'passwordsalt' => $salt,
+				));
+		*/	
+		
+		$users = $this->db
+			->select('*')
+			->from('person')
+			->get()->result();
+		echo "<pre>";
+		print_r($users);
+		
 	}	
 }

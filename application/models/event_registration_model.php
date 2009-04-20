@@ -78,6 +78,36 @@ class Event_registration_model extends Model
 			->orderby('event.startdate desc')
 			->get()->result();	
 	}
+	function get_events_for_team($team_id)
+	{
+		$rows = $this->db
+			->select('event.id as eventid, event.name eventname, event.startdate as date, divisions.name as division, event_entries.event_division, event_registrations.status,
+					  entry.id, entry.name')
+			->from('event_entries')
+			->join('entry', 'entry.id = event_entries.entry')
+			->join('event_divisions', 'event_divisions.id = event_entries.event_division')
+			->join('divisions', 'event_divisions.division = divisions.id')
+			->join('event', 'event_divisions.event = event.id')
+			->join('event_registrations', 'event_registrations.id = event_entries.event_registration')
+			->where('event_registrations.team', $team_id)
+			->where('event_registrations.status !=', 'withdrawn')
+			->orderby('event.startdate desc, event.id')
+			->get()->result();
+		$ret = array();
+		foreach ($rows as $row)
+		{
+			if (!isset($ret[$row->eventid]))
+				$ret[$row->eventid] = array(
+					'id' => $row->eventid,
+					'name' => $row->eventname,
+					'date' => $row->date,
+					'status' => $row->status,
+					'entries' => array(),
+				);
+			$ret[$row->eventid]['entries'][] = $row;
+		}
+		return $ret;
+	}
 		
 
 

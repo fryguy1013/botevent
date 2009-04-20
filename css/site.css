@@ -16,7 +16,7 @@ body
 	margin-left: auto;
 	margin-right: auto;
 	margin-top: 0;
-	padding: 10px;
+	padding: 10px;	
 }
 
 #maincontainer
@@ -35,7 +35,11 @@ img
 	max-width: 100%;
 }
 
-#mainheading > div
+#mainheadingleft
+{
+	float: left;
+}
+#mainheadingright
 {
 	float: right;
 }
@@ -52,7 +56,8 @@ h2
 
 h4
 {
-	margin-bottom: 0em;
+	font-size: 11pt;
+	margin-bottom: .25em;
 }
 
 .error {
@@ -60,6 +65,10 @@ h4
 	padding-left: .5em;
 	border: 1px solid #ff0000;
 	background: #ffaaaa;
+}
+ul
+{
+	margin: 0;
 }
 
 
@@ -439,15 +448,21 @@ h2
 
 
 /* view_entry */
-.entryview_team,
-.entryview_entry
+.entryview_entry,
+.entryview_team
 {
 	margin-bottom: .5em;
 }
 
-.entryview_team span,
-.entryview_entry span
+.entryview_entry
 {
+	font-size: 14pt;
+}
+.entryview_entry span,
+.entryview_team span,
+.entryview_competed span
+{
+	display: block;
 	font-size: 12pt;
 	font-weight: bold;
 }
@@ -456,4 +471,16 @@ h2
 {
 	margin-bottom: .5em;
 	border: 1px solid #000;
+}
+
+/* view_team */
+.teamview_members img
+{
+	width: 40px;
+	height: 50px;
+}
+.teamview_section span
+{
+	font-size: 11pt;
+	font-weight: bold;
 }
