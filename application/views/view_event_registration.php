@@ -6,7 +6,44 @@
 		<? if ($registration->status == "new"): ?>
 		Your registration is pending. The event organizer will review it, and
 		accept or reject it. You will get an email when this happens, and at
-		that point, you will be able to pay for your entry. 
+		that point, you will be able to pay for your entry.
+		<? elseif ($registration->status == "pending_payment"): ?>
+		<p>Your registration has been accepted, and you may pay now. Note that
+		payments are handled manually for now, so your status may not change
+		from pending payment to accepted immediately.</p>
+		
+		<h4>Amount due: $<?=$registration->due?></h4>
+		
+		<div class="pay_by_cc">
+			Pay by credit card
+			<form method="POST" action="http://www.asecurecart.net/server/cart.aspx/robogames">
+			<input type="hidden" name="Price" value="<?=$registration->due?>">
+			<input type="hidden" name="ID" value="<?=substr('Reg Fees - '.$registration->teamname, 0, 30)?> ">
+			<input type="hidden" name="Multi" value="N">
+			<input type="hidden" name="ReturnLink" value="http://robogames.net/registration/event_registration/view/<?=$registration->id?>">
+			<input type="submit" name="Submit" value="Add To Cart">
+			</form>
+		</div>
+		
+		<div class="pay_by_paypal">
+			Pay with paypal
+			<form target="paypal" action="https://www.paypal.com/cgi-bin/webscr" method="post">
+			<input type="image" src="https://www.paypal.com/en_US/i/btn/x-click-but22.gif" border="0" name="submit">
+			<input type="hidden" name="add" value="1">
+			<input type="hidden" name="cmd" value="_cart">
+			<input type="hidden" name="business" value="paypal@robogames.net">
+			<input type="hidden" name="item_name" value="Registration Fees for <?=$registration->teamname?> ">
+			<input type="hidden" name="amount" value="<?=$registration->due?>">
+			<input type="hidden" name="no_note" value="1">
+			<input type="hidden" name="no_shipping" value="1">
+			<input type="hidden" name="return" value="http://robogames.net/registration/event_registration/view/<?=$registration->id?>">
+			<input type="hidden" name="currency_code" value="USD">
+			</form>
+		</div>
+		
+		<? elseif ($registration->status == "accepted"): ?>
+		Your registration has been accepted, and you have paid. See you at the
+		event!
 		<? endif; ?>
 	</div>
 

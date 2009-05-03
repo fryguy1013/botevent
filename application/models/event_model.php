@@ -129,7 +129,11 @@ class Event_model extends Model
 			->get()->row();
 	}
 
-
+	function get_raw_division_from_event_division($event_division)
+	{
+		$row = $this->db->select('division')->from('event_divisions')->where('id', $event_division)->get()->row();
+		return $row->division;
+	}
 
 
 

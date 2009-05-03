@@ -280,6 +280,12 @@ img
 .event_reg_status
 {
 	margin: 1em;
+	margin-bottom: 0;
+}
+.event_reg_payment
+{
+	margin: 1em;
+	
 }
 
 .event_reg_minordetails
@@ -367,6 +373,19 @@ img
 .event_registration_status_description
 {
 	margin-left: 2em;
+}
+
+.pay_by_cc,
+.pay_by_paypal
+{
+	font-weight: bold;
+	border: 1px solid #000;
+	margin: 1em;
+	width: 10em;
+	padding: .5em;
+	margin-left: auto;
+	margin-right: auto;
+	text-align: center;
 }
 
 /* view login */

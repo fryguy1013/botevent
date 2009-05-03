@@ -265,12 +265,30 @@ class Install_model extends Model
 				));
 		*/	
 		
-		$users = $this->db
+		/*$users = $this->db
 			->select('*')
 			->from('person')
 			->get()->result();
 		echo "<pre>";
 		print_r($users);
+		*/
 		
+		$this->refresh_amount_due();
+	}
+	
+	function refresh_amount_due()
+	{
+		$prices = $this->db
+			->select('event_entries.event_registration', FALSE)
+			->select_sum('event_divisions.price', FALSE)
+			->from('event_entries')
+			->join('event_divisions', 'event_divisions.id = event_entries.event_division')
+			->groupby('event_entries.event_registration')
+			->get()->result();
+		
+		foreach ($prices as $price)
+		{
+			$this->db->update('event_registrations', array('due' => $price->price), array('id' => $price->event_registration));
+		}
 	}	
 }

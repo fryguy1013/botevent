@@ -141,12 +141,14 @@ class Event extends Controller
 		{
 			$this->form_validation->set_rules("entry_name", "Entry Name", 'trim|required');
 			$file_upload = $this->_do_upload('entry_photo');
+			$raw_division = $this->Event_model->get_raw_division_from_event_division($this->input->post('entry_div'));
 			if ($this->form_validation->run() != FALSE && ($file_upload !== FALSE || empty($_FILES['entry_photo']['name'])))
 			{
 				if ($this->input->post('submit') == 'Add Entry')
 				{
 					$e = $this->Entry_model->add_entry(
-							$this->input->post('entry_name'),						
+							$this->input->post('entry_name'),
+							$raw_division,
 							$teamid,
 							$file_upload);
 				}
@@ -155,6 +157,7 @@ class Event extends Controller
 					$this->Entry_model->edit_entry(
 							$this->input->post('entry_id'),
 							$this->input->post('entry_name'),						
+							$raw_division,
 							$file_upload);
 				}
 			}
@@ -207,7 +210,7 @@ class Event extends Controller
 
 
 		$data['team_members'] = $this->Team_model->get_team_members($teamid);
-		$data['team_entries'] = $this->Team_model->get_team_entries($teamid);
+		$data['team_entries'] = $this->Team_model->get_team_entries_with_event_division($teamid, $id);
 		$data['form_person'] = $this->input->post('person');
 		$data['form_entry'] = $this->input->post('entry');
 		$data['form_entry_division'] = $this->input->post('entry_division');
@@ -217,19 +220,11 @@ class Event extends Controller
 		$this->load->view('view_event_header', $data);
 		if (count($team_registration) != 0 && !$this->input->post('hide_registration') && $extra != 'update')
 		{
-			$data2 = array();
-			$data2['event'] = $data['event'];
-			$data2['registration'] = $team_registration;
-			$data2['entries'] = $this->Event_registration_model->get_registration_entries($team_registration->id);
-			$data2['people'] = $this->Event_registration_model->get_registration_people($team_registration->id);
-			$this->load->view('view_event_registration', $data2);
-			$data['hide_form'] = TRUE;
+			redirect(array('event_registration', 'view', $team_registration->id));
 		}
 		$this->load->view('view_event_register', $data);
 		$this->load->view('view_footer');		
 	}
-	
-
 
 	
 	function Manage($id)
@@ -252,11 +247,46 @@ class Event extends Controller
 	{
 		$this->load->model('Event_registration_model');
 		$status = $this->input->post('status');
-		$this->Event_registration_model->update_reg_status($regid, $status);
+		$message = $this->input->post('message');
+		$amount_due = $this->input->post('amount_due');
+		$this->Event_registration_model->update_reg_status($regid, $status, $amount_due);
+		$captain_email = $this->Event_registration_model->get_registration_captain_email($regid);
+		
+		$this->load->library('email');		
+		$this->email->from('registration@robogames.net', 'RoboGames Registration');
+		$this->email->to("fryguy1013@gmail.com");
+		
+		$this->email->subject('Registration Status has been updated');
+		
+		$email_message =
+"Registration changed to: $status  | $captain_email
+
+You can view the status of your entry, or make a payment here:
+".site_url(array('event_registration', 'view', $regid));
+
+		if (!empty($message))
+		{
+			$email_message .=
+"
+The event organizer has left the following message:
+$message";
+		}
+		
+		$this->email->message($email_message);
+		$this->email->send();
 		
 		$this->output->set_output($status);
 	}
 	
+	function Updatepayment($regid)
+	{
+		$this->load->model('Event_registration_model');
+		$amount_paid = $this->input->post('amount_paid');
+		$registration = $this->Event_registration_model->get_event_registration($regid);
+		$this->Event_registration_model->update_payment($registration->event, $registration->team, $amount_paid);
+	
+		$this->output->set_output($amount_paid);
+	}	
 	
 	function valid_email_or_blank($email)
 	{

@@ -82,14 +82,16 @@
 	</p>
 </div>
 
-<h2>Select the entries that will be present</h2>
+<h2>Select the robots that will be present</h2>
 <div id="event_register_entries">
 <? foreach ($team_entries as $entry): ?> 
 	<div class="event_entry">
+		<!-- <?=$entry->event_division?> -->
 		<?=form_checkbox('entry[]', $entry->id, is_array($form_entry) && in_array($entry->id, $form_entry))?>
 		<div><?=form_dropdown("entry_division[$entry->id]", $event_divisions,
 			isset($form_entry_division[$entry->id]) ? $form_entry_division[$entry->id] :
-			(isset($form_entry_division_base[$entry->id]) ? $form_entry_division_base[$entry->id] : ''))?></div>
+			(isset($form_entry_division_base[$entry->id]) ? $form_entry_division_base[$entry->id] :
+			$entry->event_division))?></div>
 		
 		<div class="event_entry_thumbnail">
 			<?=img(!empty($entry->thumbnail_url)?$entry->thumbnail_url:'/images/nopicture-entry.png')?>
@@ -99,12 +101,12 @@
 	</div>
 <? endforeach; ?>
 <? if (count($team_entries) == 0): ?>
-	<div class="error">There are no entries. Add one first</div>
+	<div class="error">There are no robots. Add one first</div>
 <? endif; ?>
 	<div style="clear: both;"></div>
 </div>
 
-<p id="add_entry"><a href="#">Add an entry to your team</a></p>
+<p id="add_entry"><a href="#">Add a robot to your team</a></p>
 <div class="event_register_add_entry_frame">
 	<? if (!empty($add_entry_errors)): ?><div class="error"><?=$add_entry_errors?></div><? endif; ?>
 
@@ -114,6 +116,12 @@
 		<div>Name:</div>
 		<input name="entry_name" type="text" value="<?=set_value('entry_name', '')?>" size="25" />
 	</p>
+
+	<p>
+		<div>Division: </div>
+		<?=form_dropdown("entry_div", $event_divisions, set_value('entry_div'))?>
+	</p>
+
 	
 	<p>
 		<div>Picture: (optional)</div>

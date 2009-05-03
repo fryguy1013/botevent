@@ -13,11 +13,12 @@ class Entry_model extends Model
 		return $this->db->get_where('entry', array('id'=>$id), 1)->row();
 	}
 	
-	function add_entry($name, $team, $picture_url)
+	function add_entry($name, $div, $team, $picture_url)
 	{
 		$data = array(
 				'name' => $name,
 				'team' => $team,
+				'default_division' => $div,
 				'picture_url' => $picture_url
 				);
 				
@@ -32,10 +33,11 @@ class Entry_model extends Model
 		return $this->db->insert_id();
 	}
 	
-	function edit_entry($entry_id, $name, $picture_url)
+	function edit_entry($entry_id, $name, $div, $picture_url)
 	{
 		$data = array(
 			'name' => $name,
+			'default_division' => $div,
 			'picture_url' => $picture_url
 		);
 				
@@ -44,7 +46,7 @@ class Entry_model extends Model
 			$thumbnail_url = $this->_make_thumbnail($picture_url);
 			if ($thumbnail_url !== FALSE)
 				$data['thumbnail_url'] = $thumbnail_url;
-		}			
+		}
 		
 		$this->db
 			->where('id', $entry_id)

@@ -12,10 +12,13 @@ class Event_registration_model extends Model
 	function get_event_registrations($event_id)
 	{
 		return $this->db
-			->select('event_registrations.id, event_registrations.team, event_registrations.status, team.name as teamname, team.id as teamid')
+			->select('event_registrations.id, event_registrations.team, event_registrations.status,
+			          team.name as teamname, team.id as teamid, team.country as teamcountry, event_registrations.due,
+					  event_payments.paid')
 			->from('event_registrations')
 			->join('team', 'team.id = event_registrations.team')
-			->where('event', $event_id)
+			->join('event_payments', 'event_payments.team = event_registrations.team and event_payments.event = event_registrations.event', 'left')
+			->where('event_registrations.event', $event_id)
 			->where('event_registrations.status !=', 'withdrawn')
 			->order_by('team.name')
 			->get()->result();
@@ -36,7 +39,8 @@ class Event_registration_model extends Model
 	function get_event_registration($registration_id)
 	{
 		return $this->db
-			->select('event_registrations.id, event_registrations.team, event_registrations.status, team.name as teamname, team.id as teamid, event_registrations.event as event')
+			->select('event_registrations.id, event_registrations.team, event_registrations.status, team.name as teamname,
+					  team.id as teamid, event_registrations.event as event, event_registrations.due')
 			->from('event_registrations')
 			->join('team', 'team.id = event_registrations.team')
 			->where('event_registrations.id', $registration_id)
@@ -108,6 +112,17 @@ class Event_registration_model extends Model
 		}
 		return $ret;
 	}
+	
+	function get_registration_captain_email($reg_id)
+	{
+		$row = $this->db
+			->select('email')
+			->from('person')
+			->join('event_people', 'event_people.person = person.id')
+			->where('event_people.event_registration', $reg_id)
+			->get()->row();
+		return $row->email;
+	}
 		
 
 
@@ -136,7 +151,8 @@ class Event_registration_model extends Model
 			'team' => $team_id,
 			'event' => $event_id,
 			'status' => 'new',
-			'captain' => $captain
+			'captain' => $captain,
+			'due' => 0
 		);		
 		
 		$this->db->insert('event_registrations', $data);
@@ -161,18 +177,42 @@ class Event_registration_model extends Model
 			'event_registration' => $registration_id
 		);
 		$this->db->insert('event_entries', $data);
-		return $this->db->insert_id();
+		$ret = $this->db->insert_id();
+		
+		// now add to the cost
+		$event_division = $this->db->get_where('event_divisions', array('id' => $event_division))->row();
+		$this->db
+			->set('due', 'due + '.$event_division->price, false)
+			->update('event_registrations', array(), array('id' => $registration_id));
+		
+		return $ret;
 	}
 	
-	function update_reg_status($registration_id, $status)
+	function update_reg_status($registration_id, $status, $amount_due)
 	{
 		$data = array(
-			'status' => $status
+			'status' => $status,
+			'due' => $amount_due
 		);
+		print_r($data);
 		
 		$this->db
 			->where('id', $registration_id)
 			->update('event_registrations', $data);
+	}
+	
+	function update_payment($event_id, $team_id, $amount_paid)
+	{
+		$this->db
+			->where('event', $event_id)
+			->where('team', $team_id)
+			->delete('event_payments');
+			
+		$this->db->insert('event_payments', array(
+			'event' => $event_id,
+			'team' => $team_id,
+			'paid' => $amount_paid,
+		));
 	}
 	
 }

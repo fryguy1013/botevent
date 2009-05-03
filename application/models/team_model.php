@@ -46,6 +46,15 @@ class Team_model extends Model
 			->where('team', $team_id)
 			->get()->result();			
 	}
+	function get_team_entries_with_event_division($team_id, $eventid)
+	{
+		return $this->db
+			->select('entry.id, name, entry.description, entry.thumbnail_url, entry.team, event_divisions.id as event_division')
+			->from('entry')
+			->join('event_divisions', 'entry.default_division = event_divisions.division and event_divisions.event = '.$eventid, 'left')
+			->where('team', $team_id)
+			->get()->result();			
+	}
 	
 	
 	function get_team_entry_event_divisions($team_id, $event_id)

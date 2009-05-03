@@ -3,29 +3,41 @@ $(document).ready(function() {
 	$('div.event_reg_message').hide();
 	$('div.event_reg_status').find('input[type=submit]').attr('disabled', 'disabled');
 
-	$('select[name=change_status]').change(function() {	
+	$('select[name=status]').change(function() {	
 		$(this).siblings('input[type=submit]').attr('disabled', '');
 		$(this).parents('div.event_reg_status').find('div.event_reg_message').show();
 		//alert($(this).children('[selected]').text());
 	});
-	
-	$('form').submit(function() {
+
+	$('div.event_reg_status > form').submit(function() {
 		$(this).find('div.event_reg_message').hide();
 		var t = $(this).find('input[type=submit]');
 		$.post($(this).attr('action'), {
-			status: $(this).find('select[name=change_status]').val()
+			status: $(this).find('select[name=status]').val(),
+			message: $(this).find('textarea[name=message]').val(),
+			amount_due: $(this).find('input[name=amount_due]').val()
 		}, function (data) {
 			t.attr('disabled', 'disabled');
 		});
 		return false;
 	});
-	
+
 	$('div.event_reg_fulldetails').hide();
 	$('div.event_reg_minordetails').click(function() {
-		$(this).hide();
-		$(this).next().show();
-	});
+		$('div.event_reg_minordetails').show();
+		$('div.event_reg_fulldetails').hide();
 	
+		$(this).hide();
+		$(this).next().show();		
+	});
+		
+	$('div.event_reg_payment > form').submit(function() {
+		$.post($(this).attr('action'), {
+			amount_paid: $(this).find('input[name=amount_paid]').val(),
+		}, function (data) { });
+		return false;
+	});
+
 });
 
 </script>
@@ -36,10 +48,10 @@ $(document).ready(function() {
 <div class="event_registration_team">
 	<div class="event_reg_minordetails">
 		<div style="float: right">Status: <?=$reg->status?></div>
-		<?=$reg->teamname?>
+		<?=$reg->teamname?> (<?=$reg->teamcountry?>)
 	</div>
 
-	<div class="event_reg_fulldetails">
+	<div class="event_reg_fulldetails" style="display: none;">
 		<div class="event_registration_team_name"><?=$reg->teamname?></div>
 
 
@@ -47,17 +59,27 @@ $(document).ready(function() {
 			<?=form_open("event/updatestatus/".$reg->id)?>
 			<div>
 				Update status:
-				<?=form_dropdown('change_status', array(
+				<?=form_dropdown('status', array(
 					'new' => 'New',
 					'pending_payment' => 'Pending Payment',
 					'accepted' => 'Accepted',
 					'rejected' => 'Rejected'), $reg->status)?>
+				Amount Due: <?=form_input('amount_due', $reg->due, 'size=4')?>
 				<?=form_submit('submit', 'Change')?>
 			</div>
-			<!--<div class="event_reg_message">
+			<div class="event_reg_message">
 				<div>Enter Message:</div>
-				<div><?=form_textarea(array('name'=>'change_email', 'value'=>'', 'rows'=>4, 'cols'=>35))?></div>
-			</div>-->			
+				<div><?=form_textarea(array('name'=>'message', 'value'=>'', 'rows'=>4, 'cols'=>35))?></div>
+			</div>			
+			<?=form_close()?>
+		</div>
+
+		<div class="event_reg_payment">
+			<?=form_open("event/updatepayment/".$reg->id)?>
+			<div>
+				Amount Paid: <?=form_input('amount_paid', $reg->due, 'size=4')?>
+				<?=form_submit('submit', 'Change')?>
+			</div>
 			<?=form_close()?>
 		</div>	
 	
