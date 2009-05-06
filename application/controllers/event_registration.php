@@ -7,7 +7,7 @@ class Event_registration extends Controller
 	{
 		parent::Controller();
 		
-		$this->load->model(array('Event_model', 'Event_registration_model'));
+		$this->load->model(array('Event_model', 'Event_registration_model', 'Team_model'));
 	}
 	
 	function View($registration_id)
@@ -39,6 +39,7 @@ class Event_registration extends Controller
 		$team_members = $this->Event_registration_model->get_registration_people($registration_id);
 		$personid = $this->session->userdata('userid');
 		
+		// sanity check that the logged in person is on the team
 		$good = FALSE;
 		foreach ($team_members as $member)
 			if ($member->id == $personid)
@@ -46,7 +47,20 @@ class Event_registration extends Controller
 				
 		if ($good)
 		{
-			$this->Event_registration_model->update_reg_status($registration_id, 'withdrawn');
+			$this->Event_registration_model->update_reg_status($registration_id, 'withdrawn', 0);
+
+			// send email to EO
+			$team = $this->Team_model->get_team($registration->team);
+			$event = $this->Event_model->get_event($registration->event);
+						
+			$this->load->library('email');		
+			$this->email->from('registration@robogames.net', 'RoboGames Registration');
+			$this->email->to("David Calkins <dcalkins@robotics-society.org>");
+			$this->email->cc("Kevin Hjelden <fryguy@burntpopcorn.net>");		
+			$this->email->subject($team->name.' has withdrawn from '.$event->name);
+			$this->email->message("no text");
+			$this->email->send();
+			
 			redirect(array('event', 'view', $registration->event));
 			return;
 		}

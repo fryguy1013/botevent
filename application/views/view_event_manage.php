@@ -77,7 +77,7 @@ $(document).ready(function() {
 		<div class="event_reg_payment">
 			<?=form_open("event/updatepayment/".$reg->id)?>
 			<div>
-				Amount Paid: <?=form_input('amount_paid', $reg->due, 'size=4')?>
+				Amount Paid: <?=form_input('amount_paid', $reg->paid, 'size=4')?>
 				<?=form_submit('submit', 'Change')?>
 			</div>
 			<?=form_close()?>

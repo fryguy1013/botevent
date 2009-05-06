@@ -197,6 +197,21 @@ class Event extends Controller
 					$personid,
 					$registration_people,
 					$registration_entries);
+
+				// send email to EO
+				$team = $this->Team_model->get_team($teamid);
+				$event = $this->Event_model->get_event($id);
+				$this->load->library('email');		
+				$this->email->from('registration@robogames.net', 'RoboGames Registration');
+				$this->email->to("David Calkins <dcalkins@robotics-society.org>");
+				$this->email->cc("Kevin Hjelden <fryguy@burntpopcorn.net>");		
+				$this->email->subject($team->name." has registered for ".$event->name);			
+				$this->email->message(
+					$team->name." has registered ".$event->name."\n\n" .
+					"You can view the registration here:\n" .
+					site_url(array('event_registration', 'view', $registration_id))
+				);
+				$this->email->send();				
 				
 				$this->session->set_flashdata('registration_success', TRUE);
 				redirect(array('event_registration', 'view', $registration_id));
@@ -254,12 +269,12 @@ class Event extends Controller
 		
 		$this->load->library('email');		
 		$this->email->from('registration@robogames.net', 'RoboGames Registration');
-		$this->email->to("fryguy1013@gmail.com");
+		$this->email->to($captain_email);
 		
 		$this->email->subject('Registration Status has been updated');
 		
 		$email_message =
-"Registration changed to: $status  | $captain_email
+"Registration changed to: $status
 
 You can view the status of your entry, or make a payment here:
 ".site_url(array('event_registration', 'view', $regid));
