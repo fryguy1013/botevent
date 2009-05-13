@@ -18,7 +18,7 @@
 			Pay by credit card
 			<form method="POST" action="http://www.asecurecart.net/server/cart.aspx/robogames">
 			<input type="hidden" name="Price" value="<?=$registration->due?>">
-			<input type="hidden" name="ID" value="<?=substr('Reg Fees - '.$registration->teamname, 0, 30)?> ">
+			<input type="hidden" name="ID" value="<?=substr('Reg Fees - '.$registration->teamname, 0, 30)?>">
 			<input type="hidden" name="Multi" value="N">
 			<input type="hidden" name="ReturnLink" value="http://robogames.net/registration/event_registration/view/<?=$registration->id?>">
 			<input type="submit" name="Submit" value="Add To Cart">
