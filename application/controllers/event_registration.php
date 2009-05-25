@@ -52,11 +52,13 @@ class Event_registration extends Controller
 			// send email to EO
 			$team = $this->Team_model->get_team($registration->team);
 			$event = $this->Event_model->get_event($registration->event);
-						
-			$this->load->library('email');		
+			$captain_email = $this->Event_registration_model->get_registration_captain_email($registration_id);
+
+			$this->load->library('email');
 			$this->email->from('registration@robogames.net', 'RoboGames Registration');
+			$this->email->reply_to($captain_email);
 			$this->email->to("David Calkins <dcalkins@robotics-society.org>");
-			$this->email->cc("Kevin Hjelden <fryguy@burntpopcorn.net>");		
+			//$this->email->to("Kevin Hjelden <fryguy@burntpopcorn.net>");		
 			$this->email->subject($team->name.' has withdrawn from '.$event->name);
 			$this->email->message("no text");
 			$this->email->send();
