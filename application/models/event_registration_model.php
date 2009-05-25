@@ -194,7 +194,6 @@ class Event_registration_model extends Model
 			'status' => $status,
 			'due' => $amount_due
 		);
-		print_r($data);
 		
 		$this->db
 			->where('id', $registration_id)
