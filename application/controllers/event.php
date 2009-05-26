@@ -113,12 +113,17 @@ class Event extends Controller
 							$this->input->post('email_addr'),
 							$file_upload,
 							'');
-				print_r($p);
 				
 					if ($p !== FALSE)
+					{
 						$this->Team_model->add_team_member($teamid, $p);
+					}
 					else
+					{
 						$data['show_add_member'] = TRUE;
+						$data['show_edit_member'] = FALSE;
+						$data['add_member_errors'] = "You must enter a unique email address. Leave the email field blank if there is no email address.";
+					}
 				}
 				else
 				{									
