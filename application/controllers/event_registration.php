@@ -60,7 +60,7 @@ class Event_registration extends Controller
 			$this->email->to("David Calkins <dcalkins@robotics-society.org>");
 			//$this->email->to("Kevin Hjelden <fryguy@burntpopcorn.net>");		
 			$this->email->subject($team->name.' has withdrawn from '.$event->name);
-			$this->email->message("no text");
+			$this->email->message(site_url(array('event_registration', 'view', $registration_id)));
 			$this->email->send();
 			
 			redirect(array('event', 'view', $registration->event));
