@@ -35,7 +35,8 @@ class Event extends Controller
 	function View($id)
 	{
 		$data = array();
-		$data['event'] = $this->Event_model->get_event($id);
+		$data['event'] = $event = $this->Event_model->get_event($id);
+		$data['registration_available'] = (strtotime($event->registrationends) > time());
 		$data['event_divisions'] = $this->Event_model->get_event_divisions($id);
 		$data['event_division_counts'] = $this->Event_model->get_event_divisions_counts($id);
 
@@ -58,10 +59,30 @@ class Event extends Controller
 		$this->load->view('view_footer');
 	}
 	
+	function Entries_xml($id)
+	{
+		$divisions = $this->Event_model->get_event_divisions($id);
+		foreach ($divisions as $division)
+		{
+			$division->entries = $this->Event_model->get_event_entries($division->event_division);
+			echo json_encode($division);
+		}
+	}
+	
 	function Register($id, $extra = '')
 	{
 		$this->load->library(array('session', 'form_validation'));
 		$this->load->model(array('Person_model', 'Team_model', 'Entry_model', 'Event_registration_model'));
+
+		$data = array();
+		$data['event'] = $event = $this->Event_model->get_event($id);
+		$data['event_divisions'] = $this->Event_model->get_event_divisions_as_id_desc($id);
+		
+		if (strtotime($event->registrationends) < time())
+		{
+			redirect(array('event', 'view', 4));
+			return;
+		}
 	
 		$personid = $this->session->userdata('userid');
 		if ($personid === false)
@@ -87,12 +108,8 @@ class Event extends Controller
 		//	redirect(array('event_registration', 'view', $team_registration->id));
 		//	return;		
 		//}
-		
+	
 
-		$data = array();
-		$data['event'] = $this->Event_model->get_event($id);
-		$data['event_divisions'] = $this->Event_model->get_event_divisions_as_id_desc($id);
-		
 		if ($this->input->post('submit') == 'Add Member' || $this->input->post('submit') == 'Edit Member')
 		{			
 			$this->form_validation->set_rules("fullname", "Full Name", 'trim|required');
@@ -205,7 +222,6 @@ class Event extends Controller
 
 				// send email to EO
 				$team = $this->Team_model->get_team($teamid);
-				$event = $this->Event_model->get_event($id);
 				$this->load->library('email');
 				$captain_email = $this->Event_registration_model->get_registration_captain_email($registration_id);		
 				$this->email->from('registration@robogames.net', 'RoboGames Registration');

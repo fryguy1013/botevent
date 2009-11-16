@@ -1,8 +1,10 @@
 <div class="event_details">
 	
+	<? if ($registration_available): ?>
 	<div class="event_registerbutton">
 		<a href="<?=site_url(array('event', 'register', $event->id))?>">Register</a>
 	</div>
+	<? endif; ?>
 	
 	<table class="event_divisions">
 	<? foreach ($event_divisions as $division): ?>

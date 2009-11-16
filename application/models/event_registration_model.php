@@ -144,6 +144,7 @@ class Event_registration_model extends Model
 		// we must remove the other registrations, first
 		$this->db
 			->where('team', $team_id)
+			->where('event', $event_id)
 			->update('event_registrations', array('status' => 'withdrawn'));
 	
 		// now add the new one
