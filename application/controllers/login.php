@@ -41,7 +41,7 @@ class Login extends Controller {
 					if (count($person) == 0)
 					{
 						$this->session->set_userdata('openid_email', $this->input->post('email_addr'));
-						redirect('login/register');
+						redirect(site_url(array('login','register')));
 						return;
 					}
 					else
@@ -275,7 +275,7 @@ class Login extends Controller {
 						$this->session->set_userdata('openid_email', $sreg['email']);
 					
 					$this->output->set_output("invalid user: $openid");
-					redirect('login/register');
+					redirect(site_url(array('login', 'register')));
 					return;
 				}
 				break;

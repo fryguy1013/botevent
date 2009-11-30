@@ -62,13 +62,37 @@ class Event extends Controller
 	function Entries_xml($id)
 	{
 		$divisions = $this->Event_model->get_event_divisions($id);
+		
+		$xml = new SimpleXMLElement('<event></event>');
 		foreach ($divisions as $division)
 		{
-			$division->entries = $this->Event_model->get_event_entries($division->event_division);
-			echo json_encode($division);
+			$xdiv = $xml->addChild('division');
+			
+			$xdiv->addAttribute('name', $division->name);
+			$xdiv->addAttribute('division', $division->division);
+			$xdiv->addAttribute('description', $division->description);
+			$xdiv->addAttribute('ruleurl', $division->ruleurl);
+			$xdiv->addAttribute('maxentries', $division->maxentries);
+			$xdiv->addAttribute('price', $division->price);
+
+			$entries = $this->Event_model->get_event_entries($division->event_division);
+			
+			foreach ($entries as $entry)
+			{
+				$xentry = $xdiv->addChild('entry');
+				$xentry->addAttribute('name', $entry->name);
+				$xentry->addAttribute('description', $entry->description);
+				$xentry->addAttribute('thumbnail_url', site_url($entry->thumbnail_url));
+				$xentry->addAttribute('teamname', $entry->teamname);
+				$xentry->addAttribute('teamid', $entry->teamid);
+				$xentry->addAttribute('status', $entry->status);
+			}			
 		}
+		
+		header('Content-Type: text/xml');
+		echo $xml->asXML();
 	}
-	
+
 	function Register($id, $extra = '')
 	{
 		$this->load->library(array('session', 'form_validation'));
@@ -78,9 +102,9 @@ class Event extends Controller
 		$data['event'] = $event = $this->Event_model->get_event($id);
 		$data['event_divisions'] = $this->Event_model->get_event_divisions_as_id_desc($id);
 		
-		if (strtotime($event->registrationends) < time())
+		if (time() > strtotime($event->registrationends))
 		{
-			redirect(array('event', 'view', 4));
+			redirect(site_url(array('event', 'view', $id)));
 			return;
 		}
 	
@@ -88,7 +112,7 @@ class Event extends Controller
 		if ($personid === false)
 		{
 			$this->session->set_userdata('onloginurl', "event/register/$id");
-			redirect('login');
+			redirect(site_url('login'));
 			return;
 		}
 		
@@ -237,7 +261,7 @@ class Event extends Controller
 				$this->email->send();				
 				
 				$this->session->set_flashdata('registration_success', TRUE);
-				redirect(array('event_registration', 'view', $registration_id));
+				redirect(site_url(array('event_registration', 'view', $registration_id)));
 				return;
 			}
 			else
