@@ -282,7 +282,7 @@ class Event extends Controller
 		$this->load->view('view_event_header', $data);
 		if (count($team_registration) != 0 && !$this->input->post('hide_registration') && $extra != 'update')
 		{
-			redirect(array('event_registration', 'view', $team_registration->id));
+			redirect(site_url(array('event_registration', 'view', $team_registration->id)));
 		}
 		$this->load->view('view_event_register', $data);
 		$this->load->view('view_footer');		
