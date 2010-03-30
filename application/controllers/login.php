@@ -11,6 +11,8 @@ class Login extends Controller {
 		$this->load->model('Person_model');
 		$this->config->load('openid');
 		
+		$this->upload_errors = "";
+		
 		//$this->output->enable_profiler(TRUE);
 	}
 	
