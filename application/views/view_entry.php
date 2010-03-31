@@ -10,7 +10,7 @@
 </div>
 
 <div class="entryview_picture">
-	<img src="<?=site_url($entry->picture_url)?>" />
+	<?=img(!empty($entry->picture_url)?$entry->picture_url:'/images/nopicture-entry.png')?>
 </div>
 
 
