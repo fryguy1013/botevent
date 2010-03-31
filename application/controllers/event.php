@@ -372,7 +372,7 @@ $message";
 		$config = array(); 
 		$config['upload_path'] = './images/uploads/'; 
 		$config['allowed_types'] = 'gif|jpg|png'; 
-		$config['max_size']	= '2000'; 
+		$config['max_size']	= '0';
 		$config['encrypt_name'] = TRUE; 
 		//$config['max_width']  = '1024'; 
 		//$config['max_height']  = '768';
