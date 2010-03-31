@@ -40,7 +40,6 @@ class Event extends Controller
 		$data['event_division_counts'] = $this->Event_model->get_event_divisions_counts($id);
 
 		$this->load->view('view_header');		
-		$this->load->view('view_event_header', $data);
 		$this->load->view('view_event', $data);
 		$this->load->view('view_footer');		
 	}
@@ -53,7 +52,6 @@ class Event extends Controller
 		$data['event_entries'] = $this->Event_model->get_event_entries($division);
 
 		$this->load->view('view_header');
-		$this->load->view('view_event_header', $data);
 		$this->load->view('view_event_entries', $data);
 		$this->load->view('view_footer');
 	}
@@ -238,8 +236,7 @@ class Event extends Controller
 		$data['form_entry_division'] = $this->input->post('entry_division');
 		$data['form_entry_division_base'] = $this->Team_model->get_team_entry_event_divisions($teamid, $id);
 		
-		$this->load->view('view_header');	
-		$this->load->view('view_event_header', $data);
+		$this->load->view('view_header');
 		if (count($team_registration) != 0 && !$this->input->post('hide_registration') && $extra != 'update')
 		{
 			redirect(array('event_registration', 'view', $team_registration->id));
@@ -260,7 +257,6 @@ class Event extends Controller
 		$data['event_people'] = $this->Event_model->get_event_people_grouped($id);
 
 		$this->load->view('view_header');		
-		$this->load->view('view_event_header', $data);
 		$this->load->view('view_event_manage', $data);
 		$this->load->view('view_footer');
 	}

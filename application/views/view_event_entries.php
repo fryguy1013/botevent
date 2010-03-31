@@ -1,3 +1,5 @@
+<?php $this->load->view('view_event_header'); ?>
+
 <div class="event_details">
 
 	<h2>Entries in the <?=$event_division->name?> division</h2>

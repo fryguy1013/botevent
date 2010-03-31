@@ -22,6 +22,7 @@
 	for ($i=2009; $i>=1920; $i--) $years[$i] = $i;
 ?>
 
+<?php $this->load->view('view_event_header'); ?>
 
 
 <div id="event_register_form">

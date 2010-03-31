@@ -1,3 +1,5 @@
+<?php $this->load->view('view_event_header'); ?>
+
 <div class="event_details">
 	
 	<div class="event_registerbutton">
