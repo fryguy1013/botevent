@@ -1,8 +1,19 @@
 <div class="event_details">
 	
+	<? if (!empty($registration_status)): ?>
+	<div class="event_registerbutton">
+		<a href="<?=site_url(array('event_registration', 'view', $registration_status->id))?>">View Registration Status</a>
+	</div>
+	<? elseif ($registration_available): ?>
 	<div class="event_registerbutton">
 		<a href="<?=site_url(array('event', 'register', $event->id))?>">Register</a>
 	</div>
+	<? else: ?>
+	<? $this->session->set_userdata('onloginurl', site_url(array('event', 'register', $event->id))); ?>
+	<div class="event_registerbutton">
+		<a href="<?=site_url(array('login'))?>">Login to see registration status</a>
+	</div>
+	<? endif; ?>
 	
 	<table class="event_divisions">
 	<? foreach ($event_divisions as $division): ?>

@@ -40,6 +40,7 @@ class Install_model extends Model
 			  `thumbnail_url` varchar(200) NOT NULL,
 			  `team` int(11) NOT NULL,
 			  `picture_url` varchar(200) NOT NULL,
+			  `default_division` int(11) NOT NULL,
 			  PRIMARY KEY  (`id`)
 			) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=latin1;
 		");

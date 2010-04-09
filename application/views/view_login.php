@@ -3,9 +3,11 @@
 $(document).ready(function() {
 	$('#openid').openid({});
 	// and, because css is a bastard:
+	/*
 	$('.openid_large_btn, .openid_small_btn').css('background-image', 'url(<?=site_url("/images/openid-icons.png")?>)');
 	$('#openid_inputarea').css('background-image', 'url(<?=site_url("/images/balloon.png")?>)');
-	$('#openid').css('background-image', 'url(<?=site_url("indicator.gif")?>)');
+	$('#openid').css('background-image', 'url(<?=site_url("/images/indicator.gif")?>)');
+	*/
 	
   
 });
