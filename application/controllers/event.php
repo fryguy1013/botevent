@@ -50,7 +50,6 @@ class Event extends Controller
 				$data['registration_status'] = $this->Event_registration_model->get_event_registration_by_team($id, $teamid[0]->id);
 		}
 
-
 		$this->load->view('view_header');		
 		$this->load->view('view_event_header', $data);
 		$this->load->view('view_event', $data);
