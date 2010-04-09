@@ -63,7 +63,7 @@ class Event_registration extends Controller
 			$this->email->message(site_url(array('event_registration', 'view', $registration_id)));
 			$this->email->send();
 			
-			redirect(array('event', 'view', $registration->event));
+			redirect(site_url(array('event', 'view', $registration->event)));
 			return;
 		}
 

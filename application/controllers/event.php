@@ -37,7 +37,8 @@ class Event extends Controller
 		$this->load->model(array('Team_model', 'Event_registration_model'));
 		
 		$data = array();
-		$data['event'] = $this->Event_model->get_event($id);
+		$data['event'] = $event = $this->Event_model->get_event($id);
+		$data['registration_available'] = (strtotime($event->registrationends) > time());
 		$data['event_divisions'] = $this->Event_model->get_event_divisions($id);
 		$data['event_division_counts'] = $this->Event_model->get_event_divisions_counts($id);
 
@@ -69,16 +70,60 @@ class Event extends Controller
 		$this->load->view('view_footer');
 	}
 	
+	function Entries_xml($id)
+	{
+		$divisions = $this->Event_model->get_event_divisions($id);
+		
+		$xml = new SimpleXMLElement('<event></event>');
+		foreach ($divisions as $division)
+		{
+			$xdiv = $xml->addChild('division');
+			
+			$xdiv->addAttribute('name', $division->name);
+			$xdiv->addAttribute('division', $division->division);
+			$xdiv->addAttribute('description', $division->description);
+			$xdiv->addAttribute('ruleurl', $division->ruleurl);
+			$xdiv->addAttribute('maxentries', $division->maxentries);
+			$xdiv->addAttribute('price', $division->price);
+
+			$entries = $this->Event_model->get_event_entries($division->event_division);
+			
+			foreach ($entries as $entry)
+			{
+				$xentry = $xdiv->addChild('entry');
+				$xentry->addAttribute('name', $entry->name);
+				$xentry->addAttribute('description', $entry->description);
+				$xentry->addAttribute('thumbnail_url', site_url($entry->thumbnail_url));
+				$xentry->addAttribute('teamname', $entry->teamname);
+				$xentry->addAttribute('teamid', $entry->teamid);
+				$xentry->addAttribute('status', $entry->status);
+			}			
+		}
+		
+		header('Content-Type: text/xml');
+		echo $xml->asXML();
+	}
+
 	function Register($id, $extra = '')
 	{
 		$this->load->library(array('session', 'form_validation'));
 		$this->load->model(array('Person_model', 'Team_model', 'Entry_model', 'Event_registration_model'));
+
+		$data = array();
+		$data['event'] = $event = $this->Event_model->get_event($id);
+		$data['event_divisions'] = $this->Event_model->get_event_divisions_as_id_desc($id);
+		
+		if (time() > strtotime($event->registrationends))
+		{
+			redirect(site_url(array('event', 'view', $id)));
+			return;
+		}
 	
 		$personid = $this->session->userdata('userid');
 		if ($personid === false)
 		{
 			$this->session->set_userdata('onloginurl', "event/register/$id");
-			redirect('login');
+			redirect(site_url('login'));
 			return;
 		}
 		
@@ -98,12 +143,8 @@ class Event extends Controller
 		//	redirect(array('event_registration', 'view', $team_registration->id));
 		//	return;		
 		//}
-		
+	
 
-		$data = array();
-		$data['event'] = $this->Event_model->get_event($id);
-		$data['event_divisions'] = $this->Event_model->get_event_divisions_as_id_desc($id);
-		
 		if ($this->input->post('submit') == 'Add Member' || $this->input->post('submit') == 'Edit Member')
 		{			
 			$this->form_validation->set_rules("fullname", "Full Name", 'trim|required');
@@ -216,7 +257,6 @@ class Event extends Controller
 
 				// send email to EO
 				$team = $this->Team_model->get_team($teamid);
-				$event = $this->Event_model->get_event($id);
 				$this->load->library('email');
 				$captain_email = $this->Event_registration_model->get_registration_captain_email($registration_id);		
 				$this->email->from('registration@robogames.net', 'RoboGames Registration');
@@ -232,7 +272,7 @@ class Event extends Controller
 				$this->email->send();				
 				
 				$this->session->set_flashdata('registration_success', TRUE);
-				redirect(array('event_registration', 'view', $registration_id));
+				redirect(site_url(array('event_registration', 'view', $registration_id)));
 				return;
 			}
 			else
@@ -253,7 +293,7 @@ class Event extends Controller
 		$this->load->view('view_event_header', $data);
 		if (count($team_registration) != 0 && !$this->input->post('hide_registration') && $extra != 'update')
 		{
-			redirect(array('event_registration', 'view', $team_registration->id));
+			redirect(site_url(array('event_registration', 'view', $team_registration->id)));
 		}
 		$this->load->view('view_event_register', $data);
 		$this->load->view('view_footer');		
@@ -343,7 +383,7 @@ $message";
 		$config = array(); 
 		$config['upload_path'] = './images/uploads/'; 
 		$config['allowed_types'] = 'gif|jpg|png'; 
-		$config['max_size']	= '2000'; 
+		$config['max_size']	= '0';
 		$config['encrypt_name'] = TRUE; 
 		//$config['max_width']  = '1024'; 
 		//$config['max_height']  = '768';
