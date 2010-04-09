@@ -34,10 +34,21 @@ class Event extends Controller
 	
 	function View($id)
 	{
+		$this->load->model(array('Team_model', 'Event_registration_model'));
+		
 		$data = array();
 		$data['event'] = $this->Event_model->get_event($id);
 		$data['event_divisions'] = $this->Event_model->get_event_divisions($id);
 		$data['event_division_counts'] = $this->Event_model->get_event_divisions_counts($id);
+
+		$personid = $this->session->userdata('userid');
+		if ($personid !== false)
+		{
+			$teamid = $this->Team_model->get_teams_for_person($personid);
+			if (count($teamid))
+				$data['registration_status'] = $this->Event_registration_model->get_event_registration_by_team($id, $teamid[0]->id);
+		}
+
 
 		$this->load->view('view_header');		
 		$this->load->view('view_event_header', $data);
