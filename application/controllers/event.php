@@ -112,12 +112,6 @@ class Event extends Controller
 		$data['event'] = $event = $this->Event_model->get_event($id);
 		$data['event_divisions'] = $this->Event_model->get_event_divisions_as_id_desc($id);
 		
-		if (time() > strtotime($event->registrationends))
-		{
-			redirect(site_url(array('event', 'view', $id)));
-			return;
-		}
-	
 		$personid = $this->session->userdata('userid');
 		if ($personid === false)
 		{
@@ -142,7 +136,13 @@ class Event extends Controller
 		//	redirect(array('event_registration', 'view', $team_registration->id));
 		//	return;		
 		//}
-	
+
+		// get them out of registration if it's closed, but not of they're already registered (so they can change it)
+		if (time() > strtotime($event->registrationends) && count($team_registration) == 0)
+		{
+			redirect(site_url(array('event', 'view', $id)));
+			return;
+		}
 
 		if ($this->input->post('submit') == 'Add Member' || $this->input->post('submit') == 'Edit Member')
 		{			
