@@ -7,3 +7,5 @@ application/config/config.php
 application/config/database.php
 .htaccess
 application/config/email.php
+web.config
+application/config/Email.php
