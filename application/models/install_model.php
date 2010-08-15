@@ -5,12 +5,13 @@ class Install_model extends Model
 	function Install_model()
 	{
 		parent::Model();
-		
+
+		$this->load->dbforge();
+		$this->load->model('Event_model');
 	}
 	
 	function div_helper($name, $price, $max)
 	{
-		$this->load->model('Event_model');
 		return array(
 			'division' => $this->Event_model->create_division($name),
 			'price' => $price,
@@ -18,139 +19,155 @@ class Install_model extends Model
 			'description' => '',
 			'ruleurl' => ''
 		);
-	}		
+	}
+
+	function get_database_version()
+	{
+	    if (!$this->db->table_exists('version'))
+	    {
+			// this is a relatively new thing, so version "1" is defined as
+			// the release before I added it
+			return $this->db->table_exists('divisions') ? 1 : 0;
+	    }
+	    $ret = $this->db->get('version')->get()->row();
+		return $ret->version;
+	}
+	
+	function commit_1()
+	{
+		$this->dbforge->add_field("id int(10) unsigned NOT NULL auto_increment");
+		$this->dbforge->add_field("name varchar(128) NOT NULL");
+		$this->dbforge->add_key("id", TRUE);
+		$this->dbforge->create_table("divisions");
+
+		$this->dbforge->add_field("id int(11) NOT NULL auto_increment");
+		$this->dbforge->add_field("name varchar(128) NOT NULL");
+		$this->dbforge->add_field("description text NOT NULL");
+		$this->dbforge->add_field("thumbnail_url varchar(200) NOT NULL");
+		$this->dbforge->add_field("team int(11) NOT NULL");
+		$this->dbforge->add_field("picture_url varchar(200) NOT NULL");
+		$this->dbforge->add_field("default_division int(11) NOT NULL");
+		$this->dbforge->add_key("id", TRUE);
+		$this->dbforge->create_table("entry");
+		
+		
+		$this->dbforge->add_field("id int(10) unsigned NOT NULL auto_increment");
+		$this->dbforge->add_field("name varchar(128) NOT NULL");
+		$this->dbforge->add_field("image varchar(128) NOT NULL");
+		$this->dbforge->add_field("description text NOT NULL");
+		$this->dbforge->add_field("startdate datetime NOT NULL");
+		$this->dbforge->add_field("enddate datetime NOT NULL");
+		$this->dbforge->add_field("registrationends datetime NOT NULL");
+		$this->dbforge->add_field("websiteurl varchar(128) NOT NULL");
+		$this->dbforge->add_field("smallimage varchar(128) NOT NULL");
+		$this->dbforge->add_field("location varchar(128) NOT NULL");
+		$this->dbforge->add_key("id", TRUE);
+		$this->dbforge->create_table("event");
+
+		$this->dbforge->add_field("id int(10) unsigned NOT NULL auto_increment");
+		$this->dbforge->add_field("event int(10) unsigned NOT NULL");
+		$this->dbforge->add_field("division int(10) unsigned NOT NULL");
+		$this->dbforge->add_field("description text NOT NULL");
+		$this->dbforge->add_field("ruleurl varchar(128) NOT NULL");
+		$this->dbforge->add_field("maxentries int(10) unsigned NOT NULL");
+		$this->dbforge->add_field("price decimal(10,0) NOT NULL");
+		$this->dbforge->add_key("id", TRUE);
+		$this->dbforge->add_key('event');
+		$this->dbforge->create_table("event_divisions");
+
+
+		$this->dbforge->add_field("id int(10) unsigned NOT NULL auto_increment");
+		$this->dbforge->add_field("event_division int(10) unsigned NOT NULL");
+		$this->dbforge->add_field("entry int(10) unsigned NOT NULL");
+		$this->dbforge->add_field("event_registration int(10) unsigned NOT NULL");
+		$this->dbforge->add_key("id", TRUE);
+		$this->dbforge->create_table("event_entries");
+
+		$this->dbforge->add_field("id int(10) unsigned NOT NULL auto_increment");
+		$this->dbforge->add_field("person int(10) unsigned NOT NULL");
+		$this->dbforge->add_field("event_registration int(10) unsigned NOT NULL");
+		$this->dbforge->add_key("id", TRUE);
+		$this->dbforge->create_table("event_people");
+
+		$this->dbforge->add_field("id int(10) unsigned NOT NULL auto_increment");
+		$this->dbforge->add_field("team int(10) unsigned NOT NULL");
+		$this->dbforge->add_field("event int(10) unsigned NOT NULL");
+		$this->dbforge->add_field("status varchar(45) NOT NULL");
+		$this->dbforge->add_field("captain int(10) unsigned NOT NULL");
+		$this->dbforge->add_key("id", TRUE);
+        $this->dbforge->create_table("event_registrations");
+
+		$this->dbforge->add_field("id int(10) unsigned NOT NULL auto_increment");
+		$this->dbforge->add_field("fullname varchar(200) NOT NULL");
+		$this->dbforge->add_field("email varchar(200) NOT NULL");
+		$this->dbforge->add_field("dob varchar(200) NOT NULL");
+		$this->dbforge->add_field("idurl varchar(200) default NULL");
+		$this->dbforge->add_field("picture_url varchar(200) NOT NULL");
+		$this->dbforge->add_field("password varchar(200) NOT NULL");
+		$this->dbforge->add_field("passwordsalt varchar(200) NOT NULL");
+		$this->dbforge->add_field("thumbnail_url varchar(200) NOT NULL");
+		$this->dbforge->add_key("id", TRUE);
+		$this->dbforge->add_key('idurl');
+		$this->dbforge->add_key('email');
+		$this->dbforge->create_table("person");
+
+		$this->dbforge->add_field("id int(10) unsigned NOT NULL auto_increment");
+		$this->dbforge->add_field("name varchar(128) NOT NULL");
+		$this->dbforge->add_field("url varchar(128) NOT NULL");
+		$this->dbforge->add_field("description text NOT NULL");
+		$this->dbforge->add_field("created datetime NOT NULL");
+		$this->dbforge->add_field("addr1 varchar(255) NOT NULL");
+		$this->dbforge->add_field("addr2 varchar(255) NOT NULL");
+		$this->dbforge->add_field("city varchar(255) NOT NULL");
+		$this->dbforge->add_field("state varchar(255) NOT NULL");
+		$this->dbforge->add_field("zip varchar(255) NOT NULL");
+		$this->dbforge->add_field("country varchar(255) NOT NULL");
+		$this->dbforge->add_key("id", TRUE);
+        $this->dbforge->create_table("team");
+
+		$this->dbforge->add_field("id int(10) unsigned NOT NULL auto_increment");
+		$this->dbforge->add_field("person int(10) unsigned NOT NULL");
+		$this->dbforge->add_field("team int(10) unsigned NOT NULL");
+		$this->dbforge->add_key("id", TRUE);
+		$this->dbforge->create_table("team_members");
+		
+		//$this->db->query("DROP VIEW IF EXISTS ${prefix}event_division_entries");
+		//$this->db->query("
+		//	CREATE VIEW ${prefix}event_division_entries AS select ${prefix}event_entries.event_division AS event_division,count(0) AS ct from ${prefix}event_entries group by ${prefix}event_entries.event_division
+		//");
+	}
+	
+	function rollback_1()
+	{
+	    if (!$this->config->item('development'))
+	    	return;
+
+		$this->dbforge->drop_table("divisions");
+		$this->dbforge->drop_table("entry");
+		$this->dbforge->drop_table("event");
+		$this->dbforge->drop_table("event_divisions");
+		$this->dbforge->drop_table("event_entries");
+		$this->dbforge->drop_table("event_people");
+        $this->dbforge->drop_table("event_registrations");
+		$this->dbforge->drop_table("person");
+        $this->dbforge->drop_table("team");
+		$this->dbforge->drop_table("team_members");
+	}
+
 	function reset()
 	{
-		/*
-		$prefix = $this->db->dbprefix;
-		$this->db->query("DROP TABLE IF EXISTS `${prefix}divisions`");
-		$this->db->query("
-			CREATE TABLE `${prefix}divisions` (
-			`id` int(10) unsigned NOT NULL auto_increment,
-			`name` varchar(128) NOT NULL,
-			PRIMARY KEY  (`id`)
-			) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=latin1;
-		");
-		$this->db->query("DROP TABLE IF EXISTS `${prefix}entry`");
-		$this->db->query("
-			CREATE TABLE `${prefix}entry` (
-			  `id` int(11) NOT NULL auto_increment,
-			  `name` varchar(128) NOT NULL,
-			  `description` text NOT NULL,
-			  `thumbnail_url` varchar(200) NOT NULL,
-			  `team` int(11) NOT NULL,
-			  `picture_url` varchar(200) NOT NULL,
-			  `default_division` int(11) NOT NULL,
-			  PRIMARY KEY  (`id`)
-			) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=latin1;
-		");
-		$this->db->query("DROP TABLE IF EXISTS `${prefix}event`");
-		$this->db->query("
-			CREATE TABLE `${prefix}event` (
-			  `id` int(10) unsigned NOT NULL auto_increment,
-			  `name` varchar(128) NOT NULL,
-			  `image` varchar(128) NOT NULL,
-			  `description` text NOT NULL,
-			  `startdate` datetime NOT NULL,
-			  `enddate` datetime NOT NULL,
-			  `registrationends` datetime NOT NULL,
-			  `websiteurl` varchar(128) NOT NULL,
-			  `smallimage` varchar(128) NOT NULL,
-			  `location` varchar(128) NOT NULL,
-			  PRIMARY KEY  (`id`)
-			) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=latin1;		
-		");
-		$this->db->query("DROP TABLE IF EXISTS `${prefix}event_divisions`");
-		$this->db->query("
-			CREATE TABLE `${prefix}event_divisions` (
-			  `id` int(10) unsigned NOT NULL auto_increment,
-			  `event` int(10) unsigned NOT NULL,
-			  `division` int(10) unsigned NOT NULL,
-			  `description` text NOT NULL,
-			  `ruleurl` varchar(128) NOT NULL,
-			  `maxentries` int(10) unsigned NOT NULL,
-			  `price` decimal(10,0) NOT NULL,
-			  PRIMARY KEY  (`id`),
-			  KEY `FK_eventclasses_1` USING BTREE (`event`)
-			) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=latin1;		
-		");
-		$this->db->query("DROP TABLE IF EXISTS `${prefix}event_entries`");
-		$this->db->query("
-			CREATE TABLE `${prefix}event_entries` (
-			  `id` int(10) unsigned NOT NULL auto_increment,
-			  `event_division` int(10) unsigned NOT NULL,
-			  `entry` int(10) unsigned NOT NULL,
-			  `event_registration` int(10) unsigned NOT NULL,
-			  PRIMARY KEY  (`id`)
-			) ENGINE=InnoDB AUTO_INCREMENT=29 DEFAULT CHARSET=latin1;
-		");
-		$this->db->query("DROP TABLE IF EXISTS `${prefix}event_people`");
-		$this->db->query("
-			CREATE TABLE `${prefix}event_people` (
-			  `id` int(10) unsigned NOT NULL auto_increment,
-			  `person` int(10) unsigned NOT NULL,
-			  `event_registration` int(10) unsigned NOT NULL,
-			  PRIMARY KEY  (`id`)
-			) ENGINE=InnoDB AUTO_INCREMENT=23 DEFAULT CHARSET=latin1;		
-		");
-		$this->db->query("DROP TABLE IF EXISTS `${prefix}event_registrations`");
-		$this->db->query("
-			CREATE TABLE `${prefix}event_registrations` (
-			  `id` int(10) unsigned NOT NULL auto_increment,
-			  `team` int(10) unsigned NOT NULL,
-			  `event` int(10) unsigned NOT NULL,
-			  `status` varchar(45) NOT NULL,
-			  `captain` int(10) unsigned NOT NULL,
-			  PRIMARY KEY  (`id`)
-			) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=latin1;		
-		");
-		$this->db->query("DROP TABLE IF EXISTS `${prefix}person`");
-		$this->db->query("
-			CREATE TABLE `${prefix}person` (
-			  `id` int(10) unsigned NOT NULL auto_increment,
-			  `fullname` varchar(200) NOT NULL,
-			  `email` varchar(200) NOT NULL,
-			  `dob` varchar(200) NOT NULL,
-			  `idurl` varchar(200) default NULL,
-			  `picture_url` varchar(200) NOT NULL,
-			  `password` varchar(200) NOT NULL,
-			  `passwordsalt` varchar(200) NOT NULL,
-			  `thumbnail_url` varchar(200) NOT NULL,
-			  PRIMARY KEY  (`id`),
-			  KEY `Index_2` (`idurl`),
-			  KEY `Index_3` (`email`)
-			) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=latin1;
-		");
-		$this->db->query("DROP TABLE IF EXISTS `${prefix}team`");
-		$this->db->query("
-			CREATE TABLE `${prefix}team` (
-			  `id` int(10) unsigned NOT NULL auto_increment,
-			  `name` varchar(128) NOT NULL,
-			  `url` varchar(128) NOT NULL,
-			  `description` text NOT NULL,
-			  `created` datetime NOT NULL,
-			  `addr1` varchar(255) NOT NULL,
-			  `addr2` varchar(255) NOT NULL,
-			  `city` varchar(255) NOT NULL,
-			  `state` varchar(255) NOT NULL,
-			  `zip` varchar(255) NOT NULL,
-			  `country` varchar(255) NOT NULL,
-			  PRIMARY KEY  (`id`)
-			) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=latin1;
-		");
-		$this->db->query("DROP TABLE IF EXISTS `${prefix}team_members`");
-		$this->db->query("
-			CREATE TABLE `${prefix}team_members` (
-			  `id` int(10) unsigned NOT NULL auto_increment,
-			  `person` int(10) unsigned NOT NULL,
-			  `team` int(10) unsigned NOT NULL,
-			  PRIMARY KEY  (`id`)
-			) ENGINE=InnoDB AUTO_INCREMENT=36 DEFAULT CHARSET=latin1;
-		");
-		//$this->db->query("DROP VIEW IF EXISTS `${prefix}event_division_entries`");
-		//$this->db->query("
-		//	CREATE VIEW `${prefix}event_division_entries` AS select `${prefix}event_entries`.`event_division` AS `event_division`,count(0) AS `ct` from `${prefix}event_entries` group by `${prefix}event_entries`.`event_division`
-		//");
+	    if (!$this->config->item('development'))
+	    	return;
+	
+	    $this->db->empty_table('divisions');
+		$this->db->empty_table('entry');
+		$this->db->empty_table('event');
+		$this->db->empty_table('event_entries');
+		$this->db->empty_table('event_people');
+		$this->db->empty_table('event_registrations');
+		$this->db->empty_table('person');
+		$this->db->empty_table('team');
+		$this->db->empty_table('team_members');
 
 		$divisions = array();
         $divisions[] = $this->div_helper('Humanoid - Kung-Fu (LightWt-R/C)', 35, 0);
@@ -237,22 +254,14 @@ class Install_model extends Model
 			'websiteurl' => 'http://www.robogames.net/',
 			'location' => 'San Francisco, CA'
 		), $divisions);
-		*/
-		/*$this->db->empty_table('entry');
-		$this->db->empty_table('person');
-		$this->db->empty_table('team');
-		$this->db->empty_table('event_entries');
-		$this->db->empty_table('event_people');
-		$this->db->empty_table('event_registrations');
-		*/
 		
 		/*
-		$this->db->where('name', 'Humanoid - MechWars')->update('divisions', array('name' => 'Humanoid - MechWars (LW)'));		
-		
+		$this->db->where('name', 'Humanoid - MechWars')->update('divisions', array('name' => 'Humanoid - MechWars (LW)'));
+
 		$this->Event_model->add_division_to_event(4, $this->div_helper('Humanoid - MechWars (MW)', 35, 0));
 		$this->Event_model->add_division_to_event(4, $this->div_helper('Open - Shooting Gallery', 35, 0));
 		*/
-		
+
 		/*
 		$salt = "6yQ4m4499HoplgP5CBqe";
 		$userid = "mwinders@me.com";
@@ -264,8 +273,8 @@ class Install_model extends Model
 				'password' => "65c09f8b2f686ce379e1d5ba216179633c12dc14",//sha1("test:$userid:$salt"),
 				'passwordsalt' => $salt,
 				));
-		*/	
-		
+		*/
+
 		/*$users = $this->db
 			->select('*')
 			->from('person')
@@ -273,10 +282,9 @@ class Install_model extends Model
 		echo "<pre>";
 		print_r($users);
 		*/
-		
-		$this->refresh_amount_due();
 	}
-	
+
+
 	function refresh_amount_due()
 	{
 		$prices = $this->db
