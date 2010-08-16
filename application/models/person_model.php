@@ -35,7 +35,9 @@ class Person_model extends Model
 			'email' => $email,
 			'picture_url' => $picture_url,
 			'idurl' => $idurl,
-			'dob' => $dob
+			'dob' => $dob,
+			'password' => '',
+			'passwordsalt' => '',
 		);			
 		
 		if (!empty($password))
