@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <system.webServer>
+        <rewrite>
+            <rewriteMaps>
+                <rewriteMap name="RewriteCodeIgniterUrls" />
+            </rewriteMaps>
+            <rules>
+                <rule name="RewriteCodeIgniterUrls" stopProcessing="true">
+                    <match url="^(.*)$" />
+                    <action type="Rewrite" url="index.php?{R:1}" logRewrittenUrl="true" />
+                    <conditions>
+                        <add input="{REQUEST_URI}" pattern="(favicon\.ico|images|js|css|robots\.txt)" negate="true" />
+                    </conditions>
+                </rule>
+            </rules>
+        </rewrite>
+    </system.webServer>
+</configuration>
