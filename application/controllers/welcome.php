@@ -11,6 +11,11 @@ class Welcome extends Controller {
 	{
 		redirect('event/all');
 	}
+	
+	function version()
+	{
+	    phpinfo();
+	}
 }
 
 /* End of file welcome.php */

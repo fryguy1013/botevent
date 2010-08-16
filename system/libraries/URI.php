@@ -111,6 +111,13 @@ class CI_URI {
 			}
 
 			$this->uri_string = (isset($_SERVER[$uri])) ? $_SERVER[$uri] : @getenv($uri);
+			//if ($this->uri_string)
+			
+			// filter out the extra parameters (IIS fix)
+			if (strpos($this->uri_string, '&') !== FALSE)
+				$this->uri_string = substr($this->uri_string, 0, strpos($this->uri_string, '&'));
+
+			log_message('debug', "_fetch_uri_string()  uri_string=".$this->uri_string);
 		}
 
 		// If the URI contains only a slash we'll kill it
