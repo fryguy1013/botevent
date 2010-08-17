@@ -1,3 +1,5 @@
+<?php $this->load->view('view_event_header'); ?>
+
 <div class="event_details">
 	
 	<? if (!empty($registration_status)): ?>

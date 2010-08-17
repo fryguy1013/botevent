@@ -1,3 +1,5 @@
+<?php $this->load->view('view_event_header'); ?>
+
 <div class="event_registration">
 	<div class="event_registration_status">
 		Status: <?=htmlentities($registration->status)?>

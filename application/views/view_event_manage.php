@@ -1,3 +1,5 @@
+<?php $this->load->view('view_event_header'); ?>
+
 <script type="text/javascript">
 $(document).ready(function() {
 	$('div.event_reg_message').hide();
