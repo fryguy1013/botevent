@@ -87,7 +87,8 @@ class Team_model extends Model
 				'city' => $city,
 				'state' => $state,
 				'zip' => $zip,
-				'country' => $country				
+				'country' => $country,
+				'description' => '',
 				);
 
 		$this->db->set('created', 'now()', FALSE);
