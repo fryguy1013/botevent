@@ -244,13 +244,13 @@ class Install_model extends Model
         $divisions[] = $this->div_helper('BEAM - Robosapien', 35, 0);
 
 		$this->Event_model->create_event(array(
-			'name' => 'Robogames 2009',
+			'name' => 'Robogames 2011',
 			'image' => '/images/events/robogames.gif',
 			'smallimage' => '/images/events/robogames.gif',
 			'description' => 'RoboGames, the world\'s largest robot competition, returns this summer, with teams from around the world competing in over 60 different events.  Register today.',
-			'startdate' => '2009-06-12 00:00:00',
-			'enddate' => '2009-06-14 00:00:00',
-			'registrationends' => '2009-05-20 00:00:00',
+			'startdate' => '2011-04-14 00:00:00',
+			'enddate' => '2011-04-17 00:00:00',
+			'registrationends' => '2011-04-01 00:00:00',
 			'websiteurl' => 'http://www.robogames.net/',
 			'location' => 'San Francisco, CA'
 		), $divisions);
