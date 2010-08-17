@@ -38,7 +38,7 @@
 		<div class="event_person_thumbnail">
 			<?=img(!empty($person->thumbnail_url)?$person->thumbnail_url:'/images/nopicture.png')?>
 		</div>
-		<div class="event_person_name"><?=$person->fullname?></div>
+		<div class="event_person_name"><?=htmlentities($person->fullname)?></div>
 		<div class="event_person_edit"><a href="<?=site_url(array('person', 'edit', $person->id))?>" id="edit_member_<?=$person->id?>">Edit</a></div>
 	</div>
 <? endforeach; ?>
@@ -47,7 +47,7 @@
 <p id="add_member"><a href="#">Add a person to your team</a></p>
 
 <div class="event_register_add_person_frame">
-	<? if (!empty($add_member_errors)): ?><div class="error"><?=$add_member_errors?></div><? endif; ?>
+	<? if (!empty($add_member_errors)): ?><div class="error"><?=htmlentities($add_member_errors)?></div><? endif; ?>
 
 	<?=form_hidden('person_id', set_value('person_id', ''))?>
 	<h3 id="add_member_heading">Add Person to Team</h3>
@@ -86,7 +86,7 @@
 <div id="event_register_entries">
 <? foreach ($team_entries as $entry): ?> 
 	<div class="event_entry">
-		<!-- <?=$entry->event_division?> -->
+		<!-- <?=htmlentities($entry->event_division)?> -->
 		<?=form_checkbox('entry[]', $entry->id, is_array($form_entry) && in_array($entry->id, $form_entry))?>
 		<div><?=form_dropdown("entry_division[$entry->id]", $event_divisions,
 			isset($form_entry_division[$entry->id]) ? $form_entry_division[$entry->id] :
@@ -96,7 +96,7 @@
 		<div class="event_entry_thumbnail">
 			<?=img(!empty($entry->thumbnail_url)?$entry->thumbnail_url:'/images/nopicture-entry.png')?>
 		</div>
-		<div class="event_entry_name"><?=$entry->name?></div>
+		<div class="event_entry_name"><?=htmlentities($entry->name)?></div>
 		<div class="event_entry_edit"><a href="<?=site_url(array('entry', 'edit', $entry->id))?>" id="edit_entry_<?=$entry->id?>">Edit</a></div>
 	</div>
 <? endforeach; ?>
@@ -108,7 +108,7 @@
 
 <p id="add_entry"><a href="#">Add a robot to your team</a></p>
 <div class="event_register_add_entry_frame">
-	<? if (!empty($add_entry_errors)): ?><div class="error"><?=$add_entry_errors?></div><? endif; ?>
+	<? if (!empty($add_entry_errors)): ?><div class="error"><?=htmlentities($add_entry_errors)?></div><? endif; ?>
 
 	<?=form_hidden('entry_id', set_value('entry_id', ''))?>
 	<h3 id="add_entry_heading">Add Entry to Team</h3>
@@ -237,19 +237,19 @@ $(document).ready(function() {
 	<? foreach ($team_members as $person): ?>
 	<? $dob_parts = explode('/', $person->dob); ?>			
 		$('a#edit_member_<?=$person->id?>').click(make_edit_member_closure(
-			'<?=$person->id?>',
-			'<?=$person->fullname?>',
-			'<?=$person->email?>',
-			'<?=$dob_parts[0]?>',
-			'<?=$dob_parts[1]?>',
-			'<?=$dob_parts[2]?>'
+			<?=json_encode($person->id)?>,
+			<?=json_encode($person->fullname)?>,
+			<?=json_encode($person->email)?>,
+			<?=json_encode($dob_parts[0])?>,
+			<?=json_encode($dob_parts[1])?>,
+			<?=json_encode($dob_parts[2])?>
 		));
 	<? endforeach; ?>
 
 	<? foreach ($team_entries as $entry): ?>
 		$('a#edit_entry_<?=$entry->id?>').click(make_edit_entry_closure(
-			'<?=$entry->id?>',
-			'<?=$entry->name?>'
+			<?=json_encode($entry->id)?>,
+			<?=json_encode($entry->name)?>
 		));
 	<? endforeach; ?>
 	

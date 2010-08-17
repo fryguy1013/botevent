@@ -18,7 +18,7 @@
 	<? if ($this->session->userdata('userid') === false): ?>
 		<a href="<?=site_url('login/logout')?>">Login</a>
 	<? else: ?>
-		Logged in as <a href="<?=site_url('person/view/'.$this->session->userdata('userid'))?>"><?=$this->session->userdata('fullname')?></a> | <a href="<?=site_url('login/logout')?>">Logout</a>
+		Logged in as <a href="<?=site_url('person/view/'.$this->session->userdata('userid'))?>"><?=htmlentities($this->session->userdata('fullname'))?></a> | <a href="<?=site_url('login/logout')?>">Logout</a>
 	<? endif; ?>
 	</div>
 	<div style="clear: both;"></div>
