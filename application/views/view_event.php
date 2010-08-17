@@ -19,7 +19,7 @@
 	<? foreach ($event_divisions as $division): ?>
 	
 		<tr class="event_division">			
-			<td class="event_division_name"><a href="<?=site_url(array('event', 'entries', $event->id, $division->event_division))?>"><?=$division->name?></a></td>
+			<td class="event_division_name"><a href="<?=site_url(array('event', 'entries', $event->id, $division->event_division))?>"><?=htmlentities($division->name)?></a></td>
 			<td class="event_division_count"><?=isset($event_division_counts[$division->event_division]) ? $event_division_counts[$division->event_division] : 0?> entries<? if ($division->maxentries != 0) echo " ($division->maxentries max)"; ?></td>
 			<td class="event_division_price"><?=$division->price == 0 ? "Free" : sprintf("\$%d",$division->price)?></td>
 		</tr>
@@ -27,7 +27,7 @@
 	</table>
 
 	<div class="event_description">
-		<?=$event->description?>
+		<?=htmlentities($event->description)?>
 	</div>
 
 </div>

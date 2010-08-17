@@ -1,10 +1,10 @@
 <div class="event_major_details">
 	<a href="<?=site_url(array('event', 'view', $event->id))?>">
-		<img class="event_image" src="<?=site_url($event->image)?>" alt="<?=$event->name?> logo" />
+		<img class="event_image" src="<?=site_url($event->image)?>" alt="<?=htmlentities($event->name)?> logo" />
 	</a>
 	<div class="event_minor_details">		
-		<div class="event_title"><a href="<?=site_url(array('event', 'view', $event->id))?>"><?=$event->name?></a></div>
-		<div class="event_location"><span>Location: </span><?=$event->location?></div>
+		<div class="event_title"><a href="<?=site_url(array('event', 'view', $event->id))?>"><?=htmlentities($event->name)?></a></div>
+		<div class="event_location"><span>Location: </span><?=htmlentities($event->location)?></div>
 		<div class="event_date"><span>Date: </span><?
 			if ($event->startdate != $event->enddate)
 				echo date("M j", strtotime($event->startdate))." to ".date("M j, Y", strtotime($event->enddate));

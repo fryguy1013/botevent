@@ -1,6 +1,6 @@
 
 <div class="teamview_team">
-	<a href="<?=site_url(array('team', 'view', $team->id))?>"><?=$team->name?></a>
+	<a href="<?=site_url(array('team', 'view', $team->id))?>"><?=htmlentities($team->name)?></a>
 </div>
 
 <div class="teamview_section">
@@ -10,14 +10,14 @@
 
 <div class="teamview_section">
 	<span>Location: </span>
-	<?=$team->city?>, <?=$team->state?>, <?=$team->country?>
+	<?=htmlentities($team->city)?>, <?=htmlentities($team->state)?>, <?=htmlentities($team->country)?>
 </div>
 	
 <h4>Team Members:</h4>
 <div class="teamview_members">
 <? foreach ($members as $member): ?>
 	<div class="teamview_member">
-		<a href="<?=site_url(array('person', 'view', $member->id))?>"><?=$member->fullname?></a>
+		<a href="<?=site_url(array('person', 'view', $member->id))?>"><?=htmlentities($member->fullname)?></a>
 	</div>
 <? endforeach; ?>
 </div>
@@ -29,7 +29,7 @@
 		<div class="event_entry_thumbnail">
 			<?=img(!empty($entry->thumbnail_url)?$entry->thumbnail_url:'/images/nopicture-entry.png')?>
 		</div>
-		<div class="event_entry_name"><a href="<?=site_url(array('entry', 'view', $entry->id))?>"><?=$entry->name?></a></div>
+		<div class="event_entry_name"><a href="<?=site_url(array('entry', 'view', $entry->id))?>"><?=htmlentities($entry->name)?></a></div>
 	</div>		
 <? endforeach; ?>
 </div>
@@ -43,15 +43,15 @@
 	<? foreach ($events as $event): ?>
 	<div class="entryevent">
 		<div>
-			<a href="<?=site_url(array('event', 'view', $event['id']))?>"><?=$event['name']?></a>
+			<a href="<?=site_url(array('event', 'view', $event['id']))?>"><?=htmlentities($event['name'])?></a>
 			on <?=date("M j, Y", strtotime($event['date']))?>
-			(<?=$event['status']?>)
+			(<?=htmlentities($event['status'])?>)
 		</div>
 		<ul>
 		<? foreach ($event['entries'] as $entry): ?>
 			<li>
-				<a href="<?=site_url(array('entry', 'view', $entry->id))?>"><?=$entry->name?></a>
-				in <a href="<?=site_url(array('event', 'entries', $event['id'], $entry->event_division))?>"><?=$entry->division?></a>
+				<a href="<?=site_url(array('entry', 'view', $entry->id))?>"><?=htmlentities($entry->name)?></a>
+				in <a href="<?=site_url(array('event', 'entries', $event['id'], $entry->event_division))?>"><?=htmlentities($entry->division)?></a>
 			</li>
 		<? endforeach; ?>
 		</ul>

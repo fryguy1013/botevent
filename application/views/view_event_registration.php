@@ -1,6 +1,6 @@
 <div class="event_registration">
 	<div class="event_registration_status">
-		Status: <?=$registration->status?>
+		Status: <?=htmlentities($registration->status)?>
 	</div>
 	<div class="event_registration_status_description">
 		<? if ($registration->status == "new"): ?>
@@ -12,15 +12,15 @@
 		payments are handled manually for now, so your status may not change
 		from pending payment to accepted immediately.</p>
 		
-		<h4>Amount due: $<?=$registration->due?></h4>
+		<h4>Amount due: $<?=htmlentities($registration->due)?></h4>
 		
 		<div class="pay_by_cc">
 			Pay by credit card
 			<form method="POST" action="http://www.asecurecart.net/server/cart.aspx/robogames">
-			<input type="hidden" name="Price" value="<?=$registration->due?>">
-			<input type="hidden" name="ID" value="<?=substr('Reg Fees - '.$registration->teamname, 0, 30)?>">
+			<input type="hidden" name="Price" value="<?=htmlentities($registration->due)?>">
+			<input type="hidden" name="ID" value="<?=htmlentities(substr('Reg Fees - '.$registration->teamname, 0, 30))?>">
 			<input type="hidden" name="Multi" value="N">
-			<input type="hidden" name="ReturnLink" value="http://robogames.net/registration/event_registration/view/<?=$registration->id?>">
+			<input type="hidden" name="ReturnLink" value="http://robogames.net/registration/event_registration/view/<?=htmlentities($registration->id)?>">
 			<input type="submit" name="Submit" value="Add To Cart">
 			</form>
 		</div>
@@ -32,11 +32,11 @@
 			<input type="hidden" name="add" value="1">
 			<input type="hidden" name="cmd" value="_cart">
 			<input type="hidden" name="business" value="paypal@robogames.net">
-			<input type="hidden" name="item_name" value="Registration Fees for <?=$registration->teamname?> ">
-			<input type="hidden" name="amount" value="<?=$registration->due?>">
+			<input type="hidden" name="item_name" value="Registration Fees for <?=htmlentities($registration->teamname)?> ">
+			<input type="hidden" name="amount" value="<?=htmlentities($registration->due)?>">
 			<input type="hidden" name="no_note" value="1">
 			<input type="hidden" name="no_shipping" value="1">
-			<input type="hidden" name="return" value="http://robogames.net/registration/event_registration/view/<?=$registration->id?>">
+			<input type="hidden" name="return" value="http://robogames.net/registration/event_registration/view/<?=htmlentities($registration->id)?>">
 			<input type="hidden" name="currency_code" value="USD">
 			</form>
 		</div>
@@ -61,7 +61,7 @@
 			<div class="event_person_thumbnail">
 				<?=img(!empty($person->thumbnail_url)?$person->thumbnail_url:'/images/nopicture.png')?>
 			</div>
-			<div class="event_person_name"><?=$person->fullname?></div>
+			<div class="event_person_name"><?=htmlentities($person->fullname)?></div>
 			</a>
 		</div>
 	<? endforeach; ?>
@@ -72,8 +72,8 @@
 			<div class="event_entry_thumbnail">
 				<?=img(!empty($entry->thumbnail_url)?$entry->thumbnail_url:'/images/nopicture-entry.png')?>
 			</div>
-			<div class="event_entry_name"><?=$entry->name?></div>
-			<div class="event_entry_division"><?=$entry->divisionname?></div>
+			<div class="event_entry_name"><?=htmlentities($entry->name)?></div>
+			<div class="event_entry_division"><?=htmlentities($entry->divisionname)?></div>
 			</a>
 		</div>
 	<? endforeach; ?>

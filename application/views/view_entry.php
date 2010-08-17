@@ -1,12 +1,12 @@
 
 <div class="entryview_entry">
 	<!--<span>Robot:</span>-->
-	<a href="<?=site_url(array('entry', 'view', $entry->id))?>"><?=$entry->name?></a>
+	<a href="<?=site_url(array('entry', 'view', $entry->id))?>"><?=htmlentities($entry->name)?></a>
 </div>
 
 <div class="entryview_team">
 	<span>Team:</span>
-	<a href="<?=site_url(array('team', 'view', $team->id))?>"><?=$team->name?></a>
+	<a href="<?=site_url(array('team', 'view', $team->id))?>"><?=htmlentities($team->name)?></a>
 </div>
 
 <div class="entryview_picture">
@@ -21,10 +21,10 @@
 	<? endif; ?>
 	<? foreach ($events as $event): ?>
 	<div class="entryevent">
-		<a href="<?=site_url(array('event', 'view', $event->id))?>"><?=$event->name?></a>
+		<a href="<?=site_url(array('event', 'view', $event->id))?>"><?=htmlentities($event->name)?></a>
 		on <?=date("M j, Y", strtotime($event->date))?>
-		in <a href="<?=site_url(array('event', 'entries', $event->id, $event->event_division))?>"><?=$event->division?></a>
-		(<?=$event->status?>)
+		in <a href="<?=site_url(array('event', 'entries', $event->id, $event->event_division))?>"><?=htmlentities($event->division)?></a>
+		(<?=htmlentities($event->status)?>)
 	</div>
 	<? endforeach; ?>
 </div>
