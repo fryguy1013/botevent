@@ -16,6 +16,9 @@ define('Auth_OpenID_RAND_SOURCE', null);
 */
 $config['base_url']	= "http://fryguy.selfip.net/";
 
+$config['requires_login'] = TRUE;
+$config['development_environment'] = FALSE;
+
 /*
 |--------------------------------------------------------------------------
 | Index File

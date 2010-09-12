@@ -45,6 +45,12 @@ class Install extends Controller {
 
 	function rollback($rev)
 	{
+		if ($this->config->item('development_environment') !== TRUE)
+		{
+			show_error('This action requires a development build');
+			die();
+		}
+		
 		$cur_version = $this->Install_model->get_database_version();
 
 		if ($rev != $cur_version - 1)
@@ -63,6 +69,12 @@ class Install extends Controller {
 	
 	function Reset()
 	{
+		if ($this->config->item('development_environment') !== TRUE)
+		{
+			show_error('This action requires a development build');
+			die();
+		}
+
 		$this->load->model('Install_model');
 		$this->Install_model->reset();
 		redirect(site_url(array('install')));

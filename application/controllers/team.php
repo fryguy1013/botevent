@@ -6,7 +6,10 @@ class Team extends Controller
 	{
 		parent::Controller();
 
-		$this->load->model('Team_model');
+		$this->load->model(array('Team_model', 'Person_model'));
+
+		if ($this->config->item('requires_login') === TRUE)
+			$this->Person_model->check_login();
 	}
 	
 	
