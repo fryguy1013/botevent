@@ -7,7 +7,10 @@ class Event_registration extends Controller
 	{
 		parent::Controller();
 		
-		$this->load->model(array('Event_model', 'Event_registration_model', 'Team_model'));
+		$this->load->model(array('Event_model', 'Event_registration_model', 'Team_model', 'Person_model'));
+
+		if ($this->config->item('requires_login') === TRUE)
+			$this->Person_model->check_login();
 	}
 	
 	function View($registration_id)

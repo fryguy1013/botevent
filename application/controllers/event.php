@@ -2,13 +2,17 @@
 
 class Event extends Controller
 {
-	
+
 	function Event()
 	{
 		parent::Controller();
 		
 		$this->load->model('Event_model');
+		$this->load->model('Person_model');
 		$this->upload_errors = "";
+		
+		if ($this->config->item('requires_login') === TRUE)
+			$this->Person_model->check_login();
 	}
 	
 	function index()
@@ -16,7 +20,6 @@ class Event extends Controller
 		$this->All();
 	}
 	
-
 	function All()
 	{
 		$data = array();
@@ -106,12 +109,7 @@ class Event extends Controller
 		$data['event_divisions'] = $this->Event_model->get_event_divisions_as_id_desc($id);
 		
 		$personid = $this->session->userdata('userid');
-		if ($personid === false)
-		{
-			$this->session->set_userdata('onloginurl', "event/register/$id");
-			redirect(site_url('login'));
-			return;
-		}
+		$this->Person_model->check_login();
 		
 		$teamid = $this->session->flashdata('teamid');
 		// TODO: In later versions, this should give them a choice to select a
