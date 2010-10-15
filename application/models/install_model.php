@@ -49,8 +49,7 @@ class Install_model extends Model
 		$this->dbforge->add_field("default_division int(11) NOT NULL");
 		$this->dbforge->add_key("id", TRUE);
 		$this->dbforge->create_table("entry");
-		
-		
+
 		$this->dbforge->add_field("id int(10) unsigned NOT NULL auto_increment");
 		$this->dbforge->add_field("name varchar(128) NOT NULL");
 		$this->dbforge->add_field("image varchar(128) NOT NULL");
@@ -75,7 +74,6 @@ class Install_model extends Model
 		$this->dbforge->add_key('event');
 		$this->dbforge->create_table("event_divisions");
 
-
 		$this->dbforge->add_field("id int(10) unsigned NOT NULL auto_increment");
 		$this->dbforge->add_field("event_division int(10) unsigned NOT NULL");
 		$this->dbforge->add_field("entry int(10) unsigned NOT NULL");
@@ -95,7 +93,7 @@ class Install_model extends Model
 		$this->dbforge->add_field("status varchar(45) NOT NULL");
 		$this->dbforge->add_field("captain int(10) unsigned NOT NULL");
 		$this->dbforge->add_key("id", TRUE);
-        $this->dbforge->create_table("event_registrations");
+		$this->dbforge->create_table("event_registrations");
 
 		$this->dbforge->add_field("id int(10) unsigned NOT NULL auto_increment");
 		$this->dbforge->add_field("fullname varchar(200) NOT NULL");
@@ -123,7 +121,7 @@ class Install_model extends Model
 		$this->dbforge->add_field("zip varchar(255) NOT NULL");
 		$this->dbforge->add_field("country varchar(255) NOT NULL");
 		$this->dbforge->add_key("id", TRUE);
-        $this->dbforge->create_table("team");
+		$this->dbforge->create_table("team");
 
 		$this->dbforge->add_field("id int(10) unsigned NOT NULL auto_increment");
 		$this->dbforge->add_field("person int(10) unsigned NOT NULL");
@@ -139,8 +137,8 @@ class Install_model extends Model
 	
 	function rollback_1()
 	{
-	    if (!$this->config->item('development'))
-	    	return;
+		if (!$this->config->item('development'))
+			return;
 
 		$this->dbforge->drop_table("divisions");
 		$this->dbforge->drop_table("entry");
@@ -148,18 +146,18 @@ class Install_model extends Model
 		$this->dbforge->drop_table("event_divisions");
 		$this->dbforge->drop_table("event_entries");
 		$this->dbforge->drop_table("event_people");
-        $this->dbforge->drop_table("event_registrations");
+		$this->dbforge->drop_table("event_registrations");
 		$this->dbforge->drop_table("person");
-        $this->dbforge->drop_table("team");
+		$this->dbforge->drop_table("team");
 		$this->dbforge->drop_table("team_members");
 	}
 
 	function reset()
 	{
-	    if (!$this->config->item('development'))
-	    	return;
+		if (!$this->config->item('development'))
+			return;
 	
-	    $this->db->empty_table('divisions');
+		$this->db->empty_table('divisions');
 		$this->db->empty_table('entry');
 		$this->db->empty_table('event');
 		$this->db->empty_table('event_entries');
@@ -282,6 +280,38 @@ class Install_model extends Model
 		echo "<pre>";
 		print_r($users);
 		*/
+	}
+
+	function backup()
+	{
+		// Load the DB utility class
+		$this->load->dbutil();
+
+		$tables = array(
+			"divisions",
+			"entry",
+			"event",
+			"event_divisions",
+			"event_entries",
+			"event_people",
+			"event_registrations",
+			"person",
+			"team",
+			"team_members",
+		);
+
+		$prefs = array(
+			'tables'      => $tables,
+			'format'      => 'txt',             // gzip, zip, txt
+			'add_drop'    => TRUE,              // Whether to add DROP TABLE statements to backup file
+			'add_insert'  => TRUE,              // Whether to add INSERT data to backup file
+			'newline'     => "\n"               // Newline character used in backup file
+		);
+
+		// Backup your entire database and assign it to a variable
+		$backup =& $this->dbutil->backup($prefs);
+		
+		return $backup;
 	}
 
 

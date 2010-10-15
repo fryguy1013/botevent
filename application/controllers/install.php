@@ -66,7 +66,6 @@ class Install extends Controller {
 		redirect(site_url(array('install')));
 	}
 
-	
 	function Reset()
 	{
 		if ($this->config->item('development_environment') !== TRUE)
@@ -78,6 +77,12 @@ class Install extends Controller {
 		$this->load->model('Install_model');
 		$this->Install_model->reset();
 		redirect(site_url(array('install')));
+	}
+	
+	function Backup()
+	{
+		$this->load->model('Install_model');
+		echo $this->Install_model->backup();
 	}
 }
 
