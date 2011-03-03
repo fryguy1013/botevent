@@ -19,7 +19,8 @@ class Entry_model extends CI_Model
 				'name' => $name,
 				'team' => $team,
 				'default_division' => $div,
-				'picture_url' => $picture_url
+				'picture_url' => $picture_url,
+				'description' => '',
 				);
 				
 		if (!empty($picture_url))

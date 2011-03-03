@@ -11,6 +11,8 @@ class Login extends CI_Controller {
 		$this->load->model('Person_model');
 		$this->config->load('openid');
 		
+		$this->upload_errors = "";
+		
 		//$this->output->enable_profiler(TRUE);
 	}
 	
@@ -41,7 +43,7 @@ class Login extends CI_Controller {
 					if (count($person) == 0)
 					{
 						$this->session->set_userdata('openid_email', $this->input->post('email_addr'));
-						redirect('login/register');
+						redirect(site_url(array('login','register')));
 						return;
 					}
 					else
@@ -275,7 +277,7 @@ class Login extends CI_Controller {
 						$this->session->set_userdata('openid_email', $sreg['email']);
 					
 					$this->output->set_output("invalid user: $openid");
-					redirect('login/register');
+					redirect(site_url(array('login', 'register')));
 					return;
 				}
 				break;
@@ -292,7 +294,7 @@ class Login extends CI_Controller {
 		$config = array(); 
 		$config['upload_path'] = './images/uploads/'; 
 		$config['allowed_types'] = 'gif|jpg|png'; 
-		$config['max_size']	= '2000'; 
+		$config['max_size']	= '0'; 
 		$config['encrypt_name'] = TRUE; 
 		//$config['max_width']  = '1024'; 
 		//$config['max_height']  = '768';

@@ -152,7 +152,7 @@ class CI_DB_driver {
 				return TRUE;
 			}
 		}
-		
+
 		return TRUE;
 	}
 

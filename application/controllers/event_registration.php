@@ -7,7 +7,10 @@ class Event_registration extends CI_Controller
 	{
 		parent::__construct();
 		
-		$this->load->model(array('Event_model', 'Event_registration_model', 'Team_model'));
+		$this->load->model(array('Event_model', 'Event_registration_model', 'Team_model', 'Person_model'));
+
+		if ($this->config->item('requires_login') === TRUE)
+			$this->Person_model->check_login();
 	}
 	
 	function View($registration_id)
@@ -63,7 +66,7 @@ class Event_registration extends CI_Controller
 			$this->email->message(site_url(array('event_registration', 'view', $registration_id)));
 			$this->email->send();
 			
-			redirect(array('event', 'view', $registration->event));
+			redirect(site_url(array('event', 'view', $registration->event)));
 			return;
 		}
 

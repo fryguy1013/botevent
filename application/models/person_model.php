@@ -35,7 +35,9 @@ class Person_model extends CI_Model
 			'email' => $email,
 			'picture_url' => $picture_url,
 			'idurl' => $idurl,
-			'dob' => $dob
+			'dob' => $dob,
+			'password' => '',
+			'passwordsalt' => '',
 		);			
 		
 		if (!empty($password))
@@ -97,4 +99,14 @@ class Person_model extends CI_Model
 		return FALSE;	
 	}
 	
+	function check_login()
+	{
+		$personid = $this->session->userdata('userid');
+		if ($personid === false)
+		{
+			$this->session->set_userdata('onloginurl', $this->input->server('QUERY_STRING'));
+			redirect(site_url('login'));
+			die();
+		}
+	}
 }

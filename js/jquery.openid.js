@@ -42,7 +42,7 @@ jQuery.fn.openid = function(opt) {
       {
         name: 'AOL',
         username_txt: 'screenname',
-        url: 'http://openid.aol.com/{username}/',
+        url: 'http://openid.aol.com/{username}',
         big: true
       },
       {

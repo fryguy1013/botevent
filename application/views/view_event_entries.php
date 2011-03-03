@@ -1,6 +1,8 @@
+<?php $this->load->view('view_event_header'); ?>
+
 <div class="event_details">
 
-	<h2>Entries in the <?=$event_division->name?> division</h2>
+	<h2>Entries in the <?=htmlentities($event_division->name)?> division</h2>
 
 	<div class="event_entries">
 	<? foreach ($event_entries as $entry): ?> 
@@ -13,7 +15,7 @@
 				</div>
 				<?=img(!empty($entry->thumbnail_url)?$entry->thumbnail_url:'/images/nopicture-entry.png')?>
 			</div>
-			<div class="event_entry_name"><a href="<?=site_url(array('entry', 'view', $entry->id))?>"><?=$entry->name?></a></div>
+			<div class="event_entry_name"><a href="<?=site_url(array('entry', 'view', $entry->id))?>"><?=htmlentities($entry->name)?></a></div>
 		</div>		
 	<? endforeach; ?>
 	</div>

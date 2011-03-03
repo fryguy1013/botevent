@@ -2,13 +2,17 @@
 
 class Event extends CI_Controller
 {
-	
+
 	function __construct()
 	{
 		parent::__construct();
 		
 		$this->load->model('Event_model');
+		$this->load->model('Person_model');
 		$this->upload_errors = "";
+		
+		if ($this->config->item('requires_login') === TRUE)
+			$this->Person_model->check_login();
 	}
 	
 	function index()
@@ -16,12 +20,6 @@ class Event extends CI_Controller
 		$this->All();
 	}
 	
-	function Reset()
-	{
-		$this->load->model('Install_model');
-		$this->Install_model->reset();
-	}
-
 	function All()
 	{
 		$data = array();
@@ -34,13 +32,23 @@ class Event extends CI_Controller
 	
 	function View($id)
 	{
+		$this->load->model(array('Team_model', 'Event_registration_model'));
+		
 		$data = array();
-		$data['event'] = $this->Event_model->get_event($id);
+		$data['event'] = $event = $this->Event_model->get_event($id);
+		$data['registration_available'] = (strtotime($event->registrationends) > time());
 		$data['event_divisions'] = $this->Event_model->get_event_divisions($id);
 		$data['event_division_counts'] = $this->Event_model->get_event_divisions_counts($id);
 
+		$personid = $this->session->userdata('userid');
+		if ($personid !== false)
+		{
+			$teamid = $this->Team_model->get_teams_for_person($personid);
+			if (count($teamid))
+				$data['registration_status'] = $this->Event_registration_model->get_event_registration_by_team($id, $teamid[0]->id);
+		}
+
 		$this->load->view('view_header');		
-		$this->load->view('view_event_header', $data);
 		$this->load->view('view_event', $data);
 		$this->load->view('view_footer');		
 	}
@@ -53,23 +61,55 @@ class Event extends CI_Controller
 		$data['event_entries'] = $this->Event_model->get_event_entries($division);
 
 		$this->load->view('view_header');
-		$this->load->view('view_event_header', $data);
 		$this->load->view('view_event_entries', $data);
 		$this->load->view('view_footer');
 	}
 	
+	function Entries_xml($id)
+	{
+		$divisions = $this->Event_model->get_event_divisions($id);
+		
+		$xml = new SimpleXMLElement('<event></event>');
+		foreach ($divisions as $division)
+		{
+			$xdiv = $xml->addChild('division');
+			
+			$xdiv->addAttribute('name', $division->name);
+			$xdiv->addAttribute('division', $division->division);
+			$xdiv->addAttribute('description', $division->description);
+			$xdiv->addAttribute('ruleurl', $division->ruleurl);
+			$xdiv->addAttribute('maxentries', $division->maxentries);
+			$xdiv->addAttribute('price', $division->price);
+
+			$entries = $this->Event_model->get_event_entries($division->event_division);
+			
+			foreach ($entries as $entry)
+			{
+				$xentry = $xdiv->addChild('entry');
+				$xentry->addAttribute('name', $entry->name);
+				$xentry->addAttribute('description', $entry->description);
+				$xentry->addAttribute('thumbnail_url', site_url($entry->thumbnail_url));
+				$xentry->addAttribute('teamname', $entry->teamname);
+				$xentry->addAttribute('teamid', $entry->teamid);
+				$xentry->addAttribute('status', $entry->status);
+			}			
+		}
+		
+		header('Content-Type: text/xml');
+		echo $xml->asXML();
+	}
+
 	function Register($id, $extra = '')
 	{
 		$this->load->library(array('session', 'form_validation'));
 		$this->load->model(array('Person_model', 'Team_model', 'Entry_model', 'Event_registration_model'));
-	
+
+		$data = array();
+		$data['event'] = $event = $this->Event_model->get_event($id);
+		$data['event_divisions'] = $this->Event_model->get_event_divisions_as_id_desc($id);
+		
 		$personid = $this->session->userdata('userid');
-		if ($personid === false)
-		{
-			$this->session->set_userdata('onloginurl', "event/register/$id");
-			redirect('login');
-			return;
-		}
+		$this->Person_model->check_login();
 		
 		$teamid = $this->session->flashdata('teamid');
 		// TODO: In later versions, this should give them a choice to select a
@@ -87,12 +127,14 @@ class Event extends CI_Controller
 		//	redirect(array('event_registration', 'view', $team_registration->id));
 		//	return;		
 		//}
-		
 
-		$data = array();
-		$data['event'] = $this->Event_model->get_event($id);
-		$data['event_divisions'] = $this->Event_model->get_event_divisions_as_id_desc($id);
-		
+		// get them out of registration if it's closed, but not of they're already registered (so they can change it)
+		if (time() > strtotime($event->registrationends) && count($team_registration) == 0)
+		{
+			redirect(site_url(array('event', 'view', $id)));
+			return;
+		}
+
 		if ($this->input->post('submit') == 'Add Member' || $this->input->post('submit') == 'Edit Member')
 		{			
 			$this->form_validation->set_rules("fullname", "Full Name", 'trim|required');
@@ -205,7 +247,6 @@ class Event extends CI_Controller
 
 				// send email to EO
 				$team = $this->Team_model->get_team($teamid);
-				$event = $this->Event_model->get_event($id);
 				$this->load->library('email');
 				$captain_email = $this->Event_registration_model->get_registration_captain_email($registration_id);		
 				$this->email->from('registration@robogames.net', 'RoboGames Registration');
@@ -221,7 +262,7 @@ class Event extends CI_Controller
 				$this->email->send();				
 				
 				$this->session->set_flashdata('registration_success', TRUE);
-				redirect(array('event_registration', 'view', $registration_id));
+				redirect(site_url(array('event_registration', 'view', $registration_id)));
 				return;
 			}
 			else
@@ -238,11 +279,10 @@ class Event extends CI_Controller
 		$data['form_entry_division'] = $this->input->post('entry_division');
 		$data['form_entry_division_base'] = $this->Team_model->get_team_entry_event_divisions($teamid, $id);
 		
-		$this->load->view('view_header');	
-		$this->load->view('view_event_header', $data);
+		$this->load->view('view_header');
 		if (count($team_registration) != 0 && !$this->input->post('hide_registration') && $extra != 'update')
 		{
-			redirect(array('event_registration', 'view', $team_registration->id));
+			redirect(site_url(array('event_registration', 'view', $team_registration->id)));
 		}
 		$this->load->view('view_event_register', $data);
 		$this->load->view('view_footer');		
@@ -260,7 +300,6 @@ class Event extends CI_Controller
 		$data['event_people'] = $this->Event_model->get_event_people_grouped($id);
 
 		$this->load->view('view_header');		
-		$this->load->view('view_event_header', $data);
 		$this->load->view('view_event_manage', $data);
 		$this->load->view('view_footer');
 	}
@@ -332,7 +371,7 @@ $message";
 		$config = array(); 
 		$config['upload_path'] = './images/uploads/'; 
 		$config['allowed_types'] = 'gif|jpg|png'; 
-		$config['max_size']	= '2000'; 
+		$config['max_size']	= '0';
 		$config['encrypt_name'] = TRUE; 
 		//$config['max_width']  = '1024'; 
 		//$config['max_height']  = '768';

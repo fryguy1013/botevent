@@ -7,6 +7,10 @@ class Person extends CI_Controller
 		parent::__construct();
 
 		$this->load->model('Person_model');
+
+		if ($this->config->item('requires_login') === TRUE)
+			$this->Person_model->check_login();
+
 	}
 	
 	

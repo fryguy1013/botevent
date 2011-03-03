@@ -32,7 +32,7 @@
 	</p>
 	
 	<? if (empty($userurl)): ?>
-		<p>Email address: <?=$email_addr?></p>
+		<p>Email address: <?=htmlentities($email_addr)?></p>
 		
 		<h3>Enter password:</h3> 
 		<p><div>Password: </div><input name="password1" type="password" size="12" /></p>

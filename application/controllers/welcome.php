@@ -12,6 +12,11 @@ class Welcome extends CI_Controller {
 		//redirect('event/all');
 		echo "hello world";
 	}
+	
+	function version()
+	{
+	    phpinfo();
+	}
 }
 
 /* End of file welcome.php */

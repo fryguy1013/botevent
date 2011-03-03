@@ -1,3 +1,5 @@
+<?php $this->load->view('view_event_header'); ?>
+
 <script type="text/javascript">
 $(document).ready(function() {
 	$('div.event_reg_message').hide();
@@ -47,12 +49,12 @@ $(document).ready(function() {
 
 <div class="event_registration_team">
 	<div class="event_reg_minordetails">
-		<div style="float: right">Status: <?=$reg->status?></div>
-		<?=$reg->teamname?> (<?=$reg->teamcountry?>)
+		<div style="float: right">Status: <?=htmlentities($reg->status)?></div>
+		<?=htmlentities($reg->teamname)?> (<?=htmlentities($reg->teamcountry)?>)
 	</div>
 
 	<div class="event_reg_fulldetails" style="display: none;">
-		<div class="event_registration_team_name"><?=$reg->teamname?></div>
+		<div class="event_registration_team_name"><?=htmlentities($reg->teamname)?></div>
 
 
 		<div class="event_reg_status">
@@ -89,7 +91,7 @@ $(document).ready(function() {
 				<div class="event_person_thumbnail">
 					<?=img(!empty($person->thumbnail_url)?$person->thumbnail_url:'/images/nopicture.png')?>
 				</div>
-				<div class="event_person_name"><?=$person->fullname?></div>
+				<div class="event_person_name"><?=htmlentities($person->fullname)?></div>
 				</a>
 			</div>
 		<? endforeach; ?>
@@ -100,8 +102,8 @@ $(document).ready(function() {
 				<div class="event_entry_thumbnail">
 					<?=img(!empty($entry->thumbnail_url)?$entry->thumbnail_url:'/images/nopicture-entry.png')?>
 				</div>
-				<div class="event_entry_name"><?=$entry->name?></div>
-				<div class="event_entry_division"><?=$entry->divisionname?></div>
+				<div class="event_entry_name"><?=htmlentities($entry->name)?></div>
+				<div class="event_entry_division"><?=htmlentities($entry->divisionname)?></div>
 				</a>
 			</div>
 		<? endforeach; ?>

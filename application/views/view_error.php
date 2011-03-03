@@ -1,1 +1,1 @@
-<div class="error"><?=$error?></div>
+<div class="error"><?=htmlentities($error)?></div>

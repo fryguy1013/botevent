@@ -147,7 +147,7 @@ class Event_model extends CI_Model
 		
 		foreach ($divisions as $div)
 		{
-			add_division_to_event($eventid, $div);
+			$this->add_division_to_event($eventid, $div);
 		}
 	}
 	function add_division_to_event($eventid, $div)
