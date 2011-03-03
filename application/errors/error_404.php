@@ -1,4 +1,4 @@
-<?php header("HTTP/1.1 404 Not Found"); ?>
+<?php
 <html>
 <head>
 <title>404 Page Not Found</title>
