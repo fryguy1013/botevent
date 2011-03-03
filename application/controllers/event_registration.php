@@ -1,11 +1,11 @@
 <?php
 
-class Event_registration extends Controller
+class Event_registration extends CI_Controller
 {
 	
-	function Event_registration()
+	function __construct()
 	{
-		parent::Controller();
+		parent::__construct();
 		
 		$this->load->model(array('Event_model', 'Event_registration_model', 'Team_model'));
 	}

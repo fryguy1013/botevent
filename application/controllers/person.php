@@ -1,10 +1,10 @@
 <?php
-class Person extends Controller
+class Person extends CI_Controller
 {
 	
-	function Person()
+	function __construct()
 	{
-		parent::Controller();
+		parent::__construct();
 
 		$this->load->model('Person_model');
 	}

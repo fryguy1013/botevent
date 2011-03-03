@@ -1,10 +1,10 @@
 <?php
 
-class Event_model extends Model
+class Event_model extends CI_Model
 {
-	function Event_model()
+	function __construct()
 	{
-		parent::Model();
+		parent::__construct();
 		
 	}
 	

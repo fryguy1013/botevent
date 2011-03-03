@@ -1,11 +1,11 @@
 <?php
 
-class Event extends Controller
+class Event extends CI_Controller
 {
 	
-	function Event()
+	function __construct()
 	{
-		parent::Controller();
+		parent::__construct();
 		
 		$this->load->model('Event_model');
 		$this->upload_errors = "";

@@ -1,10 +1,10 @@
 <?php
-class Robot extends Controller
+class Robot extends CI_Controller
 {
 	
-	function Robot()
+	function __construct()
 	{
-		parent::Controller();
+		parent::__construct();
 
 		$this->load->model('Robot_model');
 	}

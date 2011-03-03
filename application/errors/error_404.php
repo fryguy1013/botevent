@@ -1,4 +1,3 @@
-<?php
 <html>
 <head>
 <title>404 Page Not Found</title>

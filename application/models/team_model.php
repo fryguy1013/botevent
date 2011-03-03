@@ -1,10 +1,10 @@
 <?php
 
-class Team_model extends Model
+class Team_model extends CI_Model
 {
-	function Team_model()
+	function __construct()
 	{
-		parent::Model();
+		parent::__construct();
 		
 	}
 	

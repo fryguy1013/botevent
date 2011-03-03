@@ -1,10 +1,10 @@
 <?php
 
-class Entry_model extends Model
+class Entry_model extends CI_Model
 {
-	function Entry_model()
+	function __construct()
 	{
-		parent::Model();
+		parent::__construct();
 		
 	}
 	

@@ -1,10 +1,10 @@
 <?php
-class Entry extends Controller
+class Entry extends CI_Controller
 {
 	
-	function Entry()
+	function __construct()
 	{
-		parent::Controller();
+		parent::__construct();
 
 		$this->load->model('Entry_model');
 	}

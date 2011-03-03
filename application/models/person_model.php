@@ -1,10 +1,10 @@
 <?php
 
-class Person_model extends Model
+class Person_model extends CI_Model
 {
-	function Person_model()
+	function __construct()
 	{
-		parent::Model();		
+		parent::__construct();		
 	}
 	
 	function get_person_by_id($id)

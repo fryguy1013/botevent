@@ -1,10 +1,10 @@
 <?php
-class Team extends Controller
+class Team extends CI_Controller
 {
 	
-	function Team()
+	function __construct()
 	{
-		parent::Controller();
+		parent::__construct();
 
 		$this->load->model('Team_model');
 	}

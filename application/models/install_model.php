@@ -1,10 +1,10 @@
 <?php
 
-class Install_model extends Model
+class Install_model extends CI_Model
 {
-	function Install_model()
+	function __construct()
 	{
-		parent::Model();
+		parent::__construct();
 		
 	}
 	

@@ -1,10 +1,10 @@
 <?php
 
-class Login extends Controller {
+class Login extends CI_Controller {
 
-	function Login()
+	function __construct()
 	{
-		parent::Controller();
+		parent::__construct();
 		
 		$this->load->library(array('openid', 'session', 'form_validation'));
 		$this->lang->load('openid', 'english');
