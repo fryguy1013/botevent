@@ -9,8 +9,7 @@ class Welcome extends CI_Controller {
 	
 	function index()
 	{
-		//redirect('event/all');
-		echo "hello world";
+		redirect('event/all');
 	}
 	
 	function version()
