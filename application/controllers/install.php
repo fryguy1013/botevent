@@ -1,10 +1,10 @@
 <?php
 
-class Install extends Controller {
+class Install extends CI_Controller {
 
-	function Install()
+	function __construct()
 	{
-		parent::Controller();
+		parent::__construct();
 		
 		$this->load->model('Install_model');
 	}
