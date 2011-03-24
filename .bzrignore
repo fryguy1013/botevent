@@ -9,4 +9,4 @@ application/config/database.php
 application/config/email.php
 web.config
 application/config/Email.php
-application/logs
+application/logs/*
