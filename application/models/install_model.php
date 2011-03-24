@@ -154,7 +154,7 @@ class Install_model extends CI_Model
 
 	function reset()
 	{
-		if (!$this->config->item('development'))
+		if ($this->config->item('development_environment') !== TRUE)
 			return;
 	
 		$this->db->empty_table('divisions');

@@ -66,7 +66,7 @@ class Install extends CI_Controller {
 		redirect(site_url(array('install')));
 	}
 
-	function Reset()
+	function reset()
 	{
 		if ($this->config->item('development_environment') !== TRUE)
 		{
@@ -79,7 +79,7 @@ class Install extends CI_Controller {
 		redirect(site_url(array('install')));
 	}
 	
-	function Backup()
+	function backup()
 	{
 		$this->load->model('Install_model');
 		echo $this->Install_model->backup();
