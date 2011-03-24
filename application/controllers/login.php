@@ -159,7 +159,7 @@ class Login extends CI_Controller {
 			{
 				// HAS OPENID
 				$this->form_validation->set_rules('fullname', 'Full Name', 'trim|required');
-				$this->form_validation->set_rules('email_addr', 'Email Address', 'trim|required|valid_email');
+				$this->form_validation->set_rules('email_addr', 'Email Address', 'trim|required|valid_email|callback_unique_email');
 
 				if ($this->form_validation->run() != FALSE && $file_upload !== FALSE)
 				{
@@ -320,6 +320,18 @@ class Login extends CI_Controller {
 			$data = $this->upload->data();
 			return "/images/uploads/".$data['file_name'];
 		}
+	}
+
+	function unique_email($email)
+	{
+		$current = $this->Person_model->get_person_by_email($email);
+		if (!empty($email) && isset($current->id))
+		{
+			$this->form_validation->set_message('unique_email', 'The email address already exists as a user. Please enter another, or log in using that account.');
+			return FALSE;
+		}
+		else
+			return TRUE;
 	}
 
 }
