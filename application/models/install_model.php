@@ -29,7 +29,7 @@ class Install_model extends CI_Model
 			// the release before I added it
 			return $this->db->table_exists('divisions') ? 1 : 0;
 	    }
-	    $ret = $this->db->get('version')->get()->row();
+	    $ret = $this->db->get('version')->row();
 		return $ret->version;
 	}
 	
@@ -92,6 +92,7 @@ class Install_model extends CI_Model
 		$this->dbforge->add_field("event int(10) unsigned NOT NULL");
 		$this->dbforge->add_field("status varchar(45) NOT NULL");
 		$this->dbforge->add_field("captain int(10) unsigned NOT NULL");
+		$this->dbforge->add_field("due decimal(10,0) NOT NULL");
 		$this->dbforge->add_key("id", TRUE);
 		$this->dbforge->create_table("event_registrations");
 
@@ -137,7 +138,7 @@ class Install_model extends CI_Model
 	
 	function rollback_1()
 	{
-		if (!$this->config->item('development'))
+		if ($this->config->item('development_environment') !== TRUE)
 			return;
 
 		$this->dbforge->drop_table("divisions");
@@ -150,6 +151,22 @@ class Install_model extends CI_Model
 		$this->dbforge->drop_table("person");
 		$this->dbforge->drop_table("team");
 		$this->dbforge->drop_table("team_members");
+	}
+	
+	function commit_2()
+	{
+		$this->dbforge->add_field("version int(10) unsigned NOT NULL");
+		$this->dbforge->create_table("version");
+		
+		$this->db->insert('version', array('version' => 2));
+	}
+	
+	function rollback_2()
+	{
+		if ($this->config->item('development_environment') !== TRUE)
+			return;
+		
+		$this->dbforge->drop_table("version");
 	}
 
 	function reset()
@@ -260,26 +277,6 @@ class Install_model extends CI_Model
 		$this->Event_model->add_division_to_event(4, $this->div_helper('Open - Shooting Gallery', 35, 0));
 		*/
 
-		/*
-		$salt = "6yQ4m4499HoplgP5CBqe";
-		$userid = "mwinders@me.com";
-		$this->db
-			->where('id', 177)
-			//->update('person', array('idurl' => 'https://www.google.com/accounts/o8/id?id=AItOawn2FYK0rhRlMus7ncSxkQxggFeXp5F2bw0'));
-			//->update('person', array('idurl' => 'http://www.burntpopcorn.net/'));
-			->update('person', array(
-				'password' => "65c09f8b2f686ce379e1d5ba216179633c12dc14",//sha1("test:$userid:$salt"),
-				'passwordsalt' => $salt,
-				));
-		*/
-
-		/*$users = $this->db
-			->select('*')
-			->from('person')
-			->get()->result();
-		echo "<pre>";
-		print_r($users);
-		*/
 	}
 
 	function backup()
@@ -311,6 +308,7 @@ class Install_model extends CI_Model
 		// Backup your entire database and assign it to a variable
 		$backup =& $this->dbutil->backup($prefs);
 		
+		header("Content-Type: text/plain; charset=UTF-8\r\n");
 		return $backup;
 	}
 
