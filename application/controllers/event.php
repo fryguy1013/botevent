@@ -238,37 +238,55 @@ class Event extends CI_Controller
 					);
 				}
 				
-				$registration_id = $this->Event_registration_model->create_registration(
+				$safe_to_register = $this->Event_registration_model->get_safety_of_registration(
 					$id,
 					$teamid,
-					$personid,
-					$registration_people,
 					$registration_entries);
-
-				// send email to EO
-				$team = $this->Team_model->get_team($teamid);
-				$this->load->library('email');
-				$captain_email = $this->Event_registration_model->get_registration_captain_email($registration_id);		
-				$this->email->from('registration@robogames.net', 'RoboGames Registration');
-				$this->email->reply_to($captain_email);
-				$this->email->to("David Calkins <dcalkins@robotics-society.org>");
-				//$this->email->to("Kevin Hjelden <fryguy@burntpopcorn.net>");		
-				$this->email->subject($team->name." has registered for ".$event->name);			
-				$this->email->message(
-					$team->name." has registered ".$event->name."\n\n" .
-					"You can view the registration here:\n" .
-					site_url(array('event_registration', 'view', $registration_id))
-				);
-				$this->email->send();				
+					
+				if ($safe_to_register['safe'])
+				{
 				
-				$this->session->set_flashdata('registration_success', TRUE);
-				redirect(site_url(array('event_registration', 'view', $registration_id)));
-				return;
+					$registration_id = $this->Event_registration_model->create_registration(
+						$id,
+						$teamid,
+						$personid,
+						$registration_people,
+						$registration_entries);
+	
+					// send email to EO
+					$team = $this->Team_model->get_team($teamid);
+					$this->load->library('email');
+					$captain_email = $this->Event_registration_model->get_registration_captain_email($registration_id);		
+					$this->email->from('registration@robogames.net', 'RoboGames Registration');
+					$this->email->reply_to($captain_email);
+					$this->email->to("David Calkins <dcalkins@robotics-society.org>");
+					//$this->email->to("Kevin Hjelden <fryguy@burntpopcorn.net>");		
+					$this->email->subject($team->name." has registered for ".$event->name);			
+					$this->email->message(
+						$team->name." has registered ".$event->name."\n\n" .
+						"You can view the registration here:\n" .
+						site_url(array('event_registration', 'view', $registration_id))
+					);
+					$this->email->send();				
+					
+					$this->session->set_flashdata('registration_success', TRUE);
+					redirect(site_url(array('event_registration', 'view', $registration_id)));
+					return;
+				}
+				else
+				{
+					$errorstr = '';
+					foreach ($safe_to_register['fulldivisions'] as $full_division)
+					{
+						$errorstr .= 'Unable to register because '.$data['event_divisions'][$full_division]." is full.\r\n";
+					}
+					$data['registration_errors'] = $errorstr;
+				}
 			}
 			else
 			{
 				$data['registration_errors'] = validation_errors();
-			}		
+			}
 		}
 
 

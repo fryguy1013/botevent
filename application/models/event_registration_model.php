@@ -124,10 +124,57 @@ class Event_registration_model extends CI_Model
 		return $row->email;
 	}
 		
+	function get_safety_of_registration($event_id, $team_id, $registration_entries)
+	{
+		$allowed_db = $this->db
+			->select('event_divisions.id, event_divisions.maxentries')
+			->from('event_divisions')
+			->where('event_divisions.event', $event_id)
+			->get()->result();
+		
+		$cts = $this->db
+			->select('event_entries.event_division, COUNT(*) as ct', FALSE)
+			->from('event_entries')
+			->join('event_divisions', 'event_divisions.id = event_division')
+			->join('event_registrations', 'event_entries.event_registration = event_registrations.id')
+			->where('event_divisions.event', $event_id)
+			->where('event_registrations.status !=', 'withdrawn')
+			->where('event_registrations.team !=', $team_id)
+			->group_by('event_entries.event_division')
+			->get()->result();
+		$allowed = array();
+		foreach ($allowed_db as $a)
+			$allowed[$a->id] = $a->maxentries == 0 ? 999999 : $a->maxentries;
+		
+		foreach ($cts as $ct)
+			$allowed[$ct->event_division] -= $ct->ct;
+		
+		$ret = array('safe'=>true, 'fulldivisions'=>array());
+		foreach ($registration_entries as $entry)
+		{
+			if ($allowed[$entry['division']] <= 0)
+			{
+				$ret['safe'] = FALSE;
+				$ret['fulldivisions'][] = $entry['division'];
+			}
+			
+			$allowed[$entry['division']]--;
+		}
+		
+		return $ret;
+	}
 
 
 	function create_registration($event_id, $team_id, $captain, $registration_people, $registration_entries)
 	{
+		// we must remove the other registrations, first
+		$this->unregister_team_for_event($event_id, $team_id);
+
+		// make sure that we can safely register
+		$safety = $this->get_safety_of_registration($event_id, $team_id, $registration_entries);
+		if (!$safety['safe'])
+			return FALSE;
+		
 		$registration_id = $this->add_new_registration($event_id, $team_id, $captain);
 		
 		foreach ($registration_people as $person)
@@ -139,14 +186,16 @@ class Event_registration_model extends CI_Model
 		return $registration_id;
 	}
 	
-	function add_new_registration($event_id, $team_id, $captain)
+	function unregister_team_for_event($event_id, $team_id)
 	{
-		// we must remove the other registrations, first
 		$this->db
 			->where('team', $team_id)
 			->where('event', $event_id)
 			->update('event_registrations', array('status' => 'withdrawn'));
+	}
 	
+	function add_new_registration($event_id, $team_id, $captain)
+	{
 		// now add the new one
 		$data = array(
 			'team' => $team_id,

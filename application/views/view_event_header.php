@@ -1,7 +1,9 @@
 <div class="event_major_details">
+	<!--
 	<a href="<?=site_url(array('event', 'view', $event->id))?>">
 		<img class="event_image" src="<?=site_url($event->image)?>" alt="<?=htmlentities($event->name)?> logo" />
 	</a>
+	-->
 	<div class="event_minor_details">		
 		<div class="event_title"><a href="<?=site_url(array('event', 'view', $event->id))?>"><?=htmlentities($event->name)?></a></div>
 		<div class="event_location"><span>Location: </span><?=htmlentities($event->location)?></div>

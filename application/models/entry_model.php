@@ -40,7 +40,7 @@ class Entry_model extends CI_Model
 		$data = array(
 			'name' => $name,
 			'default_division' => $div,
-			'picture_url' => $picture_url
+			'picture_url' => $picture_url,
 		);
 
 		if (!empty($picture_url))

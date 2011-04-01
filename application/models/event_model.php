@@ -107,8 +107,6 @@ class Event_model extends CI_Model
 		return $ret;
 	}
 	
-
-	
 	function get_event_divisions_as_id_desc($id)
 	{
 		$ret = array();

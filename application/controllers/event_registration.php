@@ -26,7 +26,6 @@ class Event_registration extends CI_Controller
 			$data['event'] = $this->Event_model->get_event($data['registration']->event);
 			$data['entries'] = $this->Event_registration_model->get_registration_entries($registration_id);
 			$data['people'] = $this->Event_registration_model->get_registration_people($registration_id);
-			$this->load->view('view_event_header', $data);
 			$this->load->view('view_event_registration', $data);		
 		}
 		else
