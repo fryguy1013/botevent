@@ -51,10 +51,11 @@ class Openid
          , $optional = array()
          , $verify_peer = null
          , $capath = null
-         , $cainfo = null;
+         , $cainfo = null
+         , $data;
     private $identity, $claimed_id;
     protected $server, $version, $trustRoot, $aliases, $identifier_select = false
-            , $ax = false, $sreg = false, $data, $setup_url = null;
+            , $ax = false, $sreg = false, $setup_url = null;
     static protected $ax_to_sreg = array(
         'namePerson/friendly'     => 'nickname',
         'contact/email'           => 'email',
@@ -69,14 +70,20 @@ class Openid
 
     function __construct()
     {
-        $this->trustRoot = (!empty($_SERVER['HTTPS']) ? 'https' : 'http') . '://' . $_SERVER['HTTP_HOST'];
+        $this->trustRoot = 'http://' . $_SERVER['HTTP_HOST'];
+        if ((!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off')
+            || (isset($_SERVER['HTTP_X_FORWARDED_PROTO'])
+            && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https')
+        ) {
+            $this->trustRoot = 'https://' . $_SERVER['HTTP_HOST'];
+        }
         $uri = rtrim(preg_replace('#((?<=\?)|&)openid\.[^&]+#', '', $_SERVER['REQUEST_URI']), '?');
         $this->returnUrl = $this->trustRoot . $uri;
 
         $this->data = $_POST + $_GET; # OPs may send data as POST or GET.
-        
+
         if(!function_exists('curl_init') && !in_array('https', stream_get_wrappers())) {
-            die('You must have either https wrappers or curl enabled.');
+            throw new ErrorException('You must have either https wrappers or curl enabled.');
         }
     }
 
@@ -198,7 +205,7 @@ class Openid
     protected function request_streams($url, $method='GET', $params=array())
     {
         if(!$this->hostExists($url)) {
-            throw new ErrorException('Invalid request.');
+            throw new ErrorException("Could not connect to $url.", 404);
         }
 
         $params = http_build_query($params, '', '&');
@@ -287,9 +294,9 @@ class Openid
 
     protected function request($url, $method='GET', $params=array())
     {
-        $use_curl = ini_get('safe_mode') || ini_get('open_basedir') || !ini_get("allow_url_fopen");
-
-        if (function_exists('curl_init') && $use_curl) {
+        if (function_exists('curl_init')
+            && (!in_array('https', stream_get_wrappers()) || !ini_get('safe_mode') && !ini_get('open_basedir'))
+        ) {
             return $this->request_curl($url, $method, $params);
         }
         return $this->request_streams($url, $method, $params);
@@ -462,9 +469,9 @@ class Openid
                 return $server;
             }
 
-            throw new ErrorException('No servers found!');
+            throw new ErrorException("No OpenID Server found at $url", 404);
         }
-        throw new ErrorException('Endless redirection!');
+        throw new ErrorException('Endless redirection!', 500);
     }
 
     protected function sregParams()
@@ -696,8 +703,8 @@ class Openid
         }
 
         $attributes = array();
-        foreach ($this->data as $key => $value) {
-            $keyMatch = 'openid_' . $alias . '_value_';
+        foreach (explode(',', $this->data['openid_signed']) as $key) {
+            $keyMatch = $alias . '.value.';
             if (substr($key, 0, strlen($keyMatch)) != $keyMatch) {
                 continue;
             }
@@ -708,8 +715,10 @@ class Openid
                 # to check, than cause an E_NOTICE.
                 continue;
             }
+            $value = $this->data['openid_' . $alias . '_value_' . $key];
             $key = substr($this->data['openid_' . $alias . '_type_' . $key],
                           strlen('http://axschema.org/'));
+
             $attributes[$key] = $value;
         }
         return $attributes;
@@ -719,8 +728,8 @@ class Openid
     {
         $attributes = array();
         $sreg_to_ax = array_flip(self::$ax_to_sreg);
-        foreach ($this->data as $key => $value) {
-            $keyMatch = 'openid_sreg_';
+        foreach (explode(',', $this->data['openid_signed']) as $key) {
+            $keyMatch = 'sreg.';
             if (substr($key, 0, strlen($keyMatch)) != $keyMatch) {
                 continue;
             }
@@ -729,7 +738,7 @@ class Openid
                 # The field name isn't part of the SREG spec, so we ignore it.
                 continue;
             }
-            $attributes[$sreg_to_ax[$key]] = $value;
+            $attributes[$sreg_to_ax[$key]] = $this->data['openid_sreg_' . $key];
         }
         return $attributes;
     }
