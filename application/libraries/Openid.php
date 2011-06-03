@@ -287,7 +287,9 @@ class Openid
 
     protected function request($url, $method='GET', $params=array())
     {
-        if(function_exists('curl_init') && !ini_get('safe_mode') && !ini_get('open_basedir')) {
+        $use_curl = ini_get('safe_mode') || ini_get('open_basedir') || !ini_get("allow_url_fopen");
+
+        if (function_exists('curl_init') && $use_curl) {
             return $this->request_curl($url, $method, $params);
         }
         return $this->request_streams($url, $method, $params);
