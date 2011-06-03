@@ -23,7 +23,8 @@ class Event extends CI_Controller
 	function All()
 	{
 		$data = array();
-		$data['events'] = $this->Event_model->get_events();
+		$data['future_events'] = $this->Event_model->get_future_events();
+		$data['past_events'] = $this->Event_model->get_past_events();
 		
 		$this->load->view('view_header');
 		$this->load->view('view_event_all', $data);		
