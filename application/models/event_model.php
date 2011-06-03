@@ -10,8 +10,26 @@ class Event_model extends CI_Model
 	
 	function get_events()
 	{
-		return $this->db->get('event', 10)->result();
+		return $this->db->get('event')->result();
 	}
+
+	function get_future_events()
+	{
+		return $this->db
+			->from('event')
+			->where('startdate > NOW()', NULL, FALSE)
+			->order_by('startdate', 'asc')
+			->get()->result();
+	}
+	
+	function get_past_events()
+	{
+		return $this->db
+			->from('event')
+			->where('startdate < NOW()', NULL, FALSE)
+			->order_by('startdate', 'desc')
+			->get()->result();
+	}	
 	
 	function get_event($id)
 	{
