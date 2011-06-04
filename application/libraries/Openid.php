@@ -146,11 +146,13 @@ class Openid
         return !!gethostbynamel($server);
     }
 
-    protected function request_curl($url, $method='GET', $params=array())
+    protected function request_curl($url, $method='GET', $baseParams=array(), $numRedirects=5)
     {
-        $params = http_build_query($params, '', '&');
+        $params = http_build_query($baseParams, '', '&');
         $curl = curl_init($url . ($method == 'GET' && $params ? '?' . $params : ''));
-        curl_setopt($curl, CURLOPT_FOLLOWLOCATION, true);
+        
+        $needsCurlFixing = !(ini_get('open_basedir') == '' && ini_get('safe_mode') == 'Off');
+        
         curl_setopt($curl, CURLOPT_HEADER, false);
         curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
@@ -176,8 +178,33 @@ class Openid
         } else {
             curl_setopt($curl, CURLOPT_HTTPGET, true);
         }
-        $response = curl_exec($curl);
-
+        if ($needsCurlFixing) {
+            curl_setopt($curl, CURLOPT_HEADER, true);
+            
+            $response = curl_exec($curl);
+    
+            if (curl_errno($curl)) {
+                throw new ErrorException(curl_error($curl), curl_errno($curl));
+            }
+            
+            $code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+            if ($code == 301 || $code == 302) {
+                if ($numRedirects > 0) {
+                    preg_match('/Location:(.*?)\n/', $response, $matches);
+                    $newurl = trim(array_pop($matches));
+                    return $this->request_curl($newurl, $method, $baseParams, $numRedirects - 1);
+                }
+            }
+        }
+        else {
+            curl_setopt($curl, CURLOPT_FOLLOWLOCATION, true);
+            $response = curl_exec($curl);
+    
+            if (curl_errno($curl)) {
+                throw new ErrorException(curl_error($curl), curl_errno($curl));
+            }
+        }
+        
         if($method == 'HEAD') {
             $headers = array();
             foreach(explode("\n", $response) as $header) {
@@ -193,10 +220,6 @@ class Openid
             }
 
             return $headers;
-        }
-
-        if (curl_errno($curl)) {
-            throw new ErrorException(curl_error($curl), curl_errno($curl));
         }
 
         return $response;
