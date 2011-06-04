@@ -256,7 +256,7 @@ class Login extends CI_Controller {
 				if (isset($attributes['contact/email']))
 					$this->session->set_userdata('openid_email', $attributes['contact/email']);
 
-				//$this->output->set_output("invalid user: $openid");
+				//die("invalid user: ".$this->openid->identity);
 				redirect(site_url(array('login', 'register')));
 				return;
 			}
