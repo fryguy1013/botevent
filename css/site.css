@@ -200,6 +200,9 @@ img
 
 .event_all_past_event
 {
+	width: 25em;
+	height: 6em;
+	float: left;	
 	margin: .5em;	
 }
 
