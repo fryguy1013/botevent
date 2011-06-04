@@ -79,7 +79,7 @@ class Event_registration_model extends CI_Model
 			->join('event_registrations', 'event_registrations.id = event_entries.event_registration')
 			->where('event_entries.entry', $entry_id)
 			->where('event_registrations.status !=', 'withdrawn')
-			->orderby('event.startdate desc')
+			->order_by('event.startdate desc')
 			->get()->result();	
 	}
 	function get_events_for_team($team_id)
