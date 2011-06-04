@@ -288,6 +288,7 @@ class Login extends CI_Controller {
 				$this->openid->required = array('namePerson', 'contact/email');
 			$this->openid->identity = $url;
 			$this->openid->returnUrl = site_url(array('login', 'check'));
+			$this->openid->trustRoot = base_url();
 			redirect($this->openid->authUrl());
 			return;
 		}
