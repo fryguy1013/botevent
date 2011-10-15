@@ -8,7 +8,8 @@ class Login extends CI_Controller {
 
 		parse_str($_SERVER['QUERY_STRING'],$_GET);
 
-		$this->load->library(array('session', 'form_validation', 'openid'));
+		$this->load->library(array('session', 'form_validation'));
+		$this->load->library('openid', array('host' => base_url()));
 		$this->load->model('Person_model');
 
 		$this->upload_errors = "";
@@ -231,6 +232,10 @@ class Login extends CI_Controller {
 		}
 		else if ($this->openid->validate())
 		{
+			//echo "<pre>";
+			//var_dump($this->openid);
+			//die($this->openid->identity);
+
 			// success
 			$person = $this->Person_model->get_person_by_url($this->openid->identity);
 
@@ -288,7 +293,6 @@ class Login extends CI_Controller {
 				$this->openid->required = array('namePerson', 'contact/email');
 			$this->openid->identity = $url;
 			$this->openid->returnUrl = site_url(array('login', 'check'));
-			$this->openid->trustRoot = base_url();
 			redirect($this->openid->authUrl());
 			return;
 		}

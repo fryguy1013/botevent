@@ -8,7 +8,7 @@
  * Sign-on with OpenID is a two step process:
  * Step one is authentication with the provider:
  * <code>
- * $openid = new LightOpenID;
+ * $openid = new LightOpenID('my-host.example.org');
  * $openid->identity = 'ID supplied by user';
  * header('Location: ' . $openid->authUrl());
  * </code>
@@ -16,10 +16,13 @@
  * Step two is verification:
  * <code>
  * if ($this->data['openid_mode']) {
- *     $openid = new LightOpenID;
+ *     $openid = new LightOpenID('my-host.example.org');
  *     echo $openid->validate() ? 'Logged in.' : 'Failed';
  * }
  * </code>
+ *
+ * Change the 'my-host.example.org' to your domain name. Do NOT use $_SERVER['HTTP_HOST']
+ * for that, unless you know what you are doing.
  *
  * Optionally, you can set $returnUrl and $realm (or $trustRoot, which is an alias).
  * The default values for those are:
@@ -68,19 +71,25 @@ class Openid
         'pref/timezone'           => 'timezone',
         );
 
-    function __construct()
+    function __construct($params)
     {
-        $this->trustRoot = 'http://' . $_SERVER['HTTP_HOST'];
+        $host = $params['host'];
+        $this->trustRoot = (strpos($host, '://') ? $host : 'http://' . $host);
         if ((!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off')
             || (isset($_SERVER['HTTP_X_FORWARDED_PROTO'])
             && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https')
         ) {
-            $this->trustRoot = 'https://' . $_SERVER['HTTP_HOST'];
+            $this->trustRoot = (strpos($host, '://') ? $host : 'https://' . $host);
         }
+
+        if(($host_end = strpos($this->trustRoot, '/', 8)) !== false) {
+            $this->trustRoot = substr($this->trustRoot, 0, $host_end);
+        }
+
         $uri = rtrim(preg_replace('#((?<=\?)|&)openid\.[^&]+#', '', $_SERVER['REQUEST_URI']), '?');
         $this->returnUrl = $this->trustRoot . $uri;
 
-        $this->data = $_POST + $_GET; # OPs may send data as POST or GET.
+        $this->data = ($_SERVER['REQUEST_METHOD'] === 'POST') ? $_POST : $_GET;
 
         if(!function_exists('curl_init') && !in_array('https', stream_get_wrappers())) {
             throw new ErrorException('You must have either https wrappers or curl enabled.');
@@ -239,7 +248,9 @@ class Openid
                     'method' => 'GET',
                     'header' => 'Accept: application/xrds+xml, */*',
                     'ignore_errors' => true,
-                )
+                ), 'ssl' => array(
+                    'CN_match' => parse_url($url, PHP_URL_HOST),
+                ),
             );
             $url = $url . ($params ? '?' . $params : '');
             break;
@@ -250,7 +261,9 @@ class Openid
                     'header'  => 'Content-type: application/x-www-form-urlencoded',
                     'content' => $params,
                     'ignore_errors' => true,
-                )
+                ), 'ssl' => array(
+                    'CN_match' => parse_url($url, PHP_URL_HOST),
+                ),
             );
             break;
         case 'HEAD':
@@ -259,11 +272,15 @@ class Openid
             # we have to change the defaults.
             $default = stream_context_get_options(stream_context_get_default());
             stream_context_get_default(
-                array('http' => array(
+                array(
+                    'http' => array(
                     'method' => 'HEAD',
                     'header' => 'Accept: application/xrds+xml, */*',
                     'ignore_errors' => true,
-                ))
+                    ), 'ssl' => array(
+                        'CN_match' => parse_url($url, PHP_URL_HOST),
+                    ),
+                )
             );
 
             $url = $url . ($params ? '?' . $params : '');
@@ -303,11 +320,11 @@ class Openid
         }
 
         if($this->verify_peer) {
-            $opts += array('ssl' => array(
+            $opts['ssl'] += array(
                 'verify_peer' => true,
                 'capath'      => $this->capath,
                 'cafile'      => $this->cainfo,
-            ));
+            );
         }
 
         $context = stream_context_create ($opts);

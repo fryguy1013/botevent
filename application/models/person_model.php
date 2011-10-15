@@ -14,6 +14,18 @@ class Person_model extends CI_Model
 
 	function get_person_by_url($url)
 	{
+		// this fixes a bug introduced by the older version of the site where it didn't record the fragments in the database.
+		$parts = explode("#", $url);
+		if (count($parts) > 1)
+		{
+			$found_bare = $this->db->get_where('person', array('idurl'=>$parts[0]), 1)->row();
+			if (!empty($found_bare))
+			{
+				$this->db->where('idurl', $parts[0])
+					->update('person', array('idurl' => $url));
+			}
+		}
+		
 		return $this->db->get_where('person', array('idurl'=>$url), 1)->row();
 	}
 	
