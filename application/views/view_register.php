@@ -28,22 +28,11 @@
 	
 	<p>
 		<div>My Full Name:</div>
-		<input name="fullname" type="text" value="<?=set_value('fullname', $openid_fullname)?>" size="25" />
+		<input name="fullname" type="text" value="<?=set_value('fullname', '')?>" size="25" />
 	</p>
 	
-	<? if (empty($userurl)): ?>
-		<p>Email address: <?=htmlentities($email_addr)?></p>
-		
-		<h3>Enter password:</h3> 
-		<p><div>Password: </div><input name="password1" type="password" size="12" /></p>
-		<p><div>Confirm Password: </div><input name="password2" type="password" size="12" /></p>
-	<? else: ?>
-		<p>
-			<div>Email Address:</div>
-			<?=form_input("email_addr", set_value('email_addr', $openid_email), 'size="40"')?>
-		</p>
-	<? endif; ?>
-	
+	<p>Email address: <?=htmlentities($email_addr)?></p>
+
 	<p>
 		<div>Date of Birth</div>
 		<?=form_dropdown('dob_month', $months, set_value('dob_month'))?>

@@ -6,83 +6,47 @@ class Login extends CI_Controller {
 	{
 		parent::__construct();
 
-		parse_str($_SERVER['QUERY_STRING'],$_GET);
-
-		$this->load->library(array('session', 'form_validation', 'openid'));
+		$this->load->library(array('session', 'form_validation'));
 		$this->load->model('Person_model');
 
 		$this->upload_errors = "";
 
 		//$this->output->enable_profiler(TRUE);
-
 	}
 
-	// Index
 	function index()
 	{
 		$data = array();
-
-		$user_id = $this->input->post('url');
-		if (!empty($user_id))
+		
+		if ($this->input->post('action') == 'send_login_code')
 		{
-			$this->_check_openid($user_id);
-		}
-
-		if ($this->input->post('action') == 'email_password')
-		{
-			$data['show_email_only'] = TRUE;
-
 			$this->form_validation->set_rules('email_addr', 'Email Address', 'trim|required|valid_email');
-			$this->form_validation->set_rules('login_type', 'Login Type', 'trim|required');
-			$this->form_validation->set_rules('email_password', 'Password', 'trim');
-
 			if ($this->form_validation->run() != FALSE)
 			{
 				$person = $this->Person_model->get_person_by_email($this->input->post('email_addr'));
-				if ($this->input->post('login_type') == 'new_member')
+				$email_addr = $this->input->post('email_addr');
+				if (count($person) == 0)
 				{
-					if (count($person) == 0)
-					{
-						$this->session->set_userdata('openid_email', $this->input->post('email_addr'));
-						redirect(site_url(array('login','register')));
-						return;
-					}
-					else
-					{
-						$data['error'] = "That email address is already in use. Did you mean to login instead?";
-					}
+					$this->session->set_userdata('email', $this->input->post('email_addr'));
+					redirect(site_url(array('login','register')));
 				}
 				else
 				{
-					$email_addr = $this->input->post('email_addr');
-					$password = $this->input->post('email_password');
-					if (count($person) == 0)
-					{
-						$data['error'] = "That email address does not exist. Did you mean to create a new account?";
-					}
-					else if (empty($person->password) && !empty($person->idurl))
-					{
-						$this->_check_openid($person->idurl);
-					}
-					else if (empty($person->password))
-					{
-						$data['error'] = "Your email address is associated with a member of a team. In the future, you will be able to log in to this account.";
-						$data['show_email_only'] = FALSE;
-					}
-					else if ($person->password != $this->Person_model->generate_password($password, $email_addr, $person->passwordsalt))
-					{
-						$data['error'] = "The password you have typed does not exist. Try again.";
-					}
-					else
-					{
-						$this->session->set_userdata('userid', $person->id);
-						$this->session->set_userdata('fullname', $person->fullname);
-						redirect($this->session->userdata('onloginurl'));
-						die();
-					}
+					$code = $this->Person_model->create_login_code($person->id);
+					
+					$email_content = $this->load->view('email_login_code', array('userid'=>$person->id, 'code'=>$code), TRUE);
+					
+					$this->load->library('email');
+					$this->email->from('registration@robogames.net', 'RoboGames Registration');
+					//$this->email->reply_to($captain_email);
+					$this->email->to($person->email);
+					$this->email->subject("Robogames registraion login information");
+					$this->email->message($email_content);
+					$this->email->send();
+					
+					$data['success'] = 'Verification code has been sent to your email address.';
 				}
-
-			}
+			}	
 			else
 			{
 				$data['error'] = validation_errors();
@@ -91,13 +55,32 @@ class Login extends CI_Controller {
 
 		$this->load->view('view_header', $data);
 		$this->load->view('view_login', $data);
-		$this->load->view('view_footer', $data);
+		$this->load->view('view_footer', $data);		
 	}
-
+	
 	function logout()
 	{
 		$this->session->sess_destroy();
 		redirect('login');
+	}
+	
+	function validate_code($id, $code)
+	{
+		$is_valid_code = $this->Person_model->check_login_code($id, $code);
+		$person = $this->Person_model->get_person_by_id($id);
+		if (!$is_valid_code || count($person) == 0)
+		{
+			$data = array('error' => 'That login code is invalid.');
+			
+			$this->load->view('view_header', $data);
+			$this->load->view('view_login', $data);
+			$this->load->view('view_footer', $data);
+			return;
+		}
+		
+		$this->session->set_userdata('userid', $person->id);
+		$this->session->set_userdata('fullname', $person->fullname);
+		redirect($this->session->userdata('onloginurl'));
 	}
 
 	function register()
@@ -105,10 +88,8 @@ class Login extends CI_Controller {
 		$data = array();
 		$this->load->model('Team_model');
 
-		$data['email_addr'] = $this->session->userdata('openid_email');
+		$data['email_addr'] = $this->session->userdata('email');
 		$data['userurl'] = $this->session->userdata('userurl');
-		$data['openid_fullname'] = $this->session->userdata('openid_fullname');
-		$data['openid_email'] = $this->session->userdata('openid_email');
 
 		if (empty($data['email_addr']) && empty($data['userurl']))
 		{
@@ -133,48 +114,20 @@ class Login extends CI_Controller {
 
 			$dob = sprintf("%s/%s/%s", $this->input->post('dob_month'), $this->input->post('dob_day'), $this->input->post('dob_year'));
 			$file_upload = $this->_do_upload('badge_photo');
-			if (empty($data['userurl']))
-			{
-				// NO OPENID
-				$this->form_validation->set_rules('fullname', 'Full Name', 'trim|required');
-				$this->form_validation->set_rules('password1', 'Password', 'trim|required|matches[password2]');
-				$this->form_validation->set_rules('password2', 'Password Confirmation', 'trim|required');
 
-				if ($this->form_validation->run() != FALSE && $file_upload !== FALSE)
-				{
-					$personid = $this->Person_model->add_person(
-						$this->input->post('fullname'),
-						$dob,
-						$this->session->userdata('openid_email'),
-						$file_upload,
-						"mailto:".$this->session->userdata('openid_email'),
-						$this->input->post('password1'));
-				}
-				else
-				{
-					$data['error'] = $this->upload_errors.validation_errors();
-				}
+			$this->form_validation->set_rules('fullname', 'Full Name', 'trim|required');
+
+			if ($this->form_validation->run() != FALSE && $file_upload !== FALSE)
+			{
+				$personid = $this->Person_model->add_person(
+					$this->input->post('fullname'),
+					$dob,
+					$this->session->userdata('email'),
+					$file_upload);
 			}
 			else
 			{
-				// HAS OPENID
-				$this->form_validation->set_rules('fullname', 'Full Name', 'trim|required');
-				$this->form_validation->set_rules('email_addr', 'Email Address', 'trim|required|valid_email|callback_unique_email');
-
-				if ($this->form_validation->run() != FALSE && $file_upload !== FALSE)
-				{
-					$personid = $this->Person_model->add_person(
-						$this->input->post('fullname'),
-						$dob,
-						$this->input->post('email_addr'),
-						$file_upload,
-						$this->session->userdata('userurl'),
-						'');
-				}
-				else
-				{
-					$data['error'] = $this->upload_errors.validation_errors();
-				}
+				$data['error'] = $this->upload_errors.validation_errors();
 			}
 
 			if ($personid != 0)
@@ -205,98 +158,10 @@ class Login extends CI_Controller {
 		$this->load->view('view_footer', $data);
 	}
 
-	// Policy
-	function policy()
-	{
-		$this->load->view('view_policy');
-	}
-
 	// set message
 	function _set_message($msg, $val = '', $sub = '%s')
 	{
 		return str_replace($sub, $val, $this->lang->line($msg));
-	}
-
-	// Check
-	function check()
-	{
-		if (!$this->openid->mode)
-		{
-			$data['msg'] = "Unknown";
-		}
-		else if ($this->openid->mode == 'cancel')
-		{
-			// cancelled authenticating
-			$data['error'] = "Cancelled openid authentication";
-		}
-		else if ($this->openid->validate())
-		{
-			// success
-			$person = $this->Person_model->get_person_by_url($this->openid->identity);
-
-			if (count($person) > 0)
-			{
-				// they have logged into an account, so set the session var
-				$this->session->set_userdata('userid', $person->id);
-				$this->session->set_userdata('fullname', $person->fullname);
-
-				redirect($this->session->userdata('onloginurl'));
-				return;
-			}
-			else
-			{
-				// there isn't an account, so make them register first
-				$this->session->set_userdata('userurl', $this->openid->identity);
-
-				$attributes = $this->openid->getAttributes();
-				if (isset($attributes['namePerson']))
-					$this->session->set_userdata('openid_fullname', $attributes['namePerson']);
-				else if (isset($attributes['namePerson/first']) && isset($attributes['namePerson/last']))
-					$this->session->set_userdata('openid_fullname', $attributes['namePerson/first']." ".$attributes['namePerson/last']);
-				if (isset($attributes['contact/email']))
-					$this->session->set_userdata('openid_email', $attributes['contact/email']);
-
-				//die("invalid user: ".$this->openid->identity);
-				redirect(site_url(array('login', 'register')));
-				return;
-			}
-		}
-		else
-		{
-			// failure
-			$data['error'] = "Failed authenticating to " . $this->openid->identity;
-		}
-
-
-		$this->load->view('view_header', $data);
-		$this->load->view('view_login', $data);
-		$this->load->view('view_footer', $data);
-	}
-
-	function _check_openid($url)
-	{
-		$this->session->set_userdata('userurl', '');
-		$this->session->set_userdata('userid', '');
-		$this->session->set_userdata('openid_fullname', '');
-		$this->session->set_userdata('openid_email', '');
-
-		try
-		{
-			if ($url == "https://www.google.com/accounts/o8/id")
-				$this->openid->required = array('namePerson/first', 'namePerson/last', 'contact/email');
-			else
-				$this->openid->required = array('namePerson', 'contact/email');
-			$this->openid->identity = $url;
-			$this->openid->returnUrl = site_url(array('login', 'check'));
-			$this->openid->trustRoot = base_url();
-			redirect($this->openid->authUrl());
-			return;
-		}
-		catch (ErrorException $e)
-		{
-			echo $e->getMessage();
-			return;
-		}
 	}
 
 	function _do_upload($field)

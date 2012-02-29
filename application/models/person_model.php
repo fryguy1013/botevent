@@ -14,6 +14,18 @@ class Person_model extends CI_Model
 
 	function get_person_by_url($url)
 	{
+		// this fixes a bug introduced by the older version of the site where it didn't record the fragments in the database.
+		$parts = explode("#", $url);
+		if (count($parts) > 1)
+		{
+			$found_bare = $this->db->get_where('person', array('idurl'=>$parts[0]), 1)->row();
+			if (!empty($found_bare))
+			{
+				$this->db->where('idurl', $parts[0])
+					->update('person', array('idurl' => $url));
+			}
+		}
+		
 		return $this->db->get_where('person', array('idurl'=>$url), 1)->row();
 	}
 	
@@ -22,7 +34,7 @@ class Person_model extends CI_Model
 		return $this->db->get_where('person', array('email'=>$email), 1)->row();
 	}
 	
-	function add_person($fullname, $dob, $email, $picture_url, $idurl, $password = '')
+	function add_person($fullname, $dob, $email, $picture_url)
 	{
 		$this->load->helper('string');
 		
@@ -34,17 +46,8 @@ class Person_model extends CI_Model
 			'fullname' => $fullname,
 			'email' => $email,
 			'picture_url' => $picture_url,
-			'idurl' => $idurl,
 			'dob' => $dob,
-			'password' => '',
-			'passwordsalt' => '',
 		);			
-		
-		if (!empty($password))
-		{
-			$data['passwordsalt'] = random_string('alnum', 20);
-			$data['password'] = $this->generate_password($password, $email, $data['passwordsalt']);
-		}
 		
 		if (!empty($picture_url))
 		{
@@ -78,9 +81,29 @@ class Person_model extends CI_Model
 			->update('person', $data);
 	}
 
-	function generate_password($password, $username, $salt)
+	function generate_login_code_hash($id, $code)
 	{
-		return sha1("$password:$username:$salt");
+		return sha1("$id:$code");
+	}
+	
+	function create_login_code($id)
+	{
+		$code = random_string('alnum', 20);
+		$hash = $this->generate_login_code_hash($id, $code);
+		
+		$this->db->set('userid', $id);
+		$this->db->set('hash', $hash);
+		$this->db->set('generated', 'now()', FALSE);
+		$this->db->insert('login_code');
+		
+		return $code;
+	}
+	
+	function check_login_code($id, $code)
+	{
+		$hash = $this->generate_login_code_hash($id, $code);
+		
+		return count($this->db->get_where('login_code', array('userid'=>$id, 'hash'=>$hash), 1)->row()) > 0;
 	}
 	
 	function _make_thumbnail($picture_url)
