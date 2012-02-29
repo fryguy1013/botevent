@@ -66,6 +66,13 @@ h4
 	border: 1px solid #ff0000;
 	background: #ffaaaa;
 }
+.success {
+	margin-top: .5em;
+	padding-left: .5em;
+	border: 1px solid #00ff00;
+	background: #aaffaa;
+	font-size: 12pt;
+}
 ul
 {
 	margin: 0;

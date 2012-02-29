@@ -168,6 +168,29 @@ class Install_model extends CI_Model
 		
 		$this->dbforge->drop_table("version");
 	}
+	
+	function commit_3()
+	{
+		$this->db->update('version', array('version' => 3));
+
+		$this->dbforge->add_field("id int(10) unsigned NOT NULL auto_increment");
+		$this->dbforge->add_field("userid int(10) NOT NULL");
+		$this->dbforge->add_field("hash varchar(255) NOT NULL");
+		$this->dbforge->add_field("generated varchar(255) NOT NULL");
+		$this->dbforge->add_key("id", TRUE);
+		$this->dbforge->add_key(array('userid', 'hash'));
+		$this->dbforge->create_table("login_code");
+	}
+	
+	function rollback_3()
+	{
+		if ($this->config->item('development_environment') !== TRUE)
+			return;
+			
+		$this->db->update('version', array('version' => 2));
+		
+		$this->dbforge->drop_table("login_code");
+	}
 
 	function reset()
 	{
@@ -263,8 +286,8 @@ class Install_model extends CI_Model
 			'image' => '/images/events/robogames.gif',
 			'smallimage' => '/images/events/robogames.gif',
 			'description' => 'RoboGames, the world\'s largest robot competition, returns this summer, with teams from around the world competing in over 60 different events.  Register today.',
-			'startdate' => '2011-04-14 00:00:00',
-			'enddate' => '2011-04-17 00:00:00',
+			'startdate' => '2012-04-14 00:00:00',
+			'enddate' => '2012-04-17 00:00:00',
 			'registrationends' => '2011-04-01 00:00:00',
 			'websiteurl' => 'http://www.robogames.net/',
 			'location' => 'San Francisco, CA'

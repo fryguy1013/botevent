@@ -5,7 +5,6 @@
 <title>RoboGames - Robot Event Registration<? if (isset($title)) { echo $title; } ?></title>
 
 <link href="<?=site_url('/css/site.css')?>?2" media="screen" rel="stylesheet" type="text/css"/>
-<link href="<?=site_url('/css/openid.css')?>" media="screen" rel="stylesheet" type="text/css"/> 
  
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js"></script>
 
