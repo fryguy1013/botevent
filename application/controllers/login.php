@@ -35,16 +35,26 @@ class Login extends CI_Controller {
 					$code = $this->Person_model->create_login_code($person->id);
 					
 					$email_content = $this->load->view('email_login_code', array('userid'=>$person->id, 'code'=>$code), TRUE);
+
+					if ($this->config->item('use_postmark') === TRUE)
+					{
+						$this->load->library('postmark');
+						$this->postmark->to($person->email);
+						$this->postmark->subject("Robogames registraion login information");
+						$this->postmark->message_plain($email_content);
+						$this->postmark->send();
+					}
+					else
+					{
+						$this->load->library('email');
+						$this->email->from('registration@robogames.net', 'RoboGames Registration');
+						$this->email->to($person->email);
+						$this->email->subject("Robogames registraion login information");
+						$this->email->message($email_content);
+						$this->email->send();
+					}
 					
-					$this->load->library('email');
-					$this->email->from('registration@robogames.net', 'RoboGames Registration');
-					//$this->email->reply_to($captain_email);
-					$this->email->to($person->email);
-					$this->email->subject("Robogames registraion login information");
-					$this->email->message($email_content);
-					$this->email->send();
-					
-					$data['success'] = 'Verification code has been sent to your email address.';
+					$data['success'] = 'Verification code has been sent to your email address. Please wait up to 15 minutes, and check your email spam filter if it doesn\'t arrive.';
 				}
 			}	
 			else
@@ -52,7 +62,11 @@ class Login extends CI_Controller {
 				$data['error'] = validation_errors();
 			}
 		}
-
+		else
+		{
+			$data['success'] = 'We have changed email providers to hopefully fix any email delivery problems some people with strict spam filters were having. Please let us know if there are still problems';
+		}
+		
 		$this->load->view('view_header', $data);
 		$this->load->view('view_login', $data);
 		$this->load->view('view_footer', $data);		
