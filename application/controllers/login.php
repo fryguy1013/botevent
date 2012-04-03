@@ -54,7 +54,7 @@ class Login extends CI_Controller {
 						$this->email->send();
 					}
 					
-					$data['success'] = 'Verification code has been sent to your email address.';
+					$data['success'] = 'Verification code has been sent to your email address. Please wait up to 15 minutes, and check your email spam filter if it doesn\'t arrive.';
 				}
 			}	
 			else
@@ -62,7 +62,11 @@ class Login extends CI_Controller {
 				$data['error'] = validation_errors();
 			}
 		}
-
+		else
+		{
+			$data['success'] = 'We have changed email providers to hopefully fix any email delivery problems some people with strict spam filters were having. Please let us know if there are still problems';
+		}
+		
 		$this->load->view('view_header', $data);
 		$this->load->view('view_login', $data);
 		$this->load->view('view_footer', $data);		
