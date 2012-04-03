@@ -18,6 +18,7 @@ $config['base_url']	= "http://fryguy.selfip.net/";
 
 $config['requires_login'] = TRUE;
 $config['development_environment'] = FALSE;
+$config['use_postmark'] = FALSE;
 
 /*
 |--------------------------------------------------------------------------

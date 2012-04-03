@@ -10,3 +10,4 @@ application/config/email.php
 web.config
 application/config/Email.php
 application/logs/*
+application/config/postmark.php

@@ -35,14 +35,24 @@ class Login extends CI_Controller {
 					$code = $this->Person_model->create_login_code($person->id);
 					
 					$email_content = $this->load->view('email_login_code', array('userid'=>$person->id, 'code'=>$code), TRUE);
-					
-					$this->load->library('email');
-					$this->email->from('registration@robogames.net', 'RoboGames Registration');
-					//$this->email->reply_to($captain_email);
-					$this->email->to($person->email);
-					$this->email->subject("Robogames registraion login information");
-					$this->email->message($email_content);
-					$this->email->send();
+
+					if ($this->config->item('use_postmark') === TRUE)
+					{
+						$this->load->library('postmark');
+						$this->postmark->to($person->email);
+						$this->postmark->subject("Robogames registraion login information");
+						$this->postmark->message_plain($email_content);
+						$this->postmark->send();
+					}
+					else
+					{
+						$this->load->library('email');
+						$this->email->from('registration@robogames.net', 'RoboGames Registration');
+						$this->email->to($person->email);
+						$this->email->subject("Robogames registraion login information");
+						$this->email->message($email_content);
+						$this->email->send();
+					}
 					
 					$data['success'] = 'Verification code has been sent to your email address.';
 				}
