@@ -10,14 +10,16 @@ class Install_model extends CI_Model
 		$this->load->model('Event_model');
 	}
 	
-	function div_helper($name, $price, $max)
+	function div_helper($name, $price, $max_entries, $max_per_team, $free_per_team)
 	{
 		return array(
 			'division' => $this->Event_model->create_division($name),
 			'price' => $price,
-			'maxentries' => $max,
+			'maxentries' => $max_entries,
 			'description' => '',
-			'ruleurl' => ''
+			'ruleurl' => '',
+			'maxpersonperteam' => $max_per_team,
+			'freepersonperteam' => $free_per_team
 		);
 	}
 
@@ -130,6 +132,14 @@ class Install_model extends CI_Model
 		$this->dbforge->add_key("id", TRUE);
 		$this->dbforge->create_table("team_members");
 		
+		$this->dbforge->add_field("id int(10) unsigned NOT NULL auto_increment");
+		$this->dbforge->add_field("team int(10) unsigned NOT NULL");
+		$this->dbforge->add_field("event int(10) unsigned NOT NULL");
+		$this->dbforge->add_field("paid varchar(255) NOT NULL");
+		$this->dbforge->add_key("id", TRUE);
+		$this->dbforge->add_key(array('team', 'event'));
+		$this->dbforge->create_table("event_payments");
+		
 		//$this->db->query("DROP VIEW IF EXISTS ${prefix}event_division_entries");
 		//$this->db->query("
 		//	CREATE VIEW ${prefix}event_division_entries AS select ${prefix}event_entries.event_division AS event_division,count(0) AS ct from ${prefix}event_entries group by ${prefix}event_entries.event_division
@@ -151,6 +161,7 @@ class Install_model extends CI_Model
 		$this->dbforge->drop_table("person");
 		$this->dbforge->drop_table("team");
 		$this->dbforge->drop_table("team_members");
+		$this->dbforge->drop_table("event_payments");
 	}
 	
 	function commit_2()
@@ -191,115 +202,72 @@ class Install_model extends CI_Model
 		
 		$this->dbforge->drop_table("login_code");
 	}
-
+	
+	// adding max entries and such
+	function commit_4()
+	{
+		$this->db->update('version', array('version' => 4));
+		
+		$this->dbforge->add_column('event_divisions', array('maxpersonperteam' => array('type' => 'int', 'default' => '-1')));
+		$this->dbforge->add_column('event_divisions', array('freepersonperteam' => array('type' => 'int', 'default' => '-1')));
+		
+		$this->dbforge->add_column('event', array('feeperperson' => array('type' => 'int', 'default' => '0')));
+	}
+	
+	function rollback_4()
+	{
+		if ($this->config->item('development_environment') !== TRUE)
+			return;
+			
+		$this->db->update('version', array('version' => 3));
+		
+		$this->dbforge->drop_column('event_divisions', 'maxpersonperteam');
+		$this->dbforge->drop_column('event_divisions', 'freepersonperteam');
+		
+		$this->dbforge->drop_column('event', 'feeperperson');
+	}
+		
 	function reset()
 	{
 		if ($this->config->item('development_environment') !== TRUE)
 			return;
-	
+		
 		$this->db->empty_table('divisions');
 		$this->db->empty_table('entry');
 		$this->db->empty_table('event');
+		$this->db->empty_table('event_divisions');
 		$this->db->empty_table('event_entries');
 		$this->db->empty_table('event_people');
 		$this->db->empty_table('event_registrations');
 		$this->db->empty_table('person');
 		$this->db->empty_table('team');
 		$this->db->empty_table('team_members');
-
+		
 		$divisions = array();
-        $divisions[] = $this->div_helper('Humanoid - Kung-Fu (LightWt-R/C)', 35, 0);
-        $divisions[] = $this->div_helper('Humanoid - Kung-Fu (MiddleWt-R/C)', 35, 0);
-        $divisions[] = $this->div_helper('Humanoid - Freestyle/Acrobatics (R/C)', 35, 0);
-        $divisions[] = $this->div_helper('Humanoid - Stair Climbing (R/C)', 35, 0);
-        $divisions[] = $this->div_helper('Humanoid - Biped Race (R/C)', 35, 0);
-        $divisions[] = $this->div_helper('Humanoid - Golf (R/C)', 35, 0);
-        $divisions[] = $this->div_helper('Humanoid - Obstacle Course (R/C)', 35, 0);
-        $divisions[] = $this->div_helper('Humanoid - Sumo (R/C)', 35, 0);
-        $divisions[] = $this->div_helper('Humanoid - MechWars', 35, 0);
-        $divisions[] = $this->div_helper('Humanoid - BasketBall (Auto)', 35, 0);
-        $divisions[] = $this->div_helper('Humanoid - Weight Lifting (Auto)', 35, 0);
-        $divisions[] = $this->div_helper('Humanoid - Lift and Carry (Auto)', 35, 0);
-        $divisions[] = $this->div_helper('Humanoid - Marathon (Auto)', 35, 0);
-        $divisions[] = $this->div_helper('Humanoid - Obstacle Run (Auto)', 35, 0);
-        $divisions[] = $this->div_helper('Humanoid - Penalty Kick (Auto)', 35, 0);
-        $divisions[] = $this->div_helper('Humanoid - Dash (Auto)', 35, 0);
-        $divisions[] = $this->div_helper('Soccer - Biped Soccer 3:3 (R/C)', 100, 0);
-        $divisions[] = $this->div_helper('Soccer - MiroSot 5:5 (auton)', 300, 0);
-        $divisions[] = $this->div_helper('Soccer - MiroSot 11:11 (auton)', 300, 0);
-        $divisions[] = $this->div_helper('Sumo - 3kg (R/C)', 35, 0);
-        $divisions[] = $this->div_helper('Sumo - 3kg (auton)', 35, 0);
-        $divisions[] = $this->div_helper('Sumo - 1kg - Lego (auton)', 35, 0);
-        $divisions[] = $this->div_helper('Sumo - 500g (auton)', 35, 0);
-        $divisions[] = $this->div_helper('Sumo - 100g (auton)', 35, 0);
-        $divisions[] = $this->div_helper('Sumo - 25g (auton)', 35, 0);
-        $divisions[] = $this->div_helper('Combat - 340 lbs / 154.5 kg', 340, 0);
-        $divisions[] = $this->div_helper('Combat - 220 lbs / 100 kg', 220, 0);
-        $divisions[] = $this->div_helper('Combat - 120 lbs / 54.5 kg', 120, 0);
-        $divisions[] = $this->div_helper('Combat - 60 lbs / 27.3 kg', 60, 0);
-        $divisions[] = $this->div_helper('Combat - 30 lbs / 13.6 kg', 35, 0);
-        $divisions[] = $this->div_helper('Combat - 3 lbs / 1.4 kg', 35, 0);
-        $divisions[] = $this->div_helper('Combat - 3 lbs (auton)', 0, 0);
-        $divisions[] = $this->div_helper('Combat - 1 lb / 454g', 35, 0);
-        $divisions[] = $this->div_helper('Combat - 1 lb (auton)', 0, 0);
-        $divisions[] = $this->div_helper('Combat - 5.3 oz / 150g', 35, 0);
-        $divisions[] = $this->div_helper('Hockey - 12 lbs', 35, 0);
-        $divisions[] = $this->div_helper('Open - Best of Show', 35, 0);
-        $divisions[] = $this->div_helper('Open - Line Follower (auton)', 35, 0);
-        $divisions[] = $this->div_helper('Open - Maze/MicroMouse (auton)', 35, 0);
-        $divisions[] = $this->div_helper('Open - Lego Open (auton)', 35, 0);
-        $divisions[] = $this->div_helper('Open - Lego Challenge (auton)', 35, 0);
-        $divisions[] = $this->div_helper('Open - Tetrix Challenge', 35, 0);
-        $divisions[] = $this->div_helper('Open - Fire-Fighting (auton)', 35, 0);
-        $divisions[] = $this->div_helper('Open - Ribbon Climber (auton)', 35, 0);
-        $divisions[] = $this->div_helper('Open - Walker Challenge', 35, 0);
-        $divisions[] = $this->div_helper('Open - Aibo Performer (auton)', 35, 0);
-        $divisions[] = $this->div_helper('Open - Balancer Race (R/C)', 35, 0);
-        $divisions[] = $this->div_helper('Open - Balancer Race (auton)', 35, 0);
-        $divisions[] = $this->div_helper('Open - Table Top Nav (auton)', 35, 0);
-        $divisions[] = $this->div_helper('Open - Vex Challenge', 35, 0);
-        $divisions[] = $this->div_helper('Jr League - Woots & Snarks', 0, 0);
-        $divisions[] = $this->div_helper('Jr League - Lego Challenge', 0, 0);
-        $divisions[] = $this->div_helper('Jr League - Lego Magellan', 0, 0);
-        $divisions[] = $this->div_helper('Jr League - Lego Open', 0, 0);
-        $divisions[] = $this->div_helper('Jr League - Best of Show', 0, 0);
-        $divisions[] = $this->div_helper('Jr League - 500 g Sumo', 0, 0);
-        $divisions[] = $this->div_helper('Jr League - 120 lb combat', 0, 0);
-        $divisions[] = $this->div_helper('Jr League - 1 lb Combat', 0, 0);
-        $divisions[] = $this->div_helper('Jr League - BotsketBall', 0, 0);
-        $divisions[] = $this->div_helper('Jr League - Tetrix Challenge', 35, 0);
-        $divisions[] = $this->div_helper('Auto - Robomagellan', 35, 0);
-        $divisions[] = $this->div_helper('Auto - NatCar (auton)', 35, 0);
-        $divisions[] = $this->div_helper('Tetsujin - Weightlifting', 100, 0);
-        $divisions[] = $this->div_helper('Tetsujin - Walking Race', 100, 0);
-        $divisions[] = $this->div_helper('Art Bots - Static', 35, 0);
-        $divisions[] = $this->div_helper('Art Bots - Kinetic', 35, 0);
-        $divisions[] = $this->div_helper('Art Bots - Bartending', 35, 0);
-        $divisions[] = $this->div_helper('Art Bots - Musical', 35, 0);
-        $divisions[] = $this->div_helper('Art Bots - Painting', 35, 0);
-        $divisions[] = $this->div_helper('BEAM - Speeder', 35, 0);
-        $divisions[] = $this->div_helper('BEAM - Photovore', 35, 0);
-        $divisions[] = $this->div_helper('BEAM - Robosapien', 35, 0);
-
+		$divisions[] = $this->div_helper('Combat - 340 lbs / 154.5 kg', 340, 0, 4, 2);
+		$divisions[] = $this->div_helper('Combat - 220 lbs / 100 kg', 220, 0, 4, 2);
+		$divisions[] = $this->div_helper('Combat - 120 lbs / 54.5 kg', 120, 0, 4, 2);
+		$divisions[] = $this->div_helper('Combat - 60 lbs / 27.3 kg', 60, 0, 4, 2);
+		$divisions[] = $this->div_helper('Combat - 30 lbs / 13.6 kg', 35, 0, 4, 2);
+		$divisions[] = $this->div_helper('Combat - 3 lbs / 1.4 kg', 35, 0, 4, 2);
+		$divisions[] = $this->div_helper('Combat - 3 lbs (auton)', 0, 0, 4, 2);
+		$divisions[] = $this->div_helper('Combat - 1 lb / 454g', 35, 0, 4, 2);
+		$divisions[] = $this->div_helper('Combat - 1 lb (auton)', 0, 0, 4, 2);
+		$divisions[] = $this->div_helper('Combat - 5.3 oz / 150g', 35, 0, 4, 2);
+		$divisions[] = $this->div_helper('Hockey - 12 lbs', 35, 0, 4, 2);
+		
 		$this->Event_model->create_event(array(
-			'name' => 'Robogames 2011',
+			'name' => 'Sample Event',
 			'image' => '/images/events/robogames.gif',
 			'smallimage' => '/images/events/robogames.gif',
-			'description' => 'RoboGames, the world\'s largest robot competition, returns this summer, with teams from around the world competing in over 60 different events.  Register today.',
-			'startdate' => '2012-04-14 00:00:00',
-			'enddate' => '2012-04-17 00:00:00',
-			'registrationends' => '2011-04-01 00:00:00',
+			'description' => 'This is a sample event',
+			'startdate' => '2013-04-14 00:00:00',
+			'enddate' => '2013-04-17 00:00:00',
+			'registrationends' => '2013-04-01 00:00:00',
 			'websiteurl' => 'http://www.robogames.net/',
-			'location' => 'San Francisco, CA'
+			'location' => 'San Francisco, CA',
+			'feeperperson' => 40
 		), $divisions);
-		
-		/*
-		$this->db->where('name', 'Humanoid - MechWars')->update('divisions', array('name' => 'Humanoid - MechWars (LW)'));
-
-		$this->Event_model->add_division_to_event(4, $this->div_helper('Humanoid - MechWars (MW)', 35, 0));
-		$this->Event_model->add_division_to_event(4, $this->div_helper('Open - Shooting Gallery', 35, 0));
-		*/
-
 	}
 
 	function backup()
@@ -334,7 +302,6 @@ class Install_model extends CI_Model
 		header("Content-Type: text/plain; charset=UTF-8\r\n");
 		return $backup;
 	}
-
 
 	function refresh_amount_due()
 	{
