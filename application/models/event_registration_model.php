@@ -50,7 +50,7 @@ class Event_registration_model extends CI_Model
 	function get_registration_entries($registration_id)
 	{
 		return $this->db
-			->select('entry.id, entry.name, entry.description, entry.thumbnail_url, event_registration, divisions.name as divisionname')
+			->select('entry.id, entry.name, entry.description, entry.thumbnail_url, event_registration, divisions.name as divisionname, event_entries.event_division')
 			->from('entry')
 			->join('event_entries', 'event_entries.entry = entry.id')
 			->join('event_registrations', 'event_entries.event_registration = event_registrations.id')
@@ -95,7 +95,7 @@ class Event_registration_model extends CI_Model
 			->join('event_registrations', 'event_registrations.id = event_entries.event_registration')
 			->where('event_registrations.team', $team_id)
 			->where('event_registrations.status !=', 'withdrawn')
-			->orderby('event.startdate desc, event.id')
+			->order_by('event.startdate desc, event.id')
 			->get()->result();
 		$ret = array();
 		foreach ($rows as $row)
@@ -124,15 +124,17 @@ class Event_registration_model extends CI_Model
 		return $row->email;
 	}
 		
-	function get_safety_of_registration($event_id, $team_id, $registration_entries)
+	function get_safety_of_registration($event_id, $team_id, $registration_people, $registration_entries)
 	{
+		// find out the maximums for each division
 		$allowed_db = $this->db
-			->select('event_divisions.id, event_divisions.maxentries')
+			->select('event_divisions.id, event_divisions.maxentries, event_divisions.maxpersonperteam')
 			->from('event_divisions')
 			->where('event_divisions.event', $event_id)
 			->get()->result();
 		
-		$cts = $this->db
+		// get the number of people already registered in each division
+		$division_cts = $this->db
 			->select('event_entries.event_division, COUNT(*) as ct', FALSE)
 			->from('event_entries')
 			->join('event_divisions', 'event_divisions.id = event_division')
@@ -142,14 +144,22 @@ class Event_registration_model extends CI_Model
 			->where('event_registrations.team !=', $team_id)
 			->group_by('event_entries.event_division')
 			->get()->result();
+
+		// create a lookup table for 			
 		$allowed = array();
+		$maxperson_per_division = array();
 		foreach ($allowed_db as $a)
+		{
 			$allowed[$a->id] = $a->maxentries == 0 ? 999999 : $a->maxentries;
+			$maxperson_per_division[$a->id] = $a->maxpersonperteam < 0 ? 999999 : $a->maxpersonperteam;
+		}
 		
-		foreach ($cts as $ct)
+		// subtract off the number of people already registered
+		foreach ($division_cts as $ct)
 			$allowed[$ct->event_division] -= $ct->ct;
 		
 		$ret = array('safe'=>true, 'fulldivisions'=>array());
+		$maxpersonallowed = 0;
 		foreach ($registration_entries as $entry)
 		{
 			if ($allowed[$entry['division']] <= 0)
@@ -159,11 +169,17 @@ class Event_registration_model extends CI_Model
 			}
 			
 			$allowed[$entry['division']]--;
+			$maxpersonallowed += $maxperson_per_division[$entry['division']];
+		}
+		
+		if (count($registration_people) > $maxpersonallowed)
+		{
+			$ret['safe'] = FALSE;
+			$ret['allowedpeople'] = $maxpersonallowed;
 		}
 		
 		return $ret;
 	}
-
 
 	function create_registration($event_id, $team_id, $captain, $registration_people, $registration_entries)
 	{
@@ -171,7 +187,7 @@ class Event_registration_model extends CI_Model
 		$this->unregister_team_for_event($event_id, $team_id);
 
 		// make sure that we can safely register
-		$safety = $this->get_safety_of_registration($event_id, $team_id, $registration_entries);
+		$safety = $this->get_safety_of_registration($event_id, $team_id, $registration_people, $registration_entries);
 		if (!$safety['safe'])
 			return FALSE;
 		
@@ -182,6 +198,8 @@ class Event_registration_model extends CI_Model
 
 		foreach ($registration_entries as $entry)
 			$this->add_entry_to_registration($registration_id, $entry['id'], $entry['division']);
+			
+		$this->update_reg_price($registration_id);
 			
 		return $registration_id;
 	}
@@ -229,13 +247,62 @@ class Event_registration_model extends CI_Model
 		$this->db->insert('event_entries', $data);
 		$ret = $this->db->insert_id();
 		
-		// now add to the cost
-		$event_division = $this->db->get_where('event_divisions', array('id' => $event_division))->row();
-		$this->db
-			->set('due', 'due + '.$event_division->price, false)
-			->update('event_registrations', array(), array('id' => $registration_id));
-		
 		return $ret;
+	}
+	
+	function update_reg_price($registration_id)
+	{
+		$reg = $this->get_event_registration($registration_id);
+
+		$event = $this->db
+			->select('event.id, event.feeperperson')
+			->from('event')
+			->where('event.id', $reg->event)
+			->get()->row();
+
+		$reg_people = $this->db
+			->select('event_people.person')
+			->from('event_people')
+			->where('event_registration', $registration_id)
+			->get()->result();
+
+		$reg_entries = $this->db
+			->select('event_entries.entry, event_entries.event_division')
+			->from('event_entries')
+			->where('event_entries.event_registration', $registration_id)
+			->get()->result();
+		
+		$division_cost_amounts = $this->db
+			->select('event_divisions.id, event_divisions.price, event_divisions.freepersonperteam')
+			->from('event_divisions')
+			->where('event_divisions.event', $reg->event)
+			->get()->result();
+			
+		$division_freepeople = array();
+		$division_prices = array();
+		foreach ($division_cost_amounts as $a)
+		{
+			$division_freepeople[$a->id] = $a->freepersonperteam < 0 ? 999999 : $a->freepersonperteam;
+			$division_prices[$a->id] = $a->price;
+		}
+
+		$dueamount = 0;
+		$freepeople = 0;
+		
+		// add up the price for each entry and the number of free people
+		foreach ($reg_entries as $entry)
+		{
+			$dueamount += $division_prices[$entry->event_division];
+			$freepeople += $division_freepeople[$entry->event_division];
+		}
+		
+		// add in the extra cost of people
+		$dueamount += max(0, count($reg_people) - $freepeople) * $event->feeperperson;
+		
+		// now add to the cost
+		$this->db
+			->set('due', $dueamount)
+			->update('event_registrations', array(), array('id' => $registration_id));		
 	}
 	
 	function update_reg_status($registration_id, $status, $amount_due)
@@ -263,5 +330,4 @@ class Event_registration_model extends CI_Model
 			'paid' => $amount_paid,
 		));
 	}
-	
 }

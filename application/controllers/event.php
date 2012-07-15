@@ -242,11 +242,11 @@ class Event extends CI_Controller
 				$safe_to_register = $this->Event_registration_model->get_safety_of_registration(
 					$id,
 					$teamid,
+					$registration_people,
 					$registration_entries);
 					
 				if ($safe_to_register['safe'])
 				{
-				
 					$registration_id = $this->Event_registration_model->create_registration(
 						$id,
 						$teamid,
@@ -277,9 +277,16 @@ class Event extends CI_Controller
 				else
 				{
 					$errorstr = '';
-					foreach ($safe_to_register['fulldivisions'] as $full_division)
+					if (isset($safe_to_register['fulldivisions']))
 					{
-						$errorstr .= 'Unable to register because '.$data['event_divisions'][$full_division]." is full.\r\n";
+						foreach ($safe_to_register['fulldivisions'] as $full_division)
+						{
+							$errorstr .= 'Unable to register because '.$data['event_divisions'][$full_division]." is full.\r\n";
+						}
+					}
+					if (isset($safe_to_register['allowedpeople']))
+					{
+						$errorstr .= "You are only allowed ".$safe_to_register['allowedpeople']." people to compete for that number of entries.\r\n";
 					}
 					$data['registration_errors'] = $errorstr;
 				}

@@ -4,15 +4,21 @@
 </div>
 <? if ($dbversion < $maxupdateversion): ?>
 	<div>
-	    <a href="<?=site_url(array('install', 'commit', $dbversion+1))?>">Update to <?=$dbversion + 1?></a>
+		<form action="<?=site_url(array('install', 'commit', $dbversion+1))?>" method="post">
+			<input type="submit" value="Update to <?=$dbversion + 1?>">
+		</form>
 	</div>
 <? endif; ?>
 <? if ($dbversion > 0): ?>
 	<div>
-	    <a href="<?=site_url(array('install', 'rollback', $dbversion-1))?>">Rollback to <?=$dbversion - 1?></a>
+		<form action="<?=site_url(array('install', 'rollback', $dbversion-1))?>" method="post">
+			<input type="submit" value="Rollback to <?=$dbversion - 1?>">
+		</form>
 	</div>
 <? endif; ?>
 
 <div>
-    <a href="<?=site_url(array('install', 'reset'))?>">Reset database data (development only)</a>
+	<form action="<?=site_url(array('install', 'reset'))?>" method="post">
+		<input type="submit" value="Reset database data (development only)">
+	</form>
 </div>
