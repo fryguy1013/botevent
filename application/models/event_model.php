@@ -86,12 +86,13 @@ class Event_model extends CI_Model
 	function get_event_entries_grouped($id)
 	{
 		$entries = $this->db
-			->select('entry.id, entry.name, entry.description, entry.thumbnail_url, event_registration, divisions.name as divisionname')
+			->select('entry.id, entry.name, entry.description, entry.thumbnail_url, event_registration, divisions.name as divisionname, event_driver.fullname as driver')
 			->from('entry')
 			->join('event_entries', 'event_entries.entry = entry.id')
 			->join('event_registrations', 'event_entries.event_registration = event_registrations.id')
 			->join('event_divisions', 'event_divisions.id = event_entries.event_division')
 			->join('divisions', 'divisions.id = event_divisions.division')
+			->join('person as event_driver', 'event_driver.id = event_entries.driver')
 			->where('event_registrations.event', $id)
 			->get()->result();
 		

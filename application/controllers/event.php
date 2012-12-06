@@ -223,6 +223,7 @@ class Event extends CI_Controller
 			if ($this->form_validation->run() != FALSE)
 			{
 				$entry_division = $this->input->post("entry_division");
+				$entry_driver = $this->input->post("entry_driver");
 			
 				$registration_people = array();
 				foreach ($this->input->post('person') as $pid)
@@ -235,7 +236,8 @@ class Event extends CI_Controller
 				{
 					$registration_entries[] = array(
 						'id' => $eid,
-						'division' => $entry_division[$eid]
+						'division' => $entry_division[$eid],
+						'driver' => $entry_driver[$eid],
 					);
 				}
 				
@@ -299,11 +301,14 @@ class Event extends CI_Controller
 
 
 		$data['team_members'] = $this->Team_model->get_team_members($teamid);
+		$data['team_members_by_id'] = $this->Team_model->get_team_members_as_id_desc($teamid);
 		$data['team_entries'] = $this->Team_model->get_team_entries_with_event_division($teamid, $id);
 		$data['form_person'] = $this->input->post('person');
 		$data['form_entry'] = $this->input->post('entry');
 		$data['form_entry_division'] = $this->input->post('entry_division');
+		$data['form_entry_driver'] = $this->input->post('entry_driver');
 		$data['form_entry_division_base'] = $this->Team_model->get_team_entry_event_divisions($teamid, $id);
+		$data['form_entry_driver_base'] = $this->Team_model->get_team_entry_drivers($teamid, $id);
 		
 		$this->load->view('view_header');
 		if (count($team_registration) != 0 && !$this->input->post('hide_registration') && $extra != 'update')

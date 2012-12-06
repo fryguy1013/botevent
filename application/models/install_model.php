@@ -226,7 +226,25 @@ class Install_model extends CI_Model
 		
 		$this->dbforge->drop_column('event', 'feeperperson');
 	}
+
+	// adding max entries and such
+	function commit_5()
+	{
+		$this->db->update('version', array('version' => 5));
 		
+		$this->dbforge->add_column('event_entries', array('driver' => array('type' => 'int', 'default' => '-1')));
+	}
+	
+	function rollback_5()
+	{
+		if ($this->config->item('development_environment') !== TRUE)
+			return;
+			
+		$this->db->update('version', array('version' => 4));
+		
+		$this->dbforge->drop_column('event_entries', 'driver');
+	}
+
 	function reset()
 	{
 		if ($this->config->item('development_environment') !== TRUE)

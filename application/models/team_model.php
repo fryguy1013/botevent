@@ -38,6 +38,17 @@ class Team_model extends CI_Model
 			->get()->result();			
 	}
 	
+	function get_team_members_as_id_desc($team_id)
+	{
+		$ret = array();
+		foreach ($this->get_team_members($team_id) as $row)
+		{
+			$ret[$row->id] = $row->fullname;
+		}
+		return $ret;
+	}
+
+	
 	function get_team_entries($team_id)
 	{
 		return $this->db
@@ -76,6 +87,24 @@ class Team_model extends CI_Model
 		return $ret; 
 	}
 	
+	function get_team_entry_drivers($team_id, $event_id)
+	{
+		$res = $this->db
+			->select('entry.id as entry, event_entries.driver as driver')
+			->from('entry')
+			->join('event_entries', 'event_entries.entry = entry.id')
+			->join('event_divisions', 'event_divisions.id = event_entries.event_division')
+			->where('entry.team', $team_id)
+			->where('event_divisions.event', $event_id)
+			->get()->result();
+			
+		$ret = array();
+		foreach ($res as $row)
+		{
+			$ret[$row->entry] = $row->driver;
+		}
+		return $ret; 
+	}
 	
 	function add_team($name, $website, $addr1, $addr2, $city, $state, $zip, $country)
 	{

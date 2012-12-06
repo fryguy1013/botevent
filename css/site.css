@@ -241,6 +241,28 @@ img
 	font-weight: bold;
 }
 
+.event_entry_reg
+{
+	width: 45%;
+	float: left;
+	border: 1px solid #000;
+	background: #eee;
+	margin: .5em;
+	padding: .5em;
+	text-align: left;
+}
+.event_entry_reg select
+{
+	width: 150px;
+}
+
+.event_entry_reg_thumbnail img
+{
+	width: 100px;
+	float: left;
+	margin-right: .5em;
+}
+
 /* view event entries */
 
 .event_entry
@@ -253,11 +275,6 @@ img
 	padding: .5em;
 	text-align: center;
 }
-.event_entry select
-{
-	width: 150px;
-}
-
 .event_entry_thumbnail img
 {
 	width: 150px;
@@ -341,6 +358,8 @@ img
 	font-size: .8em;
 }
 
+
+
 #add_member, #add_entry
 {
 	display: none;
@@ -388,6 +407,11 @@ img
 .event_registration_status_description
 {
 	margin-left: 2em;
+}
+
+.event_entry_driver
+{
+	font-size: 8pt;
 }
 
 .pay_by_cc,

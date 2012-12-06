@@ -50,12 +50,13 @@ class Event_registration_model extends CI_Model
 	function get_registration_entries($registration_id)
 	{
 		return $this->db
-			->select('entry.id, entry.name, entry.description, entry.thumbnail_url, event_registration, divisions.name as divisionname, event_entries.event_division')
+			->select('entry.id, entry.name, entry.description, entry.thumbnail_url, event_registration, divisions.name as divisionname, event_entries.event_division, entry_driver.fullname as driver')
 			->from('entry')
 			->join('event_entries', 'event_entries.entry = entry.id')
 			->join('event_registrations', 'event_entries.event_registration = event_registrations.id')
 			->join('event_divisions', 'event_divisions.id = event_entries.event_division')
 			->join('divisions', 'divisions.id = event_divisions.division')
+			->join('person as entry_driver', 'entry_driver.id = event_entries.driver')
 			->where('event_registrations.id', $registration_id)
 			->get()->result();
 	}	
@@ -197,7 +198,7 @@ class Event_registration_model extends CI_Model
 			$this->add_person_to_registration($registration_id, $person['id']);
 
 		foreach ($registration_entries as $entry)
-			$this->add_entry_to_registration($registration_id, $entry['id'], $entry['division']);
+			$this->add_entry_to_registration($registration_id, $entry['id'], $entry['division'], $entry['driver']);
 			
 		$this->update_reg_price($registration_id);
 			
@@ -237,12 +238,13 @@ class Event_registration_model extends CI_Model
 		return $this->db->insert_id();
 	}
 
-	function add_entry_to_registration($registration_id, $entry, $event_division)
+	function add_entry_to_registration($registration_id, $entry, $event_division, $driver)
 	{
 		$data = array(
 			'entry' => $entry,
 			'event_division' => $event_division,
-			'event_registration' => $registration_id
+			'event_registration' => $registration_id,
+			'driver' => $driver
 		);
 		$this->db->insert('event_entries', $data);
 		$ret = $this->db->insert_id();

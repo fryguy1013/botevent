@@ -86,19 +86,31 @@
 <h2>Select the robots that will be present</h2>
 <div id="event_register_entries">
 <? foreach ($team_entries as $entry): ?> 
-	<div class="event_entry">
-		<!-- <?=htmlentities($entry->event_division)?> -->
-		<?=form_checkbox('entry[]', $entry->id, is_array($form_entry) && in_array($entry->id, $form_entry))?>
-		<div><?=form_dropdown("entry_division[$entry->id]", $event_divisions,
-			isset($form_entry_division[$entry->id]) ? $form_entry_division[$entry->id] :
-			(isset($form_entry_division_base[$entry->id]) ? $form_entry_division_base[$entry->id] :
-			$entry->event_division))?></div>
-		
-		<div class="event_entry_thumbnail">
+	<div class="event_entry_reg">
+		<div class="event_entry_reg_thumbnail">
 			<?=img(!empty($entry->thumbnail_url)?$entry->thumbnail_url:'/images/nopicture-entry.png')?>
 		</div>
-		<div class="event_entry_name"><?=htmlentities($entry->name)?></div>
+
+		<div class="event_entry_name">
+			<?=form_checkbox('entry[]', $entry->id, is_array($form_entry) && in_array($entry->id, $form_entry))?>
+			<span><?=htmlentities($entry->name)?></span>
+		</div>
+		<div>
+			Division:
+			<?=form_dropdown("entry_division[$entry->id]", $event_divisions,
+				isset($form_entry_division[$entry->id]) ? $form_entry_division[$entry->id] :
+				(isset($form_entry_division_base[$entry->id]) ? $form_entry_division_base[$entry->id] :
+				$entry->event_division))?>
+		</div>
+		<div>
+			Driver:
+			<?=form_dropdown("entry_driver[$entry->id]", $team_members_by_id,
+				isset($form_entry_driver[$entry->id]) ? $form_entry_driver[$entry->id] :
+				(isset($form_entry_driver_base[$entry->id]) ? $form_entry_driver_base[$entry->id] : ""))?>
+		</div>
+	
 		<div class="event_entry_edit"><a href="<?=site_url(array('entry', 'edit', $entry->id))?>" id="edit_entry_<?=$entry->id?>">Edit</a></div>
+		<div style="clear: both;"></div>
 	</div>
 <? endforeach; ?>
 <? if (count($team_entries) == 0): ?>
@@ -145,6 +157,10 @@
 
 function update_member_checked() {
 	$(this).parent().css('background', this.checked ? '#aaf' : '');
+}
+
+function update_entry_checked() {
+	$(this).parent().parent().css('background', this.checked ? '#aaf' : '');
 }
 
 var which_visible = 'none';
@@ -205,10 +221,10 @@ $(document).ready(function() {
 		.click(update_member_checked)
 		.each(update_member_checked);
 		
-	$('div.event_entry > input[type=checkbox]')
-		.change(update_member_checked)
-		.click(update_member_checked)
-		.each(update_member_checked);
+	$('div.event_entry_name > input[type=checkbox]')
+		.change(update_entry_checked)
+		.click(update_entry_checked)
+		.each(update_entry_checked);
 	
 	$('p#add_member > a').click(make_edit_member_closure('', '', '', '1', '1', '1984'));
 	$('div.event_register_add_person_frame').find('input[type=reset]').click(make_update_frames_closure('none'));	

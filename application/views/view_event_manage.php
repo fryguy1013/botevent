@@ -103,8 +103,9 @@ $(document).ready(function() {
 					<?=img(!empty($entry->thumbnail_url)?$entry->thumbnail_url:'/images/nopicture-entry.png')?>
 				</div>
 				<div class="event_entry_name"><?=htmlentities($entry->name)?></div>
-				<div class="event_entry_division"><?=htmlentities($entry->divisionname)?></div>
 				</a>
+				<div class="event_entry_division"><?=htmlentities($entry->divisionname)?></div>
+				<div class="event_entry_driver">(driver: <?=htmlentities($entry->driver)?>)</div>
 			</div>
 		<? endforeach; ?>
 	

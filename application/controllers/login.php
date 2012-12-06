@@ -62,10 +62,6 @@ class Login extends CI_Controller {
 				$data['error'] = validation_errors();
 			}
 		}
-		else
-		{
-			$data['success'] = 'We have changed email providers to hopefully fix any email delivery problems some people with strict spam filters were having. Please let us know if there are still problems';
-		}
 		
 		$this->load->view('view_header', $data);
 		$this->load->view('view_login', $data);
