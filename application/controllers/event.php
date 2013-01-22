@@ -108,7 +108,7 @@ class Event extends CI_Controller
 		$data = array();
 		$data['event'] = $event = $this->Event_model->get_event($id);
 		$data['event_divisions'] = $this->Event_model->get_event_divisions_as_id_desc($id);
-		
+
 		$personid = $this->session->userdata('userid');
 		$this->Person_model->check_login();
 		
@@ -120,6 +120,8 @@ class Event extends CI_Controller
 			$teamid = $this->Team_model->get_teams_for_person($personid);
 			$teamid = $teamid[0]->id;
 		}
+
+		$data['team_members_by_id'] = $this->Team_model->get_team_members_as_id_desc($teamid);
 		
 		// first check if they are already registered, and if they are, redirect them
 		$team_registration = $this->Event_registration_model->get_event_registration_by_team($id, $teamid);
@@ -279,12 +281,13 @@ class Event extends CI_Controller
 				else
 				{
 					$errorstr = '';
-					if (isset($safe_to_register['fulldivisions']))
+					foreach ($safe_to_register['fulldivisions'] as $full_division)
 					{
-						foreach ($safe_to_register['fulldivisions'] as $full_division)
-						{
-							$errorstr .= 'Unable to register because '.$data['event_divisions'][$full_division]." is full.\r\n";
-						}
+						$errorstr .= $data['event_divisions'][$full_division]." is full.\r\n";
+					}
+					foreach ($safe_to_register['requiredattending'] as $driver)
+					{
+						$errorstr .= $data['team_members_by_id'][$driver]." must attend in order to be a driver.\r\n";
 					}
 					if (isset($safe_to_register['allowedpeople']))
 					{
@@ -301,7 +304,6 @@ class Event extends CI_Controller
 
 
 		$data['team_members'] = $this->Team_model->get_team_members($teamid);
-		$data['team_members_by_id'] = $this->Team_model->get_team_members_as_id_desc($teamid);
 		$data['team_entries'] = $this->Team_model->get_team_entries_with_event_division($teamid, $id);
 		$data['form_person'] = $this->input->post('person');
 		$data['form_entry'] = $this->input->post('entry');

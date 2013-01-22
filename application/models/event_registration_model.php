@@ -159,7 +159,7 @@ class Event_registration_model extends CI_Model
 		foreach ($division_cts as $ct)
 			$allowed[$ct->event_division] -= $ct->ct;
 		
-		$ret = array('safe'=>true, 'fulldivisions'=>array());
+		$ret = array('safe'=>true, 'fulldivisions'=>array(), 'requiredattending'=>array());
 		$maxpersonallowed = 0;
 		foreach ($registration_entries as $entry)
 		{
@@ -178,7 +178,24 @@ class Event_registration_model extends CI_Model
 			$ret['safe'] = FALSE;
 			$ret['allowedpeople'] = $maxpersonallowed;
 		}
+
+		// get a list of all people that are trying to register on this team by id
+		$drivers_registerring = array();
+		foreach ($registration_people as $person)
+		{
+			$drivers_registerring[$person['id']] = true;
+		}
 		
+		// make sure that all of the drivers are attending
+		foreach ($registration_entries as $entry)
+		{
+			if (!isset($drivers_registerring[$entry['driver']]))
+			{
+				$ret['safe'] = FALSE;
+				$ret['requiredattending'][] = $entry['driver'];
+			}
+		}
+
 		return $ret;
 	}
 
