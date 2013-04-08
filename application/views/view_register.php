@@ -83,7 +83,7 @@
 	</p>
 	
 	<p>
-		<div class="event_register_heading">Country:</div>
+		<div class="event_register_heading">Nationality:</div>
 		<?=form_input("team_country", set_value('team_country', ''), 'size="20"')?>
 	</p>
 
