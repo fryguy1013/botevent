@@ -40,7 +40,7 @@ class Login extends CI_Controller {
 					{
 						$this->load->library('postmark');
 						$this->postmark->to($person->email);
-						$this->postmark->subject("Robogames registraion login information");
+						$this->postmark->subject("Robogames registration login information");
 						$this->postmark->message_plain($email_content);
 						$this->postmark->send();
 					}
@@ -49,7 +49,7 @@ class Login extends CI_Controller {
 						$this->load->library('email');
 						$this->email->from('registration@robogames.net', 'RoboGames Registration');
 						$this->email->to($person->email);
-						$this->email->subject("Robogames registraion login information");
+						$this->email->subject("Robogames registration login information");
 						$this->email->message($email_content);
 						$this->email->send();
 					}
