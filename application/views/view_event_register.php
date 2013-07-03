@@ -61,6 +61,11 @@
 		<div>Email Address:</div>
 		<?=form_input("email_addr", set_value('email_addr', ''), 'size="40"')?>
 	</p>
+    
+	<p>
+		<div>Phone Number:</div>
+		<?=form_input("phonenum", set_value('phonenum', ''), 'size="30"')?>
+	</p>
 	
 	<p>
 		<div>Badge Photo Picture:</div>
@@ -183,13 +188,14 @@ function make_update_frames_closure(x)
 		return false;
 	}
 }
-function make_edit_member_closure(id, name, email, dob_month, dob_day, dob_year)
+function make_edit_member_closure(id, name, email, phonenum, dob_month, dob_day, dob_year)
 {
 	return function()
 	{
 		$('input[name=person_id]').val(id);
 		$('input[name=fullname]').val(name);
 		$('input[name=email_addr]').val(email);
+        $('input[name=phonenum]').val(phonenum);
 		if (dob_month)
 			$('select[name=dob_month]').find("option[value='" + dob_month + "']").attr('selected', 'selected');
 		if (dob_day)			
@@ -226,7 +232,7 @@ $(document).ready(function() {
 		.click(update_entry_checked)
 		.each(update_entry_checked);
 	
-	$('p#add_member > a').click(make_edit_member_closure('', '', '', '1', '1', '1984'));
+	$('p#add_member > a').click(make_edit_member_closure('', '', '', '', '1', '1', '1984'));
 	$('div.event_register_add_person_frame').find('input[type=reset]').click(make_update_frames_closure('none'));	
 	$('p#add_entry > a').click(make_edit_entry_closure('', ''));
 	$('div.event_register_add_entry_frame').find('input[type=reset]').click(make_update_frames_closure('none'));
@@ -257,6 +263,7 @@ $(document).ready(function() {
 			<?=json_encode($person->id)?>,
 			<?=json_encode($person->fullname)?>,
 			<?=json_encode($person->email)?>,
+            <?=json_encode($person->phonenum)?>,
 			<?=json_encode($dob_parts[0])?>,
 			<?=json_encode($dob_parts[1])?>,
 			<?=json_encode($dob_parts[2])?>

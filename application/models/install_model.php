@@ -245,6 +245,24 @@ class Install_model extends CI_Model
 		$this->dbforge->drop_column('event_entries', 'driver');
 	}
 
+	// add driver phone number
+	function commit_6()
+	{
+		$this->db->update('version', array('version' => 6));
+		
+		$this->dbforge->add_column('person', array('phonenum' => array('type' => 'varchar(255)', 'default' => '')));
+	}
+	
+	function rollback_6()
+	{
+		if ($this->config->item('development_environment') !== TRUE)
+			return;
+			
+		$this->db->update('version', array('version' => 5));
+		
+		$this->dbforge->drop_column('person', 'phonenum');
+	}
+    
 	function reset()
 	{
 		if ($this->config->item('development_environment') !== TRUE)

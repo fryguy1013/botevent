@@ -31,7 +31,7 @@ class Team_model extends CI_Model
 	function get_team_members($team_id)
 	{
 		return $this->db
-			->select('person.id, fullname, picture_url, thumbnail_url, email, dob')
+			->select('person.id, fullname, picture_url, thumbnail_url, email, phonenum, dob')
 			->from('person')
 			->join('team_members', 'person.id = team_members.person')
 			->where('team_members.team', $team_id)

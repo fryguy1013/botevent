@@ -148,7 +148,8 @@ class Event extends CI_Controller
 			
 			$dob = sprintf("%s/%s/%s", $this->input->post('dob_month'), $this->input->post('dob_day'), $this->input->post('dob_year'));
 			$file_upload = $this->_do_upload('badge_photo');
-			if ($this->form_validation->run() != FALSE && $file_upload !== FALSE)
+            $requires_upload = $this->input->post('submit') == 'Add Member';
+			if ($this->form_validation->run() != FALSE && !($requires_upload && $file_upload === FALSE))
 			{
 				if ($this->input->post('submit') == 'Add Member')
 				{
@@ -156,6 +157,7 @@ class Event extends CI_Controller
 							$this->input->post('fullname'),
 							$dob,
 							$this->input->post('email_addr'),
+                            $this->input->post('phonenum'),
 							$file_upload,
 							'');
 				
@@ -177,6 +179,7 @@ class Event extends CI_Controller
 							$this->input->post('fullname'),
 							$dob,
 							$this->input->post('email_addr'),
+                            $this->input->post('phonenum'),
 							$file_upload);					
 				}
 			}

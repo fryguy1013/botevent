@@ -34,7 +34,7 @@ class Person_model extends CI_Model
 		return $this->db->get_where('person', array('email'=>$email), 1)->row();
 	}
 	
-	function add_person($fullname, $dob, $email, $picture_url)
+	function add_person($fullname, $dob, $email, $phonenum, $picture_url)
 	{
 		$this->load->helper('string');
 		
@@ -45,6 +45,7 @@ class Person_model extends CI_Model
 		$data = array(
 			'fullname' => $fullname,
 			'email' => $email,
+            'phonenum' => $phonenum,
 			'picture_url' => $picture_url,
 			'dob' => $dob,
 		);			
@@ -60,17 +61,18 @@ class Person_model extends CI_Model
 		return $this->db->insert_id();
 	}
 	
-	function edit_person($person_id, $fullname, $dob, $email, $picture_url)
+	function edit_person($person_id, $fullname, $dob, $email, $phonenum, $picture_url)
 	{
 		$data = array(
 			'fullname' => $fullname,
 			'email' => $email,
-			'picture_url' => $picture_url,
+            'phonenum' => $phonenum,
 			'dob' => $dob
 		);
 
 		if (!empty($picture_url))
 		{
+            $data['picture_url'] = $picture_url;
 			$thumbnail_url = $this->_make_thumbnail($picture_url);
 			if ($thumbnail_url !== FALSE)
 				$data['thumbnail_url'] = $thumbnail_url;
