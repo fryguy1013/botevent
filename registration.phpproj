@@ -746,6 +746,7 @@
     <Compile Include="application\helpers\timetext_helper.php">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="application\libraries\password.php" />
     <Compile Include="application\libraries\Postmark.php">
       <SubType>Code</SubType>
     </Compile>

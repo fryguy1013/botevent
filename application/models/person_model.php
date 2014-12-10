@@ -82,7 +82,45 @@ class Person_model extends CI_Model
 			->where('id', $person_id)
 			->update('person', $data);
 	}
+    
+    function update_password($person_id, $password)
+    {
+        $hash = password_hash($password, PASSWORD_BCRYPT);
+        
+        $this->db
+            ->where('id', $person_id)
+            ->update('person', array(
+                'password' => $hash,
+                'passwordsalt' => ''
+            ));
+    }
 
+    function check_password($person, $password)
+    {
+        if (!empty($person->passwordsalt))
+        {
+            // legacy password. need to upgrade
+            $hash = $this->generate_password($password, $person->email, $person->passwordsalt);
+            if ($hash === $person->password)
+            {
+                $this->update_password($person->id, $password);
+                return TRUE;
+            }
+        }
+        
+        if (empty($person->password))
+        {
+            return FALSE;
+        }
+        
+        return password_verify($password, $person->password);
+    }
+    
+    function generate_password($password, $username, $salt)
+    {
+        return sha1("$password:$username:$salt");
+    }
+    
 	function generate_login_code_hash($id, $code)
 	{
 		return sha1("$id:$code");
@@ -123,7 +161,7 @@ class Person_model extends CI_Model
 			return $dest_file;
 		return FALSE;	
 	}
-	
+    
 	function check_login()
 	{
 		$personid = $this->session->userdata('userid');

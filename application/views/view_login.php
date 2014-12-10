@@ -6,21 +6,22 @@
 <?php if (isset($success)) { echo "<div class=\"success\">$success</div>"; } ?>
 
 	<div id="email_form_container">
+		<p>In order to continue, please enter your email address and password.</p>
+
 		<form method="post" action="<?=site_url(array('login'));?>" id="email_form">
-		<input type="hidden" name="action" value="send_login_code" />
-		<h3>What is your email address?</h3>
 		<div>
-			My Email Address is:
+			<h4>Email Address:</h4>
 			<input name="email_addr" type="text" value="<?=set_value('email_addr')?>" size="30" />
 		</div>
-		
+
+		<div>
+			<h4>Password:</h4>
+			<input name="password" type="password" value="" size="30" />
+		</div>
+
 		<div>
 			<input type="submit" value="Continue"/>
 		</div>
-		
-		<h4>What about my password?</h4>
-		<p>As an alternative to remembering your password, simply enter your email address above
-		and we will send you an authorization code that logs you in to our system.</p>
 
 		</form>
 	</div>

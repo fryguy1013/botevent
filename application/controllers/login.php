@@ -18,50 +18,33 @@ class Login extends CI_Controller {
 	{
 		$data = array();
 		
-		if ($this->input->post('action') == 'send_login_code')
-		{
-			$this->form_validation->set_rules('email_addr', 'Email Address', 'trim|required|valid_email');
-			if ($this->form_validation->run() != FALSE)
-			{
-				$person = $this->Person_model->get_person_by_email($this->input->post('email_addr'));
-				$email_addr = $this->input->post('email_addr');
-				if (count($person) == 0)
-				{
-					$this->session->set_userdata('email', $this->input->post('email_addr'));
-					redirect(site_url(array('login','register')));
-				}
-				else
-				{
-					$code = $this->Person_model->create_login_code($person->id);
-					
-					$email_content = $this->load->view('email_login_code', array('userid'=>$person->id, 'code'=>$code), TRUE);
-
-					if ($this->config->item('use_postmark') === TRUE)
-					{
-						$this->load->library('postmark');
-						$this->postmark->to($person->email);
-						$this->postmark->subject("Robogames registration login information");
-						$this->postmark->message_plain($email_content);
-						$this->postmark->send();
-					}
-					else
-					{
-						$this->load->library('email');
-						$this->email->from('registration@robogames.net', 'RoboGames Registration');
-						$this->email->to($person->email);
-						$this->email->subject("Robogames registration login information");
-						$this->email->message($email_content);
-						$this->email->send();
-					}
-					
-					$data['success'] = 'Verification code has been sent to your email address. Please wait up to 15 minutes, and check your email spam filter if it doesn\'t arrive.';
-				}
-			}	
-			else
-			{
-				$data['error'] = validation_errors();
-			}
-		}
+        if ($this->input->post('email_addr') !== FALSE)
+        {
+            $this->form_validation->set_rules('email_addr', 'Email Address', 'trim|required|valid_email');
+            if ($this->form_validation->run() != FALSE)
+            {
+                $person = $this->Person_model->get_person_by_email($this->input->post('email_addr'));
+                $email_addr = $this->input->post('email_addr');
+                if (count($person) == 0)
+                {
+                    $data['error'] = 'There is no account with that username.';
+                }
+                else if ($this->Person_model->check_password($person, $this->input->post('password')) === FALSE)
+                {
+                    $data['error'] = 'That password is incorrect.';
+                }
+                else
+                {
+                    $this->session->set_userdata('userid', $person->id);
+                    $this->session->set_userdata('fullname', $person->fullname);
+                    redirect($this->session->userdata('onloginurl'));
+                }
+            }	
+            else
+            {
+                $data['error'] = validation_errors();
+            }
+        }
 		
 		$this->load->view('view_header', $data);
 		$this->load->view('view_login', $data);

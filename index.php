@@ -19,6 +19,8 @@
  *
  */
 	define('ENVIRONMENT', 'development');
+    
+    require_once "password.php";
 /*
  *---------------------------------------------------------------
  * ERROR REPORTING
