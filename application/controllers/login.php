@@ -29,6 +29,12 @@ class Login extends CI_Controller {
                 {
                     $data['error'] = 'There is no account with that username.';
                 }
+                else if (empty($person->password))
+                {
+                    $this->_reset_password_email($person->id, $person->email);
+                    
+                    $data['error'] = 'That account does not have a password associated with it. An email has been sent with instructions on how to reset your password.';
+                }
                 else if ($this->Person_model->check_password($person, $this->input->post('password')) === FALSE)
                 {
                     $data['error'] = 'That password is incorrect.';
@@ -74,17 +80,7 @@ class Login extends CI_Controller {
                 }
                 else
                 {
-                    $code = $this->Person_model->create_login_code($person->id, site_url(array('login', 'change_password')));
-                    $email_content = $this->load->view('email_login_code', array(
-                        'userid'=>$person->id,
-                        'code'=>$code),
-                        TRUE);
-                    
-                    $email = $this->_get_email();
-                    $email->to($this->input->post('email_addr'));
-                    $email->subject('Reset your Robogames password');
-                    $email->message($email_content);
-                    $email->send();
+                    $this->_reset_password_email($person->id, $person->email);
                         
                     $data['success'] = 'An email has been sent to your email address containing instructions on how to reset your password.';
                 }
@@ -265,7 +261,6 @@ class Login extends CI_Controller {
 		$this->load->view('view_footer', $data);
 	}
 
-	// set message
 	function _set_message($msg, $val = '', $sub = '%s')
 	{
 		return str_replace($sub, $val, $this->lang->line($msg));
@@ -310,6 +305,21 @@ class Login extends CI_Controller {
         }
     }
 
+    function _reset_password_email($id, $email_addr)
+    {
+        $code = $this->Person_model->create_login_code($id, site_url(array('login', 'change_password')));
+        $email_content = $this->load->view('email_login_code', array(
+            'userid'=>$id,
+            'code'=>$code),
+            TRUE);
+        
+        $email = $this->_get_email();
+        $email->to($email_addr);
+        $email->subject('Reset your Robogames password');
+        $email->message($email_content);
+        $email->send();
+    }
+    
 	function unique_email($email)
 	{
 		$current = $this->Person_model->get_person_by_email($email);
@@ -321,6 +331,5 @@ class Login extends CI_Controller {
 		else
 			return TRUE;
 	}
-
 }
 
