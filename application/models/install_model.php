@@ -263,6 +263,23 @@ class Install_model extends CI_Model
 		$this->dbforge->drop_column('person', 'phonenum');
 	}
     
+    function commit_7()
+    {
+        $this->db->update('version', array('version' => 7));
+        
+		$this->dbforge->add_column('login_code', array('dest_url' => array('type' => 'varchar(255)', 'default' => '')));
+	}
+	
+	function rollback_7()
+	{
+		if ($this->config->item('development_environment') !== TRUE)
+			return;
+        
+		$this->db->update('version', array('version' => 6));
+		
+		$this->dbforge->drop_column('login_code', 'dest_url');
+	}
+    
 	function reset()
 	{
 		if ($this->config->item('development_environment') !== TRUE)

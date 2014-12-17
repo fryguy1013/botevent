@@ -1,22 +1,17 @@
 <div class="login_frame">
-	<h2>Sign-in</h2>
+	<h2>Forgot password</h2>
 
 <?php if (isset($msg)) { echo "<div class=\"alert\">$msg</div>"; } ?>
 <?php if (isset($error)) { echo "<div class=\"error\">$error</div>"; } ?>
 <?php if (isset($success)) { echo "<div class=\"success\">$success</div>"; } ?>
 
 	<div id="email_form_container">
-		<p>In order to continue, please enter your email address and password.</p>
+		<p>Enter your email address to be sent a link to reset your password.</p>
 
-		<form method="post" action="<?=site_url(array('login'));?>" id="email_form">
+		<form method="post" action="<?=site_url(array('login', 'forgot_password'));?>" id="email_form">
 		<div>
 			<h4>Email Address:</h4>
 			<input name="email_addr" type="text" value="<?=set_value('email_addr')?>" size="30" />
-		</div>
-
-		<div>
-			<h4>Password:</h4>
-			<input name="password" type="password" value="" size="30" />
 		</div>
 
 		<div>
@@ -24,9 +19,5 @@
 		</div>
 
 		</form>
-
-        <p>
-            If you forgot your password, you can <a href="<?=site_url(array('login', 'forgot_password'))?>">reset your password</a>.
-        </p>
 	</div>
 </div>

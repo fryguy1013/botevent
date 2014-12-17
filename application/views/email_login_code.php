@@ -1,6 +1,6 @@
 ***********************************************************************
 ***.................. DO NOT REPLY TO THIS MESSAGE .................***
-***...... IT WILL NOT BE RECEIVED BY THE TOURNAMENT ORGANIZER ......***
+***......... IT WILL NOT BE RECEIVED BY THE EVENT ORGANIZER ........***
 ***********************************************************************
 
 This email has been sent because you have recently tried to update your

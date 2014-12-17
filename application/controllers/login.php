@@ -56,12 +56,55 @@ class Login extends CI_Controller {
 		$this->session->sess_destroy();
 		redirect('login');
 	}
+    
+    function forgot_password()
+    {
+		$data = array();
+
+        if ($this->input->post('email_addr') !== FALSE)
+        {
+            $this->form_validation->set_rules('email_addr', 'Email Address', 'trim|required|valid_email');
+            if ($this->form_validation->run() != FALSE)
+            {
+                $person = $this->Person_model->get_person_by_email($this->input->post('email_addr'));
+                $email_addr = $this->input->post('email_addr');
+                if (count($person) == 0)
+                {
+                    $data['error'] = 'There is no account with that username.';
+                }
+                else
+                {
+                    $code = $this->Person_model->create_login_code($person->id, site_url(array('login', 'change_password')));
+                    $email_content = $this->load->view('email_login_code', array(
+                        'userid'=>$person->id,
+                        'code'=>$code),
+                        TRUE);
+                    
+                    $email = $this->_get_email();
+                    $email->to($this->input->post('email_addr'));
+                    $email->subject('Reset your Robogames password');
+                    $email->message($email_content);
+                    $email->send();
+                        
+                    $data['success'] = 'An email has been sent to your email address containing instructions on how to reset your password.';
+                }
+            }	
+            else
+            {
+                $data['error'] = validation_errors();
+            }
+        }
+
+        $this->load->view('view_header', $data);
+        $this->load->view('view_forgot_password', $data);
+        $this->load->view('view_footer', $data);
+    }
 	
 	function validate_code($id, $code)
 	{
-		$is_valid_code = $this->Person_model->check_login_code($id, $code);
+		$code_info = $this->Person_model->get_login_code_info($id, $code);
 		$person = $this->Person_model->get_person_by_id($id);
-		if (!$is_valid_code || count($person) == 0)
+		if (count($code_info) == 0 || count($person) == 0)
 		{
 			$data = array('error' => 'That login code is invalid.');
 			
@@ -70,11 +113,83 @@ class Login extends CI_Controller {
 			$this->load->view('view_footer', $data);
 			return;
 		}
-		
+
+        $this->session->set_userdata('code', $code);
 		$this->session->set_userdata('userid', $person->id);
 		$this->session->set_userdata('fullname', $person->fullname);
-		redirect($this->session->userdata('onloginurl'));
+		redirect($code_info->dest_url);
 	}
+    
+    function change_password()
+    {
+		$data = array();
+        
+        if ($this->input->post('password') !== FALSE)
+        {
+            $this->form_validation->set_rules('password', 'Password', 'trim|required');
+            $this->form_validation->set_rules('password2', 'Password', 'trim|required');
+            if ($this->form_validation->run() != FALSE)
+            {
+                if ($this->input->post('password') != $this->input->post('password2'))
+                {
+                    $data['error'] = 'Passwords do not match';
+                }
+                else
+                {
+                    $id = $this->session->userdata('userid');
+                    $person = $this->Person_model->get_person_by_id($id);
+                    $ok_to_change_password = FALSE;
+                    
+                    if (count($person) == 0)
+                    {
+                        $data['error'] = 'There is no account with that username.';
+                    }
+                    else if ($this->input->post('password_orig') !== FALSE)
+                    {
+                        if ($this->Person_model->check_password($person, $this->input->post('password')) === TRUE)
+                        {
+                            $ok_to_change_password = TRUE;
+                        }
+                        else
+                        {
+                            $data['error'] = 'Original password incorrect';
+                        }
+                    }
+                    else if ($this->session->userdata('code') !== FALSE)
+                    {
+                        $code_info = $this->Person_model->get_login_code_info($id, $this->session->userdata('code'));
+                        if (count($code_info) != 0)
+                        {
+                            $ok_to_change_password = TRUE;
+                        }
+                        else
+                        {
+                            $data['error'] = 'The email you clicked has expired.';
+                        }
+                    }
+                    
+                    if ($ok_to_change_password)
+                    {
+                        $this->Person_model->update_password($id, $this->input->post('password'));
+                        $data['success'] = 'Password changed successfully';
+                    }
+                }
+            }	
+            else
+            {
+                $data['error'] = validation_errors();
+            }
+        }
+        
+        if ($this->session->userdata('code') !== FALSE)
+        {
+            $data['needs_password'] = FALSE;
+        }
+        
+        $this->load->view('view_header', $data);
+		$this->load->view('view_change_password', $data);
+		$this->load->view('view_footer', $data);		
+    }
 
 	function register()
 	{
@@ -82,9 +197,8 @@ class Login extends CI_Controller {
 		$this->load->model('Team_model');
 
 		$data['email_addr'] = $this->session->userdata('email');
-		$data['userurl'] = $this->session->userdata('userurl');
 
-		if (empty($data['email_addr']) && empty($data['userurl']))
+		if (empty($data['email_addr']))
 		{
 			redirect('login');
 			exit();
@@ -180,6 +294,21 @@ class Login extends CI_Controller {
 			return "/images/uploads/".$data['file_name'];
 		}
 	}
+    
+    function _get_email()
+    {
+        $this->load->library('email');
+		if ($this->config->item('use_postmark') === TRUE)
+		{
+			$this->load->library('postmark');
+			return $this->postmark;
+		}
+		else
+		{
+			$this->email->from('registration@robogames.net', 'RoboGames Registration');
+            return $this->email;
+        }
+    }
 
 	function unique_email($email)
 	{

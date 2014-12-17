@@ -319,6 +319,17 @@ class Postmark {
      * @access  public
      * @return  void
      */ 
+    function message($message)
+    {
+        $this->message_plain($message);
+    }  
+    
+    /**
+     * Set Email Message in Plain Text
+     *
+     * @access  public
+     * @return  void
+     */ 
     function message_plain($message)
     {
         if ( ! $this->strip_html )

@@ -11,23 +11,6 @@ class Person_model extends CI_Model
 	{
 		return $this->db->get_where('person', array('id'=>$id), 1)->row();
 	}	
-
-	function get_person_by_url($url)
-	{
-		// this fixes a bug introduced by the older version of the site where it didn't record the fragments in the database.
-		$parts = explode("#", $url);
-		if (count($parts) > 1)
-		{
-			$found_bare = $this->db->get_where('person', array('idurl'=>$parts[0]), 1)->row();
-			if (!empty($found_bare))
-			{
-				$this->db->where('idurl', $parts[0])
-					->update('person', array('idurl' => $url));
-			}
-		}
-		
-		return $this->db->get_where('person', array('idurl'=>$url), 1)->row();
-	}
 	
 	function get_person_by_email($email)
 	{
@@ -126,7 +109,7 @@ class Person_model extends CI_Model
 		return sha1("$id:$code");
 	}
 	
-	function create_login_code($id)
+	function create_login_code($id, $dest_url)
 	{
 		$code = random_string('alnum', 20);
 		$hash = $this->generate_login_code_hash($id, $code);
@@ -134,16 +117,17 @@ class Person_model extends CI_Model
 		$this->db->set('userid', $id);
 		$this->db->set('hash', $hash);
 		$this->db->set('generated', 'now()', FALSE);
+        $this->db->set('dest_url', $dest_url);
 		$this->db->insert('login_code');
 		
 		return $code;
 	}
 	
-	function check_login_code($id, $code)
+	function get_login_code_info($id, $code)
 	{
 		$hash = $this->generate_login_code_hash($id, $code);
 		
-		return count($this->db->get_where('login_code', array('userid'=>$id, 'hash'=>$hash), 1)->row()) > 0;
+		return $this->db->get_where('login_code', array('userid'=>$id, 'hash'=>$hash), 1)->row();
 	}
 	
 	function _make_thumbnail($picture_url)
