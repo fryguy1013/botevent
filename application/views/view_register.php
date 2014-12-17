@@ -26,27 +26,46 @@
 	
 	<h2>Finish creating account</h2>
 	
-	<p>
-		<div>My Full Name:</div>
+	<div>
+		<h4>My Full Name:</h4>
 		<input name="fullname" type="text" value="<?=set_value('fullname', '')?>" size="25" />
-	</p>
+	</div>
 	
-	<p>Email address: <?=htmlentities($email_addr)?></p>
+	<div>
+		<h4>Email address:</h4>
+		<input name="email_addr" type="text" value="<?=set_value('email_addr', '')?>" size="25" />
+	</div>
 
-	<p>
-		<div>Date of Birth</div>
+
+	<div>
+		<h4>Password:</h4>
+		<input name="password" type="password" value="" size="30" />
+	</div>
+
+	<div>
+		<h4>Password (again):</h4>
+		<input name="password2" type="password" value="" size="30" />
+	</div>
+
+	<div>
+		<h4>Date of Birth</h4>
 		<?=form_dropdown('dob_month', $months, set_value('dob_month'))?>
 		<?=form_dropdown('dob_day', $days, set_value('dob_day'))?>
 		<?=form_dropdown('dob_year', $years, set_value('dob_year', 1984))?>
-	</p>
-	
-	<p>
-		<div>Badge Photo Picture:</div>
+	</div>
+	    
+	<div>
+		<h4>Phone Number:</h4>
+		<?=form_input("phonenum", set_value('phonenum', ''), 'size="30"')?>
+	</div>
+
+	<div>
+		<h4>Badge Photo Picture:</h4>
 		<?=form_upload('badge_photo')?>
 		<div class="badge_photo_guidelines">Note: Follow the
 		<a href="http://robogames.net/badges.php" target="_blank">badge photo guidelines</a>
 		to ensure your registration will be accepted.</div>
-	</p>	
+	</div>	
 </div>
 
 <div class="login_frame">

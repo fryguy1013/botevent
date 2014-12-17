@@ -17,7 +17,7 @@ class Person_model extends CI_Model
 		return $this->db->get_where('person', array('email'=>$email), 1)->row();
 	}
 	
-	function add_person($fullname, $dob, $email, $phonenum, $picture_url)
+	function add_person($fullname, $dob, $email, $phonenum, $picture_url, $password)
 	{
 		$this->load->helper('string');
 		
@@ -31,7 +31,12 @@ class Person_model extends CI_Model
             'phonenum' => $phonenum,
 			'picture_url' => $picture_url,
 			'dob' => $dob,
-		);			
+		);
+        
+        if (!empty($password))
+        {
+            $data['password'] = password_hash($password, PASSWORD_BCRYPT);
+        }
 		
 		if (!empty($picture_url))
 		{

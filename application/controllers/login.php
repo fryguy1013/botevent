@@ -192,16 +192,13 @@ class Login extends CI_Controller {
 		$data = array();
 		$this->load->model('Team_model');
 
-		$data['email_addr'] = $this->session->userdata('email');
-
-		if (empty($data['email_addr']))
-		{
-			redirect('login');
-			exit();
-		}
-
 		if ($this->input->post('action') == 'register')
 		{
+			$this->form_validation->set_rules('fullname', 'Full Name', 'trim|required');
+			$this->form_validation->set_rules('email_addr', 'Email Address', 'trim|required|valid_email|callback_unique_email');
+            $this->form_validation->set_rules('password', 'Password', 'trim|required|matches[password2]');
+            $this->form_validation->set_rules('password2', 'Password confirmation', 'trim|required');
+            $this->form_validation->set_rules('phonenum', 'Phone Number', 'trim|optional');
 			$this->form_validation->set_rules('team_name', 'Team Name', 'trim|required');
 			$this->form_validation->set_rules('team_website', 'Web Site', 'trim');
 			$this->form_validation->set_rules('dob_month', 'DOB Month', 'trim|required');
@@ -218,15 +215,15 @@ class Login extends CI_Controller {
 			$dob = sprintf("%s/%s/%s", $this->input->post('dob_month'), $this->input->post('dob_day'), $this->input->post('dob_year'));
 			$file_upload = $this->_do_upload('badge_photo');
 
-			$this->form_validation->set_rules('fullname', 'Full Name', 'trim|required');
-
-			if ($this->form_validation->run() != FALSE && $file_upload !== FALSE)
+			if ($this->form_validation->run() != FALSE && $file_upload)
 			{
 				$personid = $this->Person_model->add_person(
 					$this->input->post('fullname'),
 					$dob,
-					$this->session->userdata('email'),
-					$file_upload);
+					$this->input->post('email_addr'),
+                    $this->input->post('phonenum'),
+					$file_upload,
+                    $this->input->post('password'));
 			}
 			else
 			{

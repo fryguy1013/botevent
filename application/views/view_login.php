@@ -28,5 +28,9 @@
         <p>
             If you forgot your password, you can <a href="<?=site_url(array('login', 'forgot_password'))?>">reset your password</a>.
         </p>
+
+        <p>
+            If you don't have an account, <a href="<?=site_url(array('login', 'register'))?>">register a new account</a>.
+        </p>
 	</div>
 </div>
