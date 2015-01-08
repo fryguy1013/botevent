@@ -59,6 +59,7 @@ class Event_model extends CI_Model
 			->join('event_registrations', 'event_entries.event_registration = event_registrations.id')
 			->where('event_divisions.event', $event)
 			->where('event_registrations.status !=', 'withdrawn')
+			->where('event_registrations.status !=', 'rejected')
 			->group_by('event_division')
 			->get()->result();
 		$ret = array();
@@ -80,6 +81,7 @@ class Event_model extends CI_Model
 			->join('team', 'team.id = entry.team')
 			->where('event_entries.event_division', $division)
 			->where('event_registrations.status !=', 'withdrawn')
+			->where('event_registrations.status !=', 'rejected')
 			->get()->result();
 	}
 	
