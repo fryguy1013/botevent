@@ -73,7 +73,7 @@ class Event_model extends CI_Model
 	function get_event_entries($division)
 	{
 		return $this->db
-			->select('entry.id, entry.name, entry.description, entry.thumbnail_url, team.name as teamname, team.id as teamid, event_registrations.status')
+			->select('entry.id, entry.name, entry.description, entry.thumbnail_url, team.name as teamname, team.id as teamid, team.country as teamcountry, event_registrations.status')
 			->from('entry')
 			->join('event_entries', 'event_entries.entry = entry.id')
 			->join('event_registrations', 'event_entries.event_registration = event_registrations.id')			
