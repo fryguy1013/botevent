@@ -280,6 +280,28 @@ class Install_model extends CI_Model
 		$this->dbforge->drop_column('login_code', 'dest_url');
 	}
     
+    function commit_8()
+    {
+        $this->db->update('version', array('version' => 8));
+        
+		$this->dbforge->add_field("id int(10) unsigned NOT NULL auto_increment");
+		$this->dbforge->add_field("event int(10) NOT NULL");
+		$this->dbforge->add_field("person int(10) NOT NULL");
+		$this->dbforge->add_key("id", TRUE);
+        $this->dbforge->add_key(array('person', 'event'));
+		$this->dbforge->create_table('event_owner');
+    }
+	
+	function rollback_8()
+	{
+		if ($this->config->item('development_environment') !== TRUE)
+			return;
+        
+		$this->db->update('version', array('version' => 7));
+		
+		$this->dbforge->drop_table('event_owner', 'dest_url');
+	}
+    
 	function reset()
 	{
 		if ($this->config->item('development_environment') !== TRUE)

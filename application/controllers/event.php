@@ -329,6 +329,13 @@ class Event extends CI_Controller
 	{
 		$this->load->model('Event_registration_model');
 	
+        $is_owner = $this->Event_model->is_person_owner_of_event($id, $this->session->userdata('userid'));
+        if (count($is_owner) == 0)
+        {
+            redirect(site_url(array('event', 'view', $id)));
+            return;
+        }
+        
 		$data = array();
 		$data['event'] = $this->Event_model->get_event($id);
 		$data['event_registrations'] = $this->Event_registration_model->get_event_registrations($id);
@@ -343,6 +350,21 @@ class Event extends CI_Controller
 	function Updatestatus($regid)
 	{
 		$this->load->model('Event_registration_model');
+        
+        $registration = $this->Event_registration_model->get_event_registration($regid);
+        if (count($registration) == 0)
+        {
+            redirect(site_url(array('event', 'all')));
+            return;
+        }
+        
+        $is_owner = $this->Event_model->is_person_owner_of_event($registration->event, $this->session->userdata('userid'));
+        if (count($is_owner) == 0)
+        {
+            redirect(site_url(array('event', 'view', $registration->event)));
+            return;
+        }
+        
 		$status = $this->input->post('status');
 		$message = $this->input->post('message');
 		$amount_due = $this->input->post('amount_due');
@@ -378,9 +400,23 @@ $message";
 	function Updatepayment($regid)
 	{
 		$this->load->model('Event_registration_model');
+       
+        $registration = $this->Event_registration_model->get_event_registration($regid);
+        if (count($registration) == 0)
+        {
+            redirect(site_url(array('event', 'all')));
+            return;
+        }
+        
+        $is_owner = $this->Event_model->is_person_owner_of_event($registration->event, $this->session->userdata('userid'));
+        if (count($is_owner) == 0)
+        {
+            redirect(site_url(array('event', 'view', $registration->event)));
+            return;
+        }
+        
 		$amount_paid = $this->input->post('amount_paid');
-		$registration = $this->Event_registration_model->get_event_registration($regid);
-		$this->Event_registration_model->update_payment($registration->event, $registration->team, $amount_paid);
+        $this->Event_registration_model->update_payment($registration->event, $registration->team, $amount_paid);
 	
 		$this->output->set_output($amount_paid);
 	}	

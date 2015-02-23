@@ -35,7 +35,17 @@ class Event_model extends CI_Model
 	{
 		return $this->db->get_where('event', array('id'=>$id), 1)->row();
 	}
-	
+    
+    function is_person_owner_of_event($event_id, $person_id)
+    {
+        return $this->db
+            ->select('id')
+            ->from('event_owner')
+            ->where('event', $event_id)
+            ->where('person', $person_id)
+            ->get()->row();
+    }
+    
 	function get_event_divisions($id)
 	{
 		return $this->db
