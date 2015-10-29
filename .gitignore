@@ -19,3 +19,8 @@ application/logs/*
 application/config/postmark.php
 !application/logs/index.html
 !application/logs/.htaccess
+*.ide
+*.user
+bin
+obj
+*.cache

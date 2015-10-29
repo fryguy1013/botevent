@@ -674,6 +674,8 @@
     <Compile Include="application\config\constants.php">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="application\helpers\countries_helper.php" />
+    <Compile Include="application\config\database.php" />
     <Compile Include="application\config\database.template.php">
       <SubType>Code</SubType>
     </Compile>
@@ -692,6 +694,7 @@
     <Compile Include="application\config\mimes.php">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="application\config\postmark.php" />
     <Compile Include="application\config\postmark.template.php">
       <SubType>Code</SubType>
     </Compile>
@@ -771,6 +774,7 @@
     <Compile Include="application\views\email_login_code.php">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="application\views\view_change_password.php" />
     <Compile Include="application\views\view_entry.php">
       <SubType>Code</SubType>
     </Compile>
@@ -801,6 +805,7 @@
     <Compile Include="application\views\view_footer.php">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="application\views\view_forgot_password.php" />
     <Compile Include="application\views\view_header.php">
       <SubType>Code</SubType>
     </Compile>

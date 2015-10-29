@@ -156,7 +156,7 @@ class Person_model extends CI_Model
 		$personid = $this->session->userdata('userid');
 		if ($personid === false)
 		{
-			$this->session->set_userdata('onloginurl', $this->input->server('QUERY_STRING'));
+            $this->session->set_userdata('onloginurl', current_url());
 			redirect(site_url('login'));
 			die();
 		}

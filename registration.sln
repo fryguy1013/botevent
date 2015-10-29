@@ -1,7 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2012
+# Visual Studio 14
+VisualStudioVersion = 14.0.22823.1
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{A0786B88-2ADB-4C21-ABE8-AA2D79766269}") = "registration", "registration.phpproj", "{D3CC6741-D833-4BCE-8C1D-50C9D2B11ED6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "registration.tests", "registration.tests\registration.tests.csproj", "{8E603F8B-55BD-4BB8-AAA3-4C7B4F088274}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -13,6 +17,10 @@ Global
 		{D3CC6741-D833-4BCE-8C1D-50C9D2B11ED6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D3CC6741-D833-4BCE-8C1D-50C9D2B11ED6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D3CC6741-D833-4BCE-8C1D-50C9D2B11ED6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8E603F8B-55BD-4BB8-AAA3-4C7B4F088274}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8E603F8B-55BD-4BB8-AAA3-4C7B4F088274}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8E603F8B-55BD-4BB8-AAA3-4C7B4F088274}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8E603F8B-55BD-4BB8-AAA3-4C7B4F088274}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
