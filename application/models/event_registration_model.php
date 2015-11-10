@@ -129,7 +129,8 @@ class Event_registration_model extends CI_Model
 	{
 		// find out the maximums for each division
 		$allowed_db = $this->db
-			->select('event_divisions.id, event_divisions.maxentries, event_divisions.maxpersonperteam')
+			->select('event_divisions.id, event_divisions.maxentries, event_divisions.maxpersonperteam,
+                event_divisions.max_entries_per_team')
 			->from('event_divisions')
 			->where('event_divisions.event', $event_id)
 			->get()->result();
@@ -148,10 +149,14 @@ class Event_registration_model extends CI_Model
 
 		// create a lookup table for 			
 		$allowed = array();
+		$allowed_for_team = array();
+		$allowed_for_team_initial = array();
 		$maxperson_per_division = array();
 		foreach ($allowed_db as $a)
 		{
 			$allowed[$a->id] = $a->maxentries == 0 ? 999999 : $a->maxentries;
+            $allowed_for_team[$a->id] = $a->max_entries_per_team == 0 ? 999999 : $a->max_entries_per_team;
+            $allowed_for_team_initial[$a->id] = $a->max_entries_per_team == 0 ? 999999 : $a->max_entries_per_team;
 			$maxperson_per_division[$a->id] = $a->maxpersonperteam < 0 ? 999999 : $a->maxpersonperteam;
 		}
 		
@@ -159,7 +164,7 @@ class Event_registration_model extends CI_Model
 		foreach ($division_cts as $ct)
 			$allowed[$ct->event_division] -= $ct->ct;
 		
-		$ret = array('safe'=>true, 'fulldivisions'=>array(), 'requiredattending'=>array());
+		$ret = array('safe'=>true, 'fulldivisions'=>array(), 'fulldivisionsforteam'=>array(), 'requiredattending'=>array());
 		$maxpersonallowed = 0;
 		foreach ($registration_entries as $entry)
 		{
@@ -168,8 +173,17 @@ class Event_registration_model extends CI_Model
 				$ret['safe'] = FALSE;
 				$ret['fulldivisions'][] = $entry['division'];
 			}
+            
+            if ($allowed_for_team[$entry['division']] <= 0)
+			{
+				$ret['safe'] = FALSE;
+				$ret['fulldivisionsforteam'][] = array(
+                    'division'=>$entry['division'],
+                    'count'=>$allowed_for_team_initial[$entry['division']]);
+			}
 			
 			$allowed[$entry['division']]--;
+			$allowed_for_team[$entry['division']]--;
 			$maxpersonallowed += $maxperson_per_division[$entry['division']];
 		}
 		

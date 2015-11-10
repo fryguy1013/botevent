@@ -288,6 +288,10 @@ class Event extends CI_Controller
 					{
 						$errorstr .= $data['event_divisions'][$full_division]." is full.\r\n";
 					}
+					foreach ($safe_to_register['fulldivisionsforteam'] as $full_division)
+					{
+						$errorstr .= "Entries in ".$data['event_divisions'][$full_division['division']]." is limited to ".$full_division['count']." per team.\r\n";
+					}
 					foreach ($safe_to_register['requiredattending'] as $driver)
 					{
 						$errorstr .= $data['team_members_by_id'][$driver]." must attend in order to be a driver.\r\n";

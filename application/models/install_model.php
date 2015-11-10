@@ -301,6 +301,23 @@ class Install_model extends CI_Model
 		
 		$this->dbforge->drop_table('event_owner', 'dest_url');
 	}
+        
+    function commit_9()
+    {
+        $this->db->update('version', array('version' => 9));
+        
+		$this->dbforge->add_column('event_divisions', array('max_entries_per_team' => array('type' => 'int', 'default' => '0')));
+    }
+	
+	function rollback_9()
+	{
+		if ($this->config->item('development_environment') !== TRUE)
+			return;
+        
+		$this->db->update('version', array('version' => 8));
+		
+		$this->dbforge->drop_column('event_divisions', 'max_entries_per_team');
+	}
     
 	function reset()
 	{

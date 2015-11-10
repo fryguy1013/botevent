@@ -20,7 +20,6 @@ namespace registration.tests
     public class LoginTests : BaseTest
     {
         protected const string BadgePhoto = @"photo.jpg";
-        protected BoteventDatabase _db;
 
         public LoginTests()
         {
@@ -31,8 +30,6 @@ namespace registration.tests
         {
             //I.Open(BaseUrl + "/install/reset");
             I.Open(BaseUrl + "/login/logout");
-
-            _db = new BoteventDatabase();
 
             _db.Context.Sql("delete from person").Execute();
             _db.AddPerson(

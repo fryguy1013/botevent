@@ -5,10 +5,13 @@ namespace registration.tests
 {
     public class BaseTest : FluentTest
     {
+        protected BoteventDatabase _db;
         protected const string BaseUrl = "http://localhost/registration";
 
         public BaseTest()
         {
+            _db = new BoteventDatabase();
+
             SeleniumWebDriver.Bootstrap(
                 SeleniumWebDriver.Browser.Firefox
                 );

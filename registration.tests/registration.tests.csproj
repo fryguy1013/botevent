@@ -81,6 +81,7 @@
     <Compile Include="BoteventDatabase.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="LoginTests.cs" />
+    <Compile Include="RegisterTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
