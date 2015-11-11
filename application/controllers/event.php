@@ -62,7 +62,12 @@ class Event extends CI_Controller
 		$data['event_entries'] = $this->Event_model->get_event_entries($division);
 
 		$this->load->view('view_header');
-		$this->load->view('view_event_entries', $data);
+		if (count($data['event']) == 0)
+			$this->load->view('view_error', array('error' => 'That event does not exist'));
+        else if (count($data['event_division']) == 0)
+			$this->load->view('view_error', array('error' => 'That division does not exist for this event'));
+		else
+		    $this->load->view('view_event_entries', $data);
 		$this->load->view('view_footer');
 	}
 	

@@ -151,7 +151,7 @@ class Event_model extends CI_Model
 	function get_division_info($id)
 	{
 		return $this->db
-			->select('divisions.name')
+			->select('divisions.name, event_divisions.description')
 			->from('divisions')
 			->join('event_divisions', 'event_divisions.division = divisions.id')
 			->where('event_divisions.id', $id)

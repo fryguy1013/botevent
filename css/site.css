@@ -265,6 +265,12 @@ img
 
 /* view event entries */
 
+.event_entries
+{
+  display: flex;
+  flex-wrap: wrap;
+}
+
 .event_entry
 {
 	width: 150px;

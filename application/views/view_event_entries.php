@@ -3,6 +3,10 @@
 <div class="event_details">
 
 	<h2>Entries in the <?=htmlentities($event_division->name)?> division</h2>
+    
+    <? if (!empty($event_division->description)): ?>
+    <div class="event_description"><?=htmlentities($event_division->description)?></div>
+    <? endif; ?>
 
 	<div class="event_entries">
 	<? foreach ($event_entries as $entry): ?> 
