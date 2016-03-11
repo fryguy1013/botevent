@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using FluentAutomation;
 
 using NUnit.Framework;
+using NUnit.Framework.Interfaces;
 
 namespace registration.tests
 {
@@ -16,6 +17,7 @@ namespace registration.tests
         private int _eventId;
         private int _personId;
         private List<int> _entries = new List<int>();
+        private int _teamId;
 
         [SetUp]
         public void Setup()
@@ -29,11 +31,11 @@ namespace registration.tests
                 "sample_badge_photo.jpg",
                 "password1");
 
-            var teamId = _db.AddTeam("FakeFakerson");
-            _db.AddTeamMember(teamId, _personId);
-            _entries.Add(_db.AddEntry(teamId, "robot 1"));
-            _entries.Add(_db.AddEntry(teamId, "robot 2"));
-            _entries.Add(_db.AddEntry(teamId, "robot 3"));
+            _teamId = _db.AddTeam("FakeFakerson");
+            _db.AddTeamMember(_teamId, _personId);
+            _entries.Add(_db.AddEntry(_teamId, "robot 1"));
+            _entries.Add(_db.AddEntry(_teamId, "robot 2"));
+            _entries.Add(_db.AddEntry(_teamId, "robot 3"));
 
             _eventId = _db.AddEvent("Some Event");
 
@@ -100,9 +102,17 @@ namespace registration.tests
             var person2Id = _db.AddPerson("test name");
             _db.AddTeamMember(team2Id, _personId);
             var entry1 = _db.AddEntry(team2Id, "robot 1");
-            _db.CreateRegistration(_eventId, team2Id, person2Id, new[] { person2Id }, new[]
+            _db.CreateRegistration(_eventId, team2Id, person2Id, new[]
             {
-                new RegistrationEntry { Division = divisionId, DriverId = person2Id, EntryId = entry1 }
+                person2Id
+            }, new[]
+            {
+                new RegistrationEntry
+                {
+                    Division = divisionId,
+                    DriverId = person2Id,
+                    EntryId = entry1
+                }
             });
 
             I.Open(BaseUrl + "/event/register/" + _eventId);
@@ -132,6 +142,51 @@ namespace registration.tests
             I.Assert
                 .Url(BaseUrl + "/event/register/" + _eventId)
                 .Text(t => t.Contains("Entries in /one-per-team/ is limited to 1 per team")).In("div.error");
+        }
+
+        [Test]
+        public void WhenViewingRegistration_ExpectCanChangeRegistration()
+        {
+            var divisionId = _db.AddDivisionToEvent(_eventId, "test");
+            var registrationId = _db.CreateRegistration(_eventId, _teamId, _personId, new[]
+            {
+                _personId
+            }, new[]
+            {
+                new RegistrationEntry
+                {
+                    Division = divisionId,
+                    DriverId = _personId,
+                    EntryId = _entries[0]
+                }
+            });
+
+            I.Open(BaseUrl + "/event_registration/view/" + registrationId)
+                .Assert
+                .Attribute("href", $"{BaseUrl}/event/register/{_eventId}/update").On("div.event_registerbutton > a");
+        }
+
+        [Test]
+        public void WhenRegistrationClosed_ExpectCantChangeRegistration()
+        {
+            _eventId = _db.AddEvent("Some Event", registrationEnds: DateTime.Now.AddDays(-1));
+            var divisionId = _db.AddDivisionToEvent(_eventId, "registration-ended");
+            var registrationId = _db.CreateRegistration(_eventId, _teamId, _personId, new[]
+            {
+                _personId
+            }, new[]
+            {
+                new RegistrationEntry
+                {
+                    Division = divisionId,
+                    DriverId = _personId,
+                    EntryId = _entries[0]
+                }
+            });
+
+            I.Open(BaseUrl + "/event_registration/view/" + registrationId)
+                .Assert
+                .Not.Exists("div.event_registerbutton");
         }
     }
 }

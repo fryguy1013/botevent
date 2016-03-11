@@ -118,7 +118,7 @@ namespace registration.tests
                 .ExecuteReturnLastId<int>();
         }
 
-        public void CreateRegistration(int eventId, int teamId, int captainId, int[] people, RegistrationEntry[] entries)
+        public int CreateRegistration(int eventId, int teamId, int captainId, int[] people, RegistrationEntry[] entries)
         {
             var registrationId = Context.Insert("event_registrations")
                 .Column("event", eventId)
@@ -145,6 +145,8 @@ namespace registration.tests
                 .Column("event_division", entry.Division)
                 .ExecuteReturnLastId<int>();
             }
+
+            return registrationId;
         }
     }
 

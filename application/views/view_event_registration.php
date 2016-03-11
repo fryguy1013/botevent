@@ -49,9 +49,12 @@
 		<? endif; ?>
 	</div>
 
+    <? // only show change register button if registration is open ?>
+    <? if (strtotime($event->registrationends) > time()): ?>
 	<div class="event_registerbutton">
 		<a href="<?=site_url(array('event', 'register', $event->id, 'update'))?>">Change Registration</a>
 	</div>
+    <? endif; ?>
 	<div class="event_withdrawbutton">
 		<a href="<?=site_url(array('event_registration', 'withdraw', $registration->id))?>">Withdraw</a>
 	</div>
