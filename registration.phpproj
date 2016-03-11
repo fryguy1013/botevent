@@ -668,6 +668,7 @@
     <Compile Include="application\config\autoload.php">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="application\config\config.php" />
     <Compile Include="application\config\config.template.php">
       <SubType>Code</SubType>
     </Compile>
