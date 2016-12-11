@@ -24,3 +24,4 @@ application/config/postmark.php
 bin
 obj
 *.cache
+.vs/
