@@ -29,6 +29,15 @@ namespace registration.tests
         {
             return I.Open(BaseUrl + "/login/logout");
         }
+
+        protected IActionSyntaxProvider FastRelogin(string email, string password)
+        {
+            return I.Open(BaseUrl + "/login/logout")
+                .Enter(email).WithoutEvents().In("input[name=email_addr]")
+                .Enter(password).WithoutEvents().In("input[name=password]")
+                .Click("input[type=submit]");
+
+        }
     }
 
     public static class FluentExtensions

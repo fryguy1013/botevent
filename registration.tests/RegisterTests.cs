@@ -113,7 +113,7 @@ namespace registration.tests
                     DriverId = person2Id,
                     EntryId = entry1
                 }
-            });
+            }, 0);
 
             I.Open(BaseUrl + "/event/register/" + _eventId);
             I.Click("input[name='person[]'][value=" + _personId + "]");
@@ -159,7 +159,7 @@ namespace registration.tests
                     DriverId = _personId,
                     EntryId = _entries[0]
                 }
-            });
+            }, 0);
 
             I.Open(BaseUrl + "/event_registration/view/" + registrationId)
                 .Assert
@@ -182,11 +182,34 @@ namespace registration.tests
                     DriverId = _personId,
                     EntryId = _entries[0]
                 }
-            });
+            }, 0);
 
             I.Open(BaseUrl + "/event_registration/view/" + registrationId)
                 .Assert
                 .Not.Exists("div.event_registerbutton");
         }
+
+
+        //[Test]
+        //public void WhenViewingRegistrationStatus_ExpectHasLinkToPublic()
+        //{
+        //    var divisionId = _db.AddDivisionToEvent(_eventId, "/one-per-team/", maxEntriesPerTeam: 1);
+        //    var registrationId = _db.CreateRegistration(_eventId, _teamId, _personId, new[]
+        //    {
+        //        _personId
+        //    }, new[]
+        //    {
+        //        new RegistrationEntry
+        //        {
+        //            Division = divisionId,
+        //            DriverId = _personId,
+        //            EntryId = _entries[0]
+        //        }
+        //    });
+
+        //    I.Open(BaseUrl + "/event_registration/view/" + registrationId)
+        //        .Assert
+        //        .Exists($"a[href='{BaseUrl}/event_regisration/view_public/{registrationId}'");
+        //}
     }
 }

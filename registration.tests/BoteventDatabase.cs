@@ -21,6 +21,7 @@ namespace registration.tests
             Context.Sql("delete from event_divisions").Execute();
             Context.Sql("delete from event_entries").Execute();
             Context.Sql("delete from event_people").Execute();
+            Context.Sql("delete from event_payments").Execute();
             Context.Sql("delete from event_registrations").Execute();
             Context.Sql("delete from person").Execute();
             Context.Sql("delete from team").Execute();
@@ -84,9 +85,9 @@ namespace registration.tests
         public int AddEvent(string name, DateTime? startDate = null,
             DateTime? endDate = null, DateTime? registrationEnds = null,
             string location = "", string uri = "", string description = "", string image = "",
-            string smallImage = "", decimal feePerPerson = 0)
+            string smallImage = "", decimal feePerPerson = 0, int? ownerId = null)
         {
-            return Context.Insert("event")
+            var eventId = Context.Insert("event")
                 .Column("name", name)
                 .Column("image", image)
                 .Column("smallimage", smallImage)
@@ -98,6 +99,16 @@ namespace registration.tests
                 .Column("location", location)
                 .Column("feeperperson", feePerPerson)
                 .ExecuteReturnLastId<int>();
+
+            if (ownerId != null)
+            {
+                Context.Insert("event_owner")
+                    .Column("event", eventId)
+                    .Column("person", (int)ownerId)
+                    .Execute();
+            }
+
+            return eventId;
         }
 
         public int AddDivisionToEvent(int eventId, string name, string description = "",
@@ -118,14 +129,14 @@ namespace registration.tests
                 .ExecuteReturnLastId<int>();
         }
 
-        public int CreateRegistration(int eventId, int teamId, int captainId, int[] people, RegistrationEntry[] entries)
+        public int CreateRegistration(int eventId, int teamId, int captainId, int[] people, RegistrationEntry[] entries, int due = 0)
         {
             var registrationId = Context.Insert("event_registrations")
                 .Column("event", eventId)
                 .Column("team", teamId)
                 .Column("status", "new")
                 .Column("captain", captainId)
-                .Column("due", 0)
+                .Column("due", due)
                 .ExecuteReturnLastId<int>();
 
             foreach (var person in people)
@@ -147,6 +158,29 @@ namespace registration.tests
             }
 
             return registrationId;
+        }
+
+        public void UpdateRegistrationPaid(int eventId, int teamId, decimal paid, string notes)
+        {
+            Context.Delete("event_payments")
+                .Where("event", eventId)
+                .Where("team", teamId)
+                .Execute();
+
+            Context.Insert("event_payments")
+                .Column("event", eventId)
+                .Column("team", teamId)
+                .Column("paid", paid)
+                .Column("notes", notes)
+                .Execute();
+        }
+
+        public void UpdateEntry(int entryId, string status)
+        {
+            Context.Update("event_registrations")
+                .Where("id", entryId)
+                .Column("status", status)
+                .Execute();
         }
     }
 

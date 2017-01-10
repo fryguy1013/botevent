@@ -37,9 +37,25 @@ namespace registration.tests
         [Test]
         public void WhenEventDoesntExist_ExpectShowsUsefulErrorMessage()
         {
+            I.Open(BaseUrl + "/event/view/12345");
+            I.Assert
+                .Text(t => t.Contains("That event does not exist")).In("div.error");
+        }
+
+        [Test]
+        public void WhenEventDoesntExist_ExpectEntriesShowsUsefulErrorMessage()
+        {
             I.Open(BaseUrl + "/event/entries/12345/232321313");
             I.Assert
                 .Text(t => t.Contains("That event does not exist")).In("div.error");
+        }
+
+        [Test]
+        public void WhenDivisionDoesntExist_ExpectEntriesShowsUsefulErrorMessage()
+        {
+            I.Open(BaseUrl + $"/event/entries/{_eventId}/232321313");
+            I.Assert
+                .Text(t => t.Contains("That division does not exist for this event")).In("div.error");
         }
 
         [Test]

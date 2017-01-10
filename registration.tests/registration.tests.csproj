@@ -79,6 +79,7 @@
   <ItemGroup>
     <Compile Include="BaseTest.cs" />
     <Compile Include="BoteventDatabase.cs" />
+    <Compile Include="EventManageTests.cs" />
     <Compile Include="EventTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="LoginTests.cs" />
