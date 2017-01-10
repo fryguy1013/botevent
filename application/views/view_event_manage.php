@@ -79,6 +79,16 @@ $(document).ready(function() {
 			<?=form_close()?>
 		</div>
 
+        <? if (isset($event_messages[$reg->teamid])): ?>
+        <div class="event_registration_message">
+            <? foreach ($event_messages[$reg->teamid] as $message):?>
+                <div>
+                    <p class="event_registration_message_time"><?=$message->time?></p>
+                    <p><?=nl2br(htmlentities($message->message))?></p>
+                </div>
+            <? endforeach; ?>
+        </div>
+        <? endif; ?>
 
 		<?=form_open("event/updatepayment/".$reg->id, array('class'=>'update_payment_form'))?>
 		<div class="event_reg_payment">

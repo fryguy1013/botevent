@@ -23,6 +23,24 @@ class Event_registration_model extends CI_Model
 			->order_by('team.name')
 			->get()->result();
 	}
+
+    function get_event_registration_messages_by_team($eventid)
+    {
+        $rows = $this->db
+			->select('team, message, time')
+			->from('event_registration_messages')
+			->where('event', $eventid)
+			->order_by('time')
+			->get()->result();
+		$ret = array();
+		foreach ($rows as $row)
+		{
+			if (!isset($ret[$row->team]))
+				$ret[$row->team] = array();
+			$ret[$row->team][] = $row;
+		}
+		return $ret;
+    }
 	
 	function get_event_registration_by_team($eventid, $teamid)
 	{
@@ -349,6 +367,16 @@ class Event_registration_model extends CI_Model
 			->where('id', $registration_id)
 			->update('event_registrations', $data);
 	}
+
+    function add_message($event, $team, $email_message)
+    {
+        $this->db
+            ->set('event', $event)
+            ->set('team', $team)
+            ->set('message', $email_message)
+            ->set('time', 'now()', FALSE)
+            ->insert('event_registration_messages', $data);
+    }
 	
 	function update_payment($event_id, $team_id, $amount_paid, $notes)
 	{

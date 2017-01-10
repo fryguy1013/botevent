@@ -357,6 +357,7 @@ class Event extends CI_Controller
 		$data['event_registrations'] = $this->Event_registration_model->get_event_registrations($id);
 		$data['event_entries'] = $this->Event_model->get_event_entries_grouped($id);
 		$data['event_people'] = $this->Event_model->get_event_people_grouped($id);
+        $data['event_messages'] = $this->Event_registration_model->get_event_registration_messages_by_team($id);
 
 		$this->load->view('view_header');		
 		$this->load->view('view_event_manage', $data);
@@ -403,13 +404,17 @@ You can view the status of your entry, or make a payment here:
 		{
 			$email_message .=
 "
+
 The event organizer has left the following message:
+
 $message";
 		}
 		
 		$this->email->message($email_message);
 		$this->email->send();
-		
+
+        $this->Event_registration_model->add_message($registration->event, $registration->team, $email_message);
+
 		$this->output->set_output($status);
 	}
 	

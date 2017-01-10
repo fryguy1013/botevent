@@ -331,6 +331,22 @@ img
     margin-right: 1em;
 }
 
+.event_registration_message
+{
+	margin: 1em;
+	border: 1px solid #000;
+    padding: 1em;
+}
+.event_registration_message > div {
+    margin-right: 1em;
+}
+
+.event_registration_message_time
+{
+    margin: 0;
+    font-weight: bold;
+}
+
 .event_reg_minordetails
 {
 	padding: 1em;
