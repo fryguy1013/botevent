@@ -323,7 +323,12 @@ img
 .event_reg_payment
 {
 	margin: 1em;
-	
+	border: 1px solid #000;
+    padding: 1em;
+    display: flex;
+}
+.event_reg_payment > div {
+    margin-right: 1em;
 }
 
 .event_reg_minordetails

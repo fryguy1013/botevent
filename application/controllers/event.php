@@ -432,9 +432,10 @@ $message";
         }
         
 		$amount_paid = $this->input->post('amount_paid');
-        $this->Event_registration_model->update_payment($registration->event, $registration->team, $amount_paid);
+        $notes = $this->input->post('notes');
+        $this->Event_registration_model->update_payment($registration->event, $registration->team, $amount_paid, $notes);
 	
-		$this->output->set_output($amount_paid);
+		$this->output->set_output(json_encode(array('paid'=>$amount_paid, 'notes'=>$notes)));
 	}	
 	
 	function valid_email_or_blank($email)

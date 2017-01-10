@@ -14,7 +14,7 @@ class Event_registration_model extends CI_Model
 		return $this->db
 			->select('event_registrations.id, event_registrations.team, event_registrations.status,
 			          team.name as teamname, team.id as teamid, team.country as teamcountry, event_registrations.due,
-					  event_payments.paid')
+					  event_payments.paid, event_payments.notes')
 			->from('event_registrations')
 			->join('team', 'team.id = event_registrations.team')
 			->join('event_payments', 'event_payments.team = event_registrations.team and event_payments.event = event_registrations.event', 'left')
@@ -350,7 +350,7 @@ class Event_registration_model extends CI_Model
 			->update('event_registrations', $data);
 	}
 	
-	function update_payment($event_id, $team_id, $amount_paid)
+	function update_payment($event_id, $team_id, $amount_paid, $notes)
 	{
 		$this->db
 			->where('event', $event_id)
@@ -361,6 +361,7 @@ class Event_registration_model extends CI_Model
 			'event' => $event_id,
 			'team' => $team_id,
 			'paid' => $amount_paid,
+            'notes' => $notes
 		));
 	}
 }

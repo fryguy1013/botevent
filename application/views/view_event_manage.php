@@ -33,9 +33,10 @@ $(document).ready(function() {
 		$(this).next().show();		
 	});
 		
-	$('div.event_reg_payment > form').submit(function() {
+	$('form.update_payment_form').submit(function() {
 		$.post($(this).attr('action'), {
 			amount_paid: $(this).find('input[name=amount_paid]').val(),
+            notes: $(this).find('textarea[name=notes]').val()
 		}, function (data) { });
 		return false;
 	});
@@ -76,14 +77,20 @@ $(document).ready(function() {
 			<?=form_close()?>
 		</div>
 
+
+		<?=form_open("event/updatepayment/".$reg->id, array('class'=>'update_payment_form'))?>
 		<div class="event_reg_payment">
-			<?=form_open("event/updatepayment/".$reg->id)?>
-			<div>
-				Amount Paid: <?=form_input('amount_paid', $reg->paid, 'size=4')?>
-				<?=form_submit('submit', 'Change')?>
+            <div>
+				<label for="notes">Notes:</label><br>
+                <?=form_textarea(array('name'=>'notes', 'value'=>$reg->notes, 'rows'=>4, 'cols'=>35))?>
 			</div>
-			<?=form_close()?>
-		</div>	
+			<div>
+				<label for="amount_paid">Amount Paid:</label><br>
+                <?=form_input('amount_paid', $reg->paid, 'size=6')?><br><br>
+				<?=form_submit('submit', 'Save')?>
+            </div>
+        </div>
+		<?=form_close()?>
 	
 		<? foreach ($event_people[$reg->id] as $person): ?> 
 			<div class="event_person">

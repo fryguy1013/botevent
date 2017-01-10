@@ -318,6 +318,34 @@ class Install_model extends CI_Model
 		
 		$this->dbforge->drop_column('event_divisions', 'max_entries_per_team');
 	}
+        
+    function commit_10()
+    {
+        $this->db->update('version', array('version' => 10));
+        
+		$this->dbforge->add_column('event_payments', array('notes' => array('type' => 'varchar(255)', 'default' => '')));
+
+        $this->dbforge->add_field("id int(10) unsigned NOT NULL auto_increment");
+		$this->dbforge->add_field("event int(10) NOT NULL");
+		$this->dbforge->add_field("team int(10) NOT NULL");
+		$this->dbforge->add_field("message text NOT NULL");
+		$this->dbforge->add_field("time datetime NOT NULL");
+		$this->dbforge->add_key("id", TRUE);
+        $this->dbforge->add_key(array('team', 'event'));
+		$this->dbforge->create_table('event_registration_messages');
+    }
+	
+	function rollback_10()
+	{
+		if ($this->config->item('development_environment') !== TRUE)
+			return;
+        
+		$this->db->update('version', array('version' => 9));
+		
+		$this->dbforge->drop_column('event_payments', 'notes');
+
+        $this->dbforge->drop_table('event_registration_messages');
+	}
     
 	function reset()
 	{
