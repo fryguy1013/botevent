@@ -37,20 +37,27 @@ class Event extends CI_Controller
 		
 		$data = array();
 		$data['event'] = $event = $this->Event_model->get_event($id);
-		$data['registration_available'] = (strtotime($event->registrationends) > time());
-		$data['event_divisions'] = $this->Event_model->get_event_divisions($id);
-		$data['event_division_counts'] = $this->Event_model->get_event_divisions_counts($id);
+        if (count($data['event']) != 0)
+        {
+		    $data['registration_available'] = (strtotime($event->registrationends) > time());
+		    $data['event_divisions'] = $this->Event_model->get_event_divisions($id);
+		    $data['event_division_counts'] = $this->Event_model->get_event_divisions_counts($id);
+            $data['is_owner'] = count($this->Event_model->is_person_owner_of_event($id, $this->session->userdata('userid')));
 
-		$personid = $this->session->userdata('userid');
-		if ($personid !== false)
-		{
-			$teamid = $this->Team_model->get_teams_for_person($personid);
-			if (count($teamid))
-				$data['registration_status'] = $this->Event_registration_model->get_event_registration_by_team($id, $teamid[0]->id);
-		}
+		    $personid = $this->session->userdata('userid');
+		    if ($personid !== false)
+		    {
+			    $teamid = $this->Team_model->get_teams_for_person($personid);
+			    if (count($teamid))
+				    $data['registration_status'] = $this->Event_registration_model->get_event_registration_by_team($id, $teamid[0]->id);
+		    }
+        }
 
-		$this->load->view('view_header');		
-		$this->load->view('view_event', $data);
+		$this->load->view('view_header');
+        if (count($data['event']) == 0)
+			$this->load->view('view_error', array('error' => 'That event does not exist'));
+		else
+		    $this->load->view('view_event', $data);
 		$this->load->view('view_footer');		
 	}
 	
