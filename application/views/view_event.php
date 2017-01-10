@@ -16,6 +16,13 @@
 		<a href="<?=site_url(array('login'))?>">Login to see registration status</a>
 	</div>
 	<? endif; ?>
+
+	<? if ($is_owner): ?>
+	<div class="event_registerbutton">
+		<a href="<?=site_url(array('event', 'manage', $event->id))?>">Manage</a>
+	</div>
+	<? endif; ?>
+
 	
 	<table class="event_divisions">
 	<? foreach ($event_divisions as $division): ?>
