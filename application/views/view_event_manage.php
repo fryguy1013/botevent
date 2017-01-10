@@ -50,7 +50,9 @@ $(document).ready(function() {
 
 <div class="event_registration_team">
 	<div class="event_reg_minordetails">
-		<div style="float: right">Status: <?=htmlentities($reg->status)?></div>
+		<div style="float: right">
+            Status: <?=htmlentities($reg->status)?> | <? if ($reg->paid <= $reg->due): ?>Due: $<?=$reg->due - $reg->paid?><? else:?><b>Overpaid: $<?=$reg->paid - $reg->due?></b><? endif;?>
+        </div>
 		<?=htmlentities($reg->teamname)?> (<?=htmlentities($reg->teamcountry)?>)
 	</div>
 
