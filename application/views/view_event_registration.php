@@ -33,6 +33,7 @@
 		<? endif; ?>
 	</div>
 
+    <? if ($is_member): ?>
     <? // only show change register button if registration is open ?>
     <? if (strtotime($event->registrationends) > time()): ?>
 	<div class="event_registerbutton">
@@ -42,6 +43,7 @@
 	<div class="event_withdrawbutton">
 		<a href="<?=site_url(array('event_registration', 'withdraw', $registration->id))?>">Withdraw</a>
 	</div>
+    <? endif; ?>
 
 
 	<? foreach ($people as $person): ?> 

@@ -18,7 +18,6 @@ class Event_registration extends CI_Controller
 		$data = array();
 		
 		$data['registration'] = $this->Event_registration_model->get_event_registration($registration_id);
-		
 
 		$this->load->view('view_header');
 		if (count($data['registration']) > 0)
@@ -26,6 +25,13 @@ class Event_registration extends CI_Controller
 			$data['event'] = $this->Event_model->get_event($data['registration']->event);
 			$data['entries'] = $this->Event_registration_model->get_registration_entries($registration_id);
 			$data['people'] = $this->Event_registration_model->get_registration_people($registration_id);
+
+		    $personid = $this->session->userdata('userid');
+            $data['is_member'] = FALSE;
+		    foreach ($data['people'] as $member)
+			    if ($member->id == $personid)
+				    $data['is_member'] = TRUE;
+
 			$this->load->view('view_event_registration', $data);		
 		}
 		else
