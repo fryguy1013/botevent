@@ -36,6 +36,16 @@ class Event_model extends CI_Model
 		return $this->db->get_where('event', array('id'=>$id), 1)->row();
 	}
     
+    function get_owners_of_event($event_id)
+    {
+        return $this->db
+            ->select('person.fullname, person.email')
+            ->from('event_owner')
+            ->join('person', 'person.id = event_owner.person')
+            ->where('event', $event_id)
+            ->get()->result();
+    }
+
     function is_person_owner_of_event($event_id, $person_id)
     {
         return $this->db

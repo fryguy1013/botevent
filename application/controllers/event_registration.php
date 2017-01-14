@@ -59,8 +59,11 @@ class Event_registration extends CI_Controller
 			$this->load->library('email');
 			$this->email->from('registration@robogames.net', 'RoboGames Registration');
 			$this->email->reply_to($captain_email);
-			$this->email->to("David Calkins <dcalkins@robotics-society.org>");
-			//$this->email->to("Kevin Hjelden <fryguy@burntpopcorn.net>");		
+            $owners = $this->Event_model->get_owners_of_event($registration->event);
+            foreach ($owners as $owner)
+            {
+				$this->email->to($owner->fullname." <".$owner->email.">");
+            }
 			$this->email->subject($team->name.' has withdrawn from '.$event->name);
 			$this->email->message(site_url(array('event_registration', 'view', $registration_id)));
 			$this->email->send();
@@ -72,7 +75,5 @@ class Event_registration extends CI_Controller
 		$this->load->view('view_header');
 		$this->load->view('view_error', array('error' => 'You are not allowed to withdrawn from that event'));
 		$this->load->view('view_footer');
-
 	}
-		
 }
