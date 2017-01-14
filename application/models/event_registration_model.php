@@ -161,6 +161,7 @@ class Event_registration_model extends CI_Model
 			->join('event_registrations', 'event_entries.event_registration = event_registrations.id')
 			->where('event_divisions.event', $event_id)
 			->where('event_registrations.status !=', 'withdrawn')
+			->where('event_registrations.status !=', 'rejected')
 			->where('event_registrations.team !=', $team_id)
 			->group_by('event_entries.event_division')
 			->get()->result();
