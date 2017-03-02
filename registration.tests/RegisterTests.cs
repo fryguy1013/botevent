@@ -16,6 +16,7 @@ namespace registration.tests
     {
         private int _eventId;
         private int _personId;
+        private int _person2Id;
         private List<int> _entries = new List<int>();
         private int _teamId;
 
@@ -31,8 +32,10 @@ namespace registration.tests
                 "sample_badge_photo.jpg",
                 "password1");
 
+            _person2Id = _db.AddPerson("test name #2");
             _teamId = _db.AddTeam("FakeFakerson");
             _db.AddTeamMember(_teamId, _personId);
+            _db.AddTeamMember(_teamId, _person2Id);
             _entries.Add(_db.AddEntry(_teamId, "robot 1"));
             _entries.Add(_db.AddEntry(_teamId, "robot 2"));
             _entries.Add(_db.AddEntry(_teamId, "robot 3"));
@@ -58,6 +61,39 @@ namespace registration.tests
             I.Assert
                 .Url(u => u.ToString().StartsWith(BaseUrl + "/event_registration/view/"))
                 .Text(t => t.Contains("Your registration is pending")).In("div.event_registration_status_description");
+        }
+
+        [Test]
+        public void WhenRegistering_ExpectCanSeeChangeRegistrationButton()
+        {
+            var divisionId = _db.AddDivisionToEvent(_eventId, "/one-per-team/");
+
+            I.Open(BaseUrl + "/event/register/" + _eventId);
+            I.Click("input[name='person[]'][value=" + _personId + "]");
+            I.Click("input[name='entry[]'][value=" + _entries[0] + "]");
+            I.Select(Option.Value, divisionId.ToString()).From("select[name='entry_division[" + _entries[0] + "]']");
+            I.Click("input[name='entry[]'][value=" + _entries[1] + "]");
+            I.Select(Option.Value, divisionId.ToString()).From("select[name='entry_division[" + _entries[1] + "]']");
+            I.Click("input[type=submit][value=Register]");
+            I.Assert
+                .Url(u => u.ToString().StartsWith(BaseUrl + "/event_registration/view/"))
+                .Text(t => t.Contains("Change Registration")).In("div.event_registerbutton a");
+        }
+
+        [Test]
+        public void WhenRegisteringButNotGoing_ExpectCanSeeChangeRegistrationButton()
+        {
+            var divisionId = _db.AddDivisionToEvent(_eventId, "/one-per-team/");
+
+            I.Open(BaseUrl + "/event/register/" + _eventId);
+            I.Click("input[name='person[]'][value=" + _person2Id + "]");
+            I.Click("input[name='entry[]'][value=" + _entries[0] + "]");
+            I.Select(Option.Value, divisionId.ToString()).From("select[name='entry_division[" + _entries[0] + "]']");
+            I.Select(Option.Value, _person2Id.ToString()).From("select[name='entry_driver[" + _entries[0] + "]']");
+            I.Click("input[type=submit][value=Register]");
+            I.Assert
+                .Url(u => u.ToString().StartsWith(BaseUrl + "/event_registration/view/"))
+                .Text(t => t.Contains("Change Registration")).In("div.event_registerbutton a");
         }
 
         [Test]

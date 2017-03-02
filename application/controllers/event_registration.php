@@ -26,11 +26,9 @@ class Event_registration extends CI_Controller
 			$data['entries'] = $this->Event_registration_model->get_registration_entries($registration_id);
 			$data['people'] = $this->Event_registration_model->get_registration_people($registration_id);
 
+            $all_team_members = $this->Team_model->get_team_members_as_id_desc($data['registration']->teamid);
 		    $personid = $this->session->userdata('userid');
-            $data['is_member'] = FALSE;
-		    foreach ($data['people'] as $member)
-			    if ($member->id == $personid)
-				    $data['is_member'] = TRUE;
+            $data['is_member'] = isset($all_team_members[$personid]);
 
 			$this->load->view('view_event_registration', $data);		
 		}
@@ -48,12 +46,9 @@ class Event_registration extends CI_Controller
 		$personid = $this->session->userdata('userid');
 		
 		// sanity check that the logged in person is on the team
-		$good = FALSE;
-		foreach ($team_members as $member)
-			if ($member->id == $personid)
-				$good = TRUE;
+        $all_team_members = $this->Team_model->get_team_members_as_id_desc($registration->teamid);
 				
-		if ($good)
+		if (isset($all_team_members[$personid]))
 		{
 			$this->Event_registration_model->update_reg_status($registration_id, 'withdrawn', 0);
 
