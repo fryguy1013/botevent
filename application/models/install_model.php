@@ -346,6 +346,23 @@ class Install_model extends CI_Model
 
         $this->dbforge->drop_table('event_registration_messages');
 	}
+        
+    function commit_11()
+    {
+        $this->db->update('version', array('version' => 11));
+        
+		$this->dbforge->modify_column('event_divisions', array('maxentries' => array('type' => 'int', 'default' => '0')));
+    }
+	
+	function rollback_11()
+	{
+		if ($this->config->item('development_environment') !== TRUE)
+			return;
+        
+		$this->db->update('version', array('version' => 10));
+		
+		$this->dbforge->modify_column('event_divisions', array('maxentries' => array('type' => 'int(10) unsigned NOT NULL')));
+	}
     
 	function reset()
 	{

@@ -164,6 +164,50 @@ namespace registration.tests
         }
 
         [Test]
+        public void WhenRegisteringInFullClass_ExpectRejected()
+        {
+            var divisionId = _db.AddDivisionToEvent(_eventId, "/full/", maxEntries: -1);
+
+            I.Open(BaseUrl + "/event/register/" + _eventId);
+            I.Click("input[name='person[]'][value=" + _personId + "]");
+            I.Click("input[name='entry[]'][value=" + _entries[0] + "]");
+            I.Select(Option.Value, divisionId.ToString()).From("select[name='entry_division[" + _entries[0] + "]']");
+            I.Click("input[type=submit][value=Register]");
+            I.Assert
+                .Url(BaseUrl + "/event/register/" + _eventId)
+                .Text(t => t.Contains("/full/ is full")).In("div.error");
+        }
+
+        [Test]
+        public void WhenAddingPersonWithRobotsInFullClass_ExpectAccepted()
+        {
+            var divisionId = _db.AddDivisionToEvent(_eventId, "/full/", maxEntries: -1);
+
+            _db.CreateRegistration(_eventId, _teamId, _personId, new int[]
+                {
+                },
+                new[]
+                {
+                    new RegistrationEntry
+                    {
+                        Division = divisionId,
+                        DriverId = _personId,
+                        EntryId = _entries[0]
+                    }
+                }, 0);
+
+
+            I.Open(BaseUrl + "/event/register/" + _eventId + "/update");
+            I.Click("input[name='person[]'][value=" + _personId + "]");
+            I.Click("input[name='entry[]'][value=" + _entries[0] + "]");
+            I.Select(Option.Value, divisionId.ToString()).From("select[name='entry_division[" + _entries[0] + "]']");
+            I.Click("input[type=submit][value=Register]");
+            I.Assert
+                .Url(u => u.ToString().StartsWith(BaseUrl + "/event_registration/view/"))
+                .Text(t => t.Contains("Your registration is pending")).In("div.event_registration_status_description");
+        }
+
+        [Test]
         public void WhenRegisteringWithTooManyBotsOnTeamInClass_ExpectRejected()
         {
             var divisionId = _db.AddDivisionToEvent(_eventId, "/one-per-team/", maxEntriesPerTeam: 1);

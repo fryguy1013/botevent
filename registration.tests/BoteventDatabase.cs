@@ -35,6 +35,9 @@ namespace registration.tests
                 password = CryptSharp.Crypter.Blowfish.Crypt(password);
             }
 
+            if (dob == "")
+                dob = "1/1/1970";
+
             return Context.Insert("person")
                 .Column("fullname", fullName)
                 .Column("email", email)

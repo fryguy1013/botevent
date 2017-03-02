@@ -8,7 +8,6 @@ class Event_registration_model extends CI_Model
 		
 	}
 	
-
 	function get_event_registrations($event_id)
 	{
 		return $this->db
@@ -166,14 +165,30 @@ class Event_registration_model extends CI_Model
 			->group_by('event_entries.event_division')
 			->get()->result();
 
+        // get the number of entries *this team* already registered
+		$previous_division_cts = $this->db
+			->select('event_entries.event_division, COUNT(*) as ct', FALSE)
+			->from('event_entries')
+			->join('event_divisions', 'event_divisions.id = event_division')
+			->join('event_registrations', 'event_entries.event_registration = event_registrations.id')
+			->where('event_divisions.event', $event_id)
+			->where('event_registrations.status !=', 'withdrawn')
+			->where('event_registrations.status !=', 'rejected')
+			->where('event_registrations.team', $team_id)
+			->group_by('event_entries.event_division')
+			->get()->result();
+
+
 		// create a lookup table for 			
 		$allowed = array();
+        $previous = array();
 		$allowed_for_team = array();
 		$allowed_for_team_initial = array();
 		$maxperson_per_division = array();
 		foreach ($allowed_db as $a)
 		{
 			$allowed[$a->id] = $a->maxentries == 0 ? 999999 : $a->maxentries;
+            $previous[$a->id] = 0;
             $allowed_for_team[$a->id] = $a->max_entries_per_team == 0 ? 999999 : $a->max_entries_per_team;
             $allowed_for_team_initial[$a->id] = $a->max_entries_per_team == 0 ? 999999 : $a->max_entries_per_team;
 			$maxperson_per_division[$a->id] = $a->maxpersonperteam < 0 ? 999999 : $a->maxpersonperteam;
@@ -182,12 +197,19 @@ class Event_registration_model extends CI_Model
 		// subtract off the number of people already registered
 		foreach ($division_cts as $ct)
 			$allowed[$ct->event_division] -= $ct->ct;
+
+        foreach ($previous_division_cts as $ct)
+            $previous[$ct->event_division] += $ct->ct;
 		
 		$ret = array('safe'=>true, 'fulldivisions'=>array(), 'fulldivisionsforteam'=>array(), 'requiredattending'=>array());
 		$maxpersonallowed = 0;
 		foreach ($registration_entries as $entry)
 		{
-			if ($allowed[$entry['division']] <= 0)
+            if ($previous[$entry['division']] > 0)
+            {
+                $previous[$entry['division']]--;
+            }
+			else if ($allowed[$entry['division']] <= 0)
 			{
 				$ret['safe'] = FALSE;
 				$ret['fulldivisions'][] = $entry['division'];
@@ -234,13 +256,13 @@ class Event_registration_model extends CI_Model
 
 	function create_registration($event_id, $team_id, $captain, $registration_people, $registration_entries)
 	{
-		// we must remove the other registrations, first
-		$this->unregister_team_for_event($event_id, $team_id);
-
 		// make sure that we can safely register
 		$safety = $this->get_safety_of_registration($event_id, $team_id, $registration_people, $registration_entries);
 		if (!$safety['safe'])
 			return FALSE;
+
+		// we must remove the other registrations, first
+		$this->unregister_team_for_event($event_id, $team_id);
 		
 		$registration_id = $this->add_new_registration($event_id, $team_id, $captain);
 		
